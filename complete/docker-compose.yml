@@ -29,12 +29,11 @@ services:
     environment:
      - ZOO_MY_ID=3
   api:
-    image: nuvla/api:latest
+    image: nuvla/api:0.0.1-SNAPSHOT
     restart: unless-stopped
     ports:
-     - "5000:5000"
+     - "8200"
     environment:
-     - NUVLA_SERVER_PORT=5000
      - ZK_ENDPOINTS="zk:2181"
      - ES_HOST=es
      - ES_PORT=9300
@@ -43,13 +42,20 @@ services:
      - "traefik.backend=api"
      - "traefik.frontend.rule=PathPrefix:/api"
   ui:
-    image: nuvla/ui:latest
+    image: nuvla/ui:0.0.1-SNAPSHOT
     restart: unless-stopped
     ports:
-     - "9090:80"
+     - "80"
     labels:
      - "traefik.enable=true"
      - "traefik.backend=ui"
-     - "traefik.foo.frontend.rule=PathPrefixStrip:/ui"
-     - "traefik.bar.frontend.rule=Path:/"
+     - "traefik.root.frontend.rule=Path:/"
+#     - "traefik.index.frontend.rule=Path:/index.html"
+     - "traefik.ui.frontend.rule=PathPrefixStrip:/ui"
+     - "traefik.css.frontend.rule=PathPrefix:/css"
+     - "traefik.js.frontend.rule=PathPrefix:/js"
+     - "traefik.images.frontend.rule=PathPrefix:/images"
+#  job:
+#    image: nuvla/job:0.0.1-SNAPSHOT
+#    restart: unless-stopped
 
