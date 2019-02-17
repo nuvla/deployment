@@ -32,7 +32,7 @@ services:
     image: nuvla/api:0.0.1-SNAPSHOT
     restart: unless-stopped
     ports:
-     - "8200"
+     - "8200:8200"
     environment:
      - ZK_ENDPOINTS="zk:2181"
      - ES_HOST=es
@@ -40,6 +40,8 @@ services:
     labels:
      - "traefik.enable=true"
      - "traefik.backend=api"
+     - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
+     - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
      - "traefik.frontend.rule=PathPrefix:/api"
      - "traefik.frontend.priority=20"
   ui:
@@ -50,6 +52,8 @@ services:
     labels:
      - "traefik.enable=true"
      - "traefik.backend=ui"
+     - "traefik.backend.healthcheck.path=/ui/index.html"
+     - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
      - "traefik.frontend.rule=PathPrefix:/"
      - "traefik.frontend.priority=10"
 #  job:

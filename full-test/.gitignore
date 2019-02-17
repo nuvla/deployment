@@ -1,0 +1,9 @@
+*~
+target
+*.iml
+.idea/
+*.logs
+*.log
+*.nrepl-port
+.nrepl-history
+.DS_Store
