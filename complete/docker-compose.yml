@@ -41,6 +41,7 @@ services:
      - "traefik.enable=true"
      - "traefik.backend=api"
      - "traefik.frontend.rule=PathPrefix:/api"
+     - "traefik.frontend.priority=20"
   ui:
     image: nuvla/ui:0.0.1-SNAPSHOT
     restart: unless-stopped
@@ -49,12 +50,8 @@ services:
     labels:
      - "traefik.enable=true"
      - "traefik.backend=ui"
-     - "traefik.root.frontend.rule=Path:/"
-#     - "traefik.index.frontend.rule=Path:/index.html"
-     - "traefik.ui.frontend.rule=PathPrefixStrip:/ui"
-     - "traefik.css.frontend.rule=PathPrefix:/css"
-     - "traefik.js.frontend.rule=PathPrefix:/js"
-     - "traefik.images.frontend.rule=PathPrefix:/images"
+     - "traefik.frontend.rule=PathPrefix:/"
+     - "traefik.frontend.priority=10"
 #  job:
 #    image: nuvla/job:0.0.1-SNAPSHOT
 #    restart: unless-stopped

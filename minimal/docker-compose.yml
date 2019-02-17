@@ -21,11 +21,11 @@ services:
     environment:
      - ZOO_MY_ID=3
   cimi:
-    image: nuvla/api:latest
+    image: nuvla/api:0.0.1-SNAPSHOT
     container_name: cimi
     restart: unless-stopped
     ports:
-     - "8201:8201"
+     - "8200:8200"
     environment:
      - ZK_ENDPOINTS="zk:2181"
      - ES_HOST=es
