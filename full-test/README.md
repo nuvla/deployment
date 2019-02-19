@@ -81,7 +81,7 @@ following:
 
 ```json
 {
-    "userTemplate" : {
+    "template" : {
         "href" : "user-template/direct",
         "username" : "super",
         "password" : "${hashed_password}",
