@@ -63,9 +63,19 @@ The full Nuvla deployment can be accessed from
 Bootstrapping
 -------------
 
-The database will be empty, with no users or any other resources. To
-bootstrap the server by creating a super user, use the following
-procedure.
+If SUPER_PASS env variable is set and super user doesn't already exist,
+the super user will be created at the server startup.
+
+DON'T FORGET TO CHANGE THE DEFAULT `SUPER_PASS` PASSWORD.
+
+You can then configure your server normally via the API.
+
+Manual bootstrapping
+--------------------
+
+Remove SUPER_PASS env variable from docker-compose file.
+The database will be empty at startup, with no users or any other
+resources. To create a super user, use the following procedure.
 
 Create a hashed password value for the super user:
 
@@ -117,7 +127,6 @@ curl -XPOST \
 replacing `${plaintext_password}` with the original plaintext value of
 your password.
 
-You can then configure your server normally via the API.
 
 Stopping
 --------
