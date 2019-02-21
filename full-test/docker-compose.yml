@@ -32,7 +32,7 @@ services:
     environment:
       - ZOO_MY_ID=3
   api:
-    image: nuvla/api:0.0.1-SNAPSHOT
+    image: nuvla/api:test
     restart: unless-stopped
     ports:
       - "8200:8200"
@@ -49,7 +49,7 @@ services:
       - "traefik.frontend.rule=PathPrefix:/api"
       - "traefik.frontend.priority=20"
   ui:
-    image: nuvla/ui:0.0.1-SNAPSHOT
+    image: nuvla/ui:test
     restart: unless-stopped
     ports:
       - "80"
@@ -61,17 +61,17 @@ services:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.frontend.priority=10"
   job-executor:
-    image: nuvla/job:0.0.1-SNAPSHOT
+    image: nuvla/job:test
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_executor.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts-list es
+    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts es
   job-dist-dummy:
-    image: nuvla/job:0.0.1-SNAPSHOT
+    image: nuvla/job:test
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_distributor_dummy_test_action.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
   job-dist-jobs-cleanup:
-    image: nuvla/job:0.0.1-SNAPSHOT
+    image: nuvla/job:test
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181

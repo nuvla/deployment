@@ -21,7 +21,7 @@ services:
     environment:
      - ZOO_MY_ID=3
   cimi:
-    image: nuvla/api:0.0.1-SNAPSHOT
+    image: nuvla/api:test
     container_name: cimi
     restart: unless-stopped
     ports:
