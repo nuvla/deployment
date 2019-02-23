@@ -48,5 +48,4 @@
 
   :aliases {"test" ["do"
                     ["test"]
-                    #_["with-profiles" "test" ["doo" "nashorn" "test" "once"]]]
-            "docs" ["codox"]})
+                    #_["with-profiles" "test" ["doo" "nashorn" "test" "once"]]]})
