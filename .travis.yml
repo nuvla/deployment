@@ -3,3 +3,6 @@ dist: xenial
 deploy:
   provider: script
     script: docker -v
+  skip_cleanup: true
+  on:
+    all_branches: true
