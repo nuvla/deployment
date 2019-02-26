@@ -1,0 +1,5 @@
+dist: xenial
+
+deploy:
+  provider: script
+    script: docker -v
