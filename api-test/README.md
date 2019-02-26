@@ -15,7 +15,7 @@ This can be started with the command:
 docker-compose up -d
 ```
 
-Both services run on their standard ports: 9200, 9300 for
+Both services run on their standard ports: 9200 for
 Elasticsearch and 2181 for Zookeeper.
 
 Stopping

@@ -6,12 +6,11 @@ services:
     restart: unless-stopped
     ports:
      - "9200:9200"
-     - "9300:9300"     
     environment:
      - cluster.name=elasticsearch
      - xpack.security.enabled=false
      - discovery.type=single-node
-     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
   zk:
     image: zookeeper:latest
     container_name: zookeeper

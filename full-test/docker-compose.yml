@@ -18,7 +18,6 @@ services:
     restart: unless-stopped
     expose:
       - "9200"
-      - "9300"
     environment:
       - cluster.name=elasticsearch
       - xpack.security.enabled=false
@@ -32,13 +31,13 @@ services:
     environment:
       - ZOO_MY_ID=3
   api:
-    image: nuvla/api:test
+    image: nuvladev/api:master
     restart: unless-stopped
     ports:
       - "8200:8200"
     environment:
       - ES_HOST=es
-      - ES_PORT=9300
+      - ES_PORT=9200
       - ZK_ENDPOINTS=zk:2181
       - SUPER_PASS=supeRsupeR
     labels:
@@ -49,7 +48,7 @@ services:
       - "traefik.frontend.rule=PathPrefix:/api"
       - "traefik.frontend.priority=20"
   ui:
-    image: nuvla/ui:test
+    image: nuvladev/ui:master
     restart: unless-stopped
     ports:
       - "80"
@@ -61,17 +60,17 @@ services:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.frontend.priority=10"
   job-executor:
-    image: nuvla/job:test
+    image: nuvladev/job:master
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_executor.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts es
   job-dist-dummy:
-    image: nuvla/job:test
+    image: nuvladev/job:master
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_distributor_dummy_test_action.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
   job-dist-jobs-cleanup:
-    image: nuvla/job:test
+    image: nuvladev/job:master
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181

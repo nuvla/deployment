@@ -6,12 +6,11 @@ services:
     restart: unless-stopped
     expose:
      - "9200"
-     - "9300"
     environment:
      - cluster.name=elasticsearch
      - xpack.security.enabled=false
      - discovery.type=single-node
-     - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
   zk:
     image: zookeeper:latest
     container_name: zookeeper
@@ -21,7 +20,7 @@ services:
     environment:
      - ZOO_MY_ID=3
   cimi:
-    image: nuvla/api:test
+    image: nuvladev/api:master
     container_name: cimi
     restart: unless-stopped
     ports:
@@ -29,5 +28,5 @@ services:
     environment:
      - ZK_ENDPOINTS="zk:2181"
      - ES_HOST=es
-     - ES_PORT=9300
+     - ES_PORT=9200
 
