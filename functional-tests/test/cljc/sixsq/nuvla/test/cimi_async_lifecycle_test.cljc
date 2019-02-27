@@ -36,16 +36,16 @@
                             :principal "ADMIN"}]}})
 
 
-(def nuvla-username (env :nuvla-username))
+(def nuvla-username (env :nuvla-username "super"))
 
 
-(def nuvla-password (env :nuvla-password))
+(def nuvla-password (env :nuvla-password "supeRsupeR"))
 
 
-(def nuvla-host (env :nuvla-host))
+(def nuvla-host (env :nuvla-host "localhost"))
 
 
-(def nuvla-insecure (env :nuvla-insecure))
+(def nuvla-insecure (env :nuvla-insecure "FALSE"))
 
 
 (def server-endpoint (str "https://" nuvla-host "/api/cloud-entry-point"))
