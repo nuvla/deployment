@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cleanup() {
+    $DM_BIN rm -y `$DM_BIN ls -q`
+}
+
+trap cleanup ERR
+
 CSIZE=${1:-1}
 
 DM_VER=v0.16.1
@@ -47,7 +53,7 @@ DSTACK_CMD="docker -H $ip:2376 --tls
     --tlscert $HOME/.docker/machine/machines/$MNAME/cert.pem
     stack"
 
-STACK_NAME=full-test
+STACK_NAME=test
 $DSTACK_CMD deploy --compose-file $STACK_NAME/docker-compose.yml $STACK_NAME
 $DSTACK_CMD ls
 $DSTACK_CMD services $STACK_NAME
