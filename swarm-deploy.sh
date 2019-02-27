@@ -5,7 +5,11 @@ env
 
 CSIZE=${1:-1}
 
-yes y | ssh-keygen -q -t rsa -N '' >/dev/null
+set -x
+ls -al ~/.ssh
+yes y | ssh-keygen -t rsa -N ''
+ls -al ~/.ssh
+set +x
 
 MNAME=dockermachine-${TRAVIS_BUILD_ID}
 DCMD="docker run --rm --name docker-machine 
