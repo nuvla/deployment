@@ -7,7 +7,7 @@ CSIZE=${1:-1}
 
 set -x
 ls -al ~/.ssh
-ssh-keygen -t rsa -N ''
+yes y | ssh-keygen -q -t rsa -N ''  -f ~/.ssh/id_rsa 2>&1 > /dev/null
 ls -al ~/.ssh
 set +x
 
