@@ -1,15 +1,9 @@
 #!/bin/bash
 set -e
 
-env
-
 CSIZE=${1:-1}
 
-set -x
-ls -al ~/.ssh
 yes y | ssh-keygen -q -t rsa -N ''  -f ~/.ssh/id_rsa 2>&1 > /dev/null
-ls -al ~/.ssh
-set +x
 
 MNAME=dockermachine-${TRAVIS_BUILD_ID}
 DCMD="docker run --rm --name docker-machine 
@@ -39,3 +33,17 @@ if [ $CSIZE -gt 1 ]; then
 fi
 
 $DCMD ssh $MNAME "sudo docker node ls" 
+
+DSTACK_CMD="docker -H $ip:2376 --tls 
+    --tlscacert $HOME/.docker/machine/machines/$MNAME/ca.pem
+    --tlskey $HOME/.docker/machine/machines/$MNAME/key.pem
+    --tlscert $HOME/.docker/machine/machines/$MNAME/cert.pem
+    stack"
+
+STACK_NAME=full-test
+$DSTACK_CMD deploy --compose-file $STACK_NAME/docker-compose.yml $STACK_NAME
+$DSTACK_CMD ls
+$DSTACK_CMD services $STACK_NAME
+$DSTACK_CMD rm $STACK_NAME
+
+$DCMD rm -y `$DCMD ls -q`
