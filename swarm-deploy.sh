@@ -32,6 +32,9 @@ if [ $CSIZE -gt 1 ]; then
     done
 fi
 
+ls -alR $HOME/.docker/machine/machines/
+sudo chown -R `id -u`: $HOME/.docker/machine/machines/
+
 $DCMD ssh $MNAME "sudo docker node ls" 
 
 DSTACK_CMD="docker -H $ip:2376 --tls 
