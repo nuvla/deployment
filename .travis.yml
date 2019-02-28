@@ -1,5 +1,5 @@
 language: generic
-dist: xenial
+dist: trusty
 services:
 - docker
 before_script:
