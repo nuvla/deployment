@@ -2,12 +2,11 @@ language: generic
 dist: xenial
 services:
 - docker
-before_deploy:
+before_script:
   - ./swarm-deploy.sh deploy
-deploy:
-  provider: script
-  script: bash cd functional-tests && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
-after_deploy:
+script:
+  - cd functional-tests && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
+after_script:
   - ./swarm-deploy.sh terminate
 env:
   global:
