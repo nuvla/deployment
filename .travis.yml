@@ -6,7 +6,9 @@ before_script:
   - ./swarm-deploy.sh deploy
 script:
   - cd functional-tests && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
-after_script:
+after_success:
+  - ./swarm-deploy.sh terminate
+after_failure:
   - ./swarm-deploy.sh terminate
 env:
   global:
