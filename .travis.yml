@@ -6,6 +6,7 @@ before_script:
   - $TRAVIS_BUILD_DIR/swarm-deploy.sh deploy
 script:
   - cat $HOME/nuvla-test-host
+  - sleep 60
   - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
 after_success:
   - $TRAVIS_BUILD_DIR/swarm-deploy.sh terminate
