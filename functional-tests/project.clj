@@ -1,10 +1,11 @@
-(def +version+ "0.0.1-SNAPSHOT")
+
+(def +sixsq-nuvla-api-version+ "0.0.1")
 
 (defproject sixsq.nuvla.deployment/functional-tests "0.0.1-SNAPSHOT"
 
   :description "test full deployment with clojure library"
 
-  :url "https://github.com/nuvla/clojure-library"
+  :url "https://github.com/nuvla/deployment"
 
   :license {:name         "Apache 2.0"
             :url          "http://www.apache.org/licenses/LICENSE-2.0.txt"
@@ -24,7 +25,7 @@
   :clean-targets ^{:protect false} ["target" "out"]
 
   :dependencies
-  [[sixsq.nuvla/clojure-library "0.0.1-SNAPSHOT"]
+  [[sixsq.nuvla/api ~+sixsq-nuvla-api-version+]
    [environ]]
 
   :profiles {:provided {:dependencies [[org.clojure/clojure]
