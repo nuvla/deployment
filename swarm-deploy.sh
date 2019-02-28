@@ -60,7 +60,9 @@ deploy() {
         stack"
     
     STACK_NAME=test
-    $DSTACK_CMD deploy --compose-file $STACK_NAME/docker-compose.yml $STACK_NAME
+    cd $STACK_NAME
+    $DSTACK_CMD deploy --compose-file docker-compose.yml $STACK_NAME
+    cd -
     $DSTACK_CMD ls
     $DSTACK_CMD services $STACK_NAME
     echo $ip > $HOME/nuvla-test-host
