@@ -11,9 +11,8 @@ backend services.  The deployment includes:
  
  - **zk**: Zookeeper for job processing. Not accessible externally.
  
- - **api**: Nuvla API server. Accessible externally on port 8200 to
-   allow for bootstrapping the service. It is also accessible through
-   the traefik endpoint on the `/api*` paths. Paths not starting with
+ - **api**: Nuvla API server. It is also accessible through the
+   traefik endpoint on the `/api*` paths. Paths not starting with
    `/api/` will be redirected to `/api/cloud-entry-point`.
    
  - **ui**: Nuvla browser user interface. Serves the static content of
@@ -21,22 +20,26 @@ backend services.  The deployment includes:
    paths. Paths that do not start with `/ui/` will be redirected to
    `/ui/`.
    
- - **job**: Engine for asynchronous process of jobs. **Not currently
-   active.**
+ - **job-\***: Engine for asynchronous processing of jobs. Job
+   executor, distributor, and cleanup containers are started as part
+   of the deployment.  These are accessible only internally.
    
  - **proxy**: Traefik load balancer and router. Deployed Nuvla service
-   accessible on port 80. The web interface for traefik is available
-   on port 8080. This is **not** a secure configuration for
-   production.
+   accessible on port 443 with a self-signed certificate. The web
+   interface for traefik is available on port 8080 via HTTP. This is
+   **not** a secure configuration for production.
 
-This deployment is **not suitable for production** because of the
-following settings:
+Prerequisites
+-------------
 
- - HTTP (not HTTPS) is used for external access to the service.
- - The traefik web interface (port 8080) is exposed.
- - The API server (port 8200) is directly exposed.
+If running Docker locally, you'll need to initialize your deployment
+to run in swarm mode. Just run the command:
 
-These settings are, however, useful for testing. 
+```sh
+docker swarm init
+```
+
+The `docker stack` commands below should then work.
 
 Starting
 --------
@@ -44,21 +47,26 @@ Starting
 This can be started with the command:
 
 ```sh
-docker-compose up -d
+docker stack deploy nuvla
 ```
 
-You can view the API server logs by running the command:
+You can view the status of the deployment with:
 
 ```sh
-docker-compose logs -f api
+docker stack services nuvla
 ```
 
-The logs will indicate when the API server on port 8200 is available.
-This is normally the last service to come up.
+With the service reference, you can view the logs of any service:
 
-The full Nuvla deployment can be accessed from
-`http://nuvla.example.org/`, using your actual host name
-(e.g. localhost if running locally).
+```sh
+docker service logs -f nuvla_api
+```
+
+changing the name of the service as necessary.
+
+The full Nuvla deployment can be accessed from `https://localhost/`,
+assuming that your running everything locally.  Change "localhost" to
+your host name when running remotely.
 
 Bootstrapping
 -------------
@@ -70,71 +78,13 @@ DON'T FORGET TO CHANGE THE DEFAULT `SUPER_PASS` PASSWORD.
 
 You can then configure your server normally via the API.
 
-Manual bootstrapping
---------------------
-
-Remove SUPER_PASS env variable from docker-compose file.
-The database will be empty at startup, with no users or any other
-resources. To create a super user, use the following procedure.
-
-Create a hashed password value for the super user:
-
-```sh
-echo -n "plaintext-password" | \
-  sha512sum | \
-  cut -d ' ' -f 1 | \
-  tr '[:lower:]' '[:upper:]'
-```
-
-Create a file named `user-template-super.json` that contains the
-following:
-
-```json
-{
-    "template" : {
-        "href" : "user-template/direct",
-        "username" : "super",
-        "password" : "${hashed_password}",
-        "emailAddress" : "super@example.com",
-        "state" : "ACTIVE",
-        "isSuperUser" : true
-    }
-}
-```
-
-replacing `${hashed_password}` with the value you generated above.
-
-Create the super user via the CIMI server:
-
-```sh
-curl -XPOST \
-     -H 'nuvla-authn-info:internal ADMIN' \
-     -H 'content-type:application/json' \
-     -d@user-template-super.json \
-     http://nuvla.example.org:8200/api/user
-```
-
-You will now be able to log into server as the `super` user:
-
-```sh
-curl -XPOST \
-     -d href=session-template/internal \
-     -d username=super \
-     -d password=${plaintext_password} \
-     http://nuvla.example.org/api/session
-```
-
-replacing `${plaintext_password}` with the original plaintext value of
-your password.
-
-
 Stopping
 --------
 
 To stop the server, simply do the following:
 
 ```sh
-docker-compose down -v
+docker stack rm nuvla
 ```
 
 This should stop the containers and remove the containers and any
