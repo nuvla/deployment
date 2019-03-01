@@ -47,7 +47,7 @@ Starting
 This can be started with the command:
 
 ```sh
-docker stack deploy nuvla
+docker stack deploy nuvla --compose-file docker-compose.yml
 ```
 
 You can view the status of the deployment with:
