@@ -1,9 +1,10 @@
 version: '3.3'
+
 services:
   proxy:
-    image: traefik:latest
+    image: traefik:1.7
     restart: unless-stopped
-    command: --api --web --docker --docker.exposedByDefault=false --loglevel=info
+    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=nuvla_frontend --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
@@ -18,67 +19,91 @@ services:
       - "80:80"
       - "443:443"
       - "8080:8080"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - frontend
+
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
     restart: unless-stopped
-    expose:
-      - "9200"
     environment:
       - cluster.name=elasticsearch
       - xpack.security.enabled=false
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - backend
+
   zk:
-    image: zookeeper:latest
+    image: zookeeper:3.4
     restart: unless-stopped
-    expose:
-      - "2181"
     environment:
       - ZOO_MY_ID=3
+    networks:
+      - backend
+
   api:
     image: nuvladev/api:master
     restart: unless-stopped
-    ports:
-      - "8200:8200"
     environment:
       - ES_HOST=es
       - ES_PORT=9200
       - ZK_ENDPOINTS=zk:2181
       - SUPER_PASS=supeRsupeR
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=api"
-      - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
-      - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-      - "traefik.frontend.rule=PathPrefix:/api"
-      - "traefik.frontend.priority=20"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=8200"
+        - "traefik.backend=api"
+        - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
+        - "traefik.frontend.rule=PathPrefix:/api"
+        - "traefik.frontend.priority=20"
+    networks:
+      - backend
+      - frontend
+
   ui:
     image: nuvladev/ui:master
     restart: unless-stopped
-    ports:
-      - "80"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=ui"
-      - "traefik.backend.healthcheck.path=/ui/index.html"
-      - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-      - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.frontend.priority=10"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.backend=ui"
+        - "traefik.backend.healthcheck.path=/ui/index.html"
+        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
+        - "traefik.frontend.rule=PathPrefix:/"
+        - "traefik.frontend.priority=10"
+    networks:
+      - frontend
+
   job-executor:
     image: nuvladev/job:master
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_executor.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts es
+    networks:
+      - backend
+
   job-dist-dummy:
     image: nuvladev/job:master
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_distributor_dummy_test_action.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
+    networks:
+      - backend
+
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
     restart: unless-stopped
     entrypoint: /app/job/src/scripts/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
+    networks:
+      - backend
 
 configs:
   traefik.toml:
@@ -89,3 +114,7 @@ secrets:
     file: ./traefik/nuvla.crt
   nuvla.key:
     file: ./traefik/nuvla.key
+
+networks:
+  frontend:
+  backend:
