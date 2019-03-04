@@ -4,9 +4,22 @@ jobs:
     machine: true
     steps:
         - checkout
-        - run: ps axf
-        - run: uname -a
-        - run: lscpu
-        - run: free
-        - run: cat /etc/issue
-        - run: docker -v
+        - run: 
+            name: Provision swarm cluster
+            command: |
+                $CIRCLE_WORKING_DIRECTORY/test/swarm-deploy.sh deploy 2
+                cat "$HOME"/nuvla-test-host
+                export ip=$(cat "$HOME"/nuvla-test-host)
+                $CIRCLE_WORKING_DIRECTORY/test/wait-avail.sh https://$ip/api/cloud-entry-point 2
+        - run: 
+            name: Tests
+            command: |
+                cd $CIRCLE_WORKING_DIRECTORY/functional-tests
+                export NUVLA_INSECURE=TRUE
+                export NUVLA_HOST=$(cat $HOME/nuvla-test-host)
+                lein do clean, test
+        - run: 
+            name: Destroy swarm cluster
+            command: |
+                $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
+            when: always
