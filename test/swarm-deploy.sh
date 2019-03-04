@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 cleanup() {
     $DM_BIN rm -y "$($DM_BIN ls -q)"
@@ -50,10 +50,6 @@ deploy() {
             $DM_BIN ssh "$WNAME" "sudo docker swarm join --token ${joinToken} ${ip}:2377"
         done
     fi
-    
-    cat "$HOME"/.docker/machine/machines/"$MNAME"/ca.pem
-    cat "$HOME"/.docker/machine/machines/"$MNAME"/key.pem
-    cat "$HOME"/.docker/machine/machines/"$MNAME"/cert.pem
 
     $DM_BIN ssh "$MNAME" "sudo docker node ls"
 
