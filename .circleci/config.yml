@@ -9,6 +9,7 @@ jobs:
             command: |
                 pwd
                 echo $CIRCLE_WORKING_DIRECTORY
+                ls -la
                 $CIRCLE_WORKING_DIRECTORY/test/swarm-deploy.sh deploy 2
                 cat "$HOME"/nuvla-test-host
                 export ip=$(cat "$HOME"/nuvla-test-host)
