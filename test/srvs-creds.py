@@ -1,5 +1,4 @@
 
-
 #
 # Creates the services and credenials needed for the ESA Swarm/Minio
 # infrastructure for GNSS.
@@ -138,6 +137,7 @@ print("module id: %s\n" % gnss_module_id)
 #
 
 deployment = {"module": {"href": gnss_module_id},
+              "infrastructure-service-id": swarm_id,
               "credential-id": swarm_cred_id}
 
 deployment_response = nuvla_api.add('deployment', deployment)
