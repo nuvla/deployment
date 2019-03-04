@@ -7,22 +7,19 @@ jobs:
         - run: 
             name: Provision swarm cluster
             command: |
-                pwd
-                echo $CIRCLE_WORKING_DIRECTORY
-                ls -la
-                $CIRCLE_WORKING_DIRECTORY/test/swarm-deploy.sh deploy 2
+                ./test/swarm-deploy.sh deploy 2
                 cat "$HOME"/nuvla-test-host
                 export ip=$(cat "$HOME"/nuvla-test-host)
-                $CIRCLE_WORKING_DIRECTORY/test/wait-avail.sh https://$ip/api/cloud-entry-point 2
+                ./test/wait-avail.sh https://$ip/api/cloud-entry-point 2
         - run: 
             name: Tests
             command: |
-                cd $CIRCLE_WORKING_DIRECTORY/functional-tests
+                cd functional-tests
                 export NUVLA_INSECURE=TRUE
                 export NUVLA_HOST=$(cat $HOME/nuvla-test-host)
                 lein do clean, test
         - run: 
             name: Destroy swarm cluster
             command: |
-                $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
+                ./test/swarm-deploy.sh terminate
             when: always
