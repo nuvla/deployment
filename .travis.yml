@@ -2,7 +2,7 @@ language: generic
 dist: trusty
 services:
 - docker
-before_script:
+install:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && \
         ip=`cat $HOME/nuvla-test-host` && \
         $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN
