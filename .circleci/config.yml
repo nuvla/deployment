@@ -8,5 +8,5 @@ jobs:
         - run: uname -a
         - run: lscpu
         - run: free
-        - run: [ -f /etc/issue ] && cat /etc/issue
+        - run: cat /etc/issue
         - run: docker -v
