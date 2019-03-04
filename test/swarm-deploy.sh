@@ -7,7 +7,7 @@ cleanup() {
 
 trap cleanup ERR
 
-action_err_msg="Action required: deploy|termiate"
+action_err_msg="Action required: deploy|terminate"
 ACTION=${1:?$action_err_msg}
 SWSIZE=${2:-1}
 
@@ -59,8 +59,9 @@ deploy() {
         --tlscert $HOME/.docker/machine/machines/$MNAME/cert.pem
         stack"
     
-    STACK_NAME=test
-    cd $STACK_NAME
+    # FIXME: hardcoded to nuvla due to traefik.
+    STACK_NAME=nuvla
+    cd test
     $DSTACK_CMD deploy --compose-file docker-compose.yml $STACK_NAME
     cd -
     $DSTACK_CMD ls
