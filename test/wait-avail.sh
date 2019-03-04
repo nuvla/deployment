@@ -5,7 +5,7 @@ set -e
 endpoint=${1:?"Endpoint required: http[s]://host[:port][/resource]"}
 wait_min_max=${2:-2}
 time_max=$(( $(date +%s) + $(($wait_min_max * 60)) ))
-cmd="curl -k --connect-timeout 5 --max-time 10 -sfS $endpoint"
+cmd="curl -k -L --connect-timeout 5 --max-time 10 -sfS $endpoint"
 set +e
 $cmd
 rc=$?
