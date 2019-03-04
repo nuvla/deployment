@@ -3,15 +3,15 @@ dist: trusty
 services:
 - docker
 before_script:
-  - $TRAVIS_BUILD_DIR/swarm-deploy.sh deploy 2
+  - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy 2
 script:
   - cat $HOME/nuvla-test-host
-  - sleep 60
+  - $TRAVIS_BUILD_DIR/test/wait-avail.sh https://`cat $HOME/nuvla-test-host`/api/cloud-entry-point
   - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
 after_success:
-  - $TRAVIS_BUILD_DIR/swarm-deploy.sh terminate
+  - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 after_failure:
-  - $TRAVIS_BUILD_DIR/swarm-deploy.sh terminate
+  - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 env:
   global:
   - secure: t0LD73PI+nx6+l/+dNMnHsmZ8uhI4N5o8Ui3NyWE5md+T64dCTGaEQOWfMPD/cQabFZV2szdPanPg0Pqc0RIs7Km1CUND0s1yF6l6/SwfySpmciIQgcawLsiNZfUZECFEHdqaPSfpgxewX3suq56WMeflcHKVbcMs6A6Xu7DDOYxix4w/kH/yushbuX8g6PjEuKU5XsHuyLQLPS1lBNrjf4QLhjsI1tMQz/12eCbPRPF/j7ZNTRbhK5LbPQrqfGkIqNsqcFZQEzDB0A7hScA2mWvbvjhUatoZhqykA+RA/3D5yonVT+sywrgA7ldhaBUUN6qJBw5ogmuR2GfGPrC0zwt9926oFU73RTbDwiXBh5t8GBOwzfzl1ya4PQXurMeM+RolySjdlIeFnzH7JuG1vAIG6xgmEedYnH59Z9lbsGMtsID4Hwxo+zBJduWPDXs0/S+Yv2tdAiz+YbgInYZX6BybWfG6d13It4w08GYUPCoyDn/U8TacXu1aLbPR90+WoKEvUIFA5/jZnuYr8hQCobY48SH7Wtkqsc/wzye1TG5BpPQ9gs83DNTmOYIeRhgn86jvM188EhHVrgLMMD96Uaw3WeREwUDx0D9jhBEOKvt3dF1Mz7+cf49syD+2p8c+zv2fi4tLn6KH4hwZHH6ZToexeRZHp5rYzf6S8QlW1U=
