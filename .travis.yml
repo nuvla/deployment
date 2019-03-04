@@ -3,11 +3,11 @@ dist: trusty
 services:
 - docker
 before_script:
-  - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy 2
+  - set -e; $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE
 script:
-  - cat $HOME/nuvla-test-host
-  - $TRAVIS_BUILD_DIR/test/wait-avail.sh https://`cat $HOME/nuvla-test-host`/api/cloud-entry-point
-  - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
+  - set -e; cat $HOME/nuvla-test-host
+  - set -e; $TRAVIS_BUILD_DIR/test/wait-avail.sh https://`cat $HOME/nuvla-test-host`/api/cloud-entry-point $WAIT_AVAIL_MIN
+  - set -e; cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
 after_success:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 after_failure:
