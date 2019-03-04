@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 cleanup() {
     $DM_BIN rm -y `$DM_BIN ls -q`
@@ -51,6 +51,10 @@ deploy() {
         done
     fi
     
+    cat $HOME/.docker/machine/machines/$MNAME/ca.pem
+    cat $HOME/.docker/machine/machines/$MNAME/key.pem
+    cat $HOME/.docker/machine/machines/$MNAME/cert.pem
+
     $DM_BIN ssh $MNAME "sudo docker node ls"
 
     DSTACK_CMD="docker -H $ip:2376 --tls 
