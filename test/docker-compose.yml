@@ -93,14 +93,6 @@ services:
     networks:
       - backend
 
-  job-dist-dummy:
-    image: nuvladev/job:master
-    restart: unless-stopped
-    entrypoint: /app/job/src/scripts/job_distributor_dummy_test_action.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
-    networks:
-      - backend
-
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
     restart: unless-stopped
