@@ -88,7 +88,7 @@ services:
   job-executor:
     image: nuvladev/job:master
     restart: unless-stopped
-    entrypoint: /app/job/src/scripts/job_executor.py
+    entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts es
     networks:
       - backend
@@ -96,7 +96,7 @@ services:
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
     restart: unless-stopped
-    entrypoint: /app/job/src/scripts/job_distributor_jobs_cleanup.py
+    entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
     networks:
       - backend
