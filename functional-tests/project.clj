@@ -13,7 +13,7 @@
 
   :plugins [[lein-parent "0.3.5"]]
 
-  :parent-project {:coords  [sixsq.nuvla/parent "6.1.5"]
+  :parent-project {:coords  [sixsq.nuvla/parent "6.2.0"]
                    :inherit [:plugins
                              :min-lein-version
                              :managed-dependencies
