@@ -89,3 +89,22 @@ docker stack rm nuvla
 
 This should stop the containers and remove the containers and any
 volumes that were created.
+
+Clean Up Problems
+-----------------
+
+When running the command to remove the stack, it should asynchonously
+delete all the resources associated with the stack. Unfortunately,
+there are race conditions in the clean up that often cause the
+nuvla_api container to remain defined (but not running).  This in turn
+causes the nuvla_frontend network deletion to fail. Worse, it ends in
+a state where it can be listed but not deleted. Grrr...
+
+The discussion around this issue can be found in a [GitHub
+issue](https://github.com/moby/moby/issues/32620) and a related
+[Gist](https://gist.github.com/dperny/86bb33f195e4a3c27bbc497372652994)
+that describes the `network rm` problems.
+
+The only workaround seems to be to restart the Docker daemon to return
+to a clean state.
+
