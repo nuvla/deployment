@@ -90,6 +90,10 @@ docker stack rm nuvla
 This should stop the containers and remove the containers and any
 volumes that were created.
 
+**NOTE: Because of the problem described below, you may want to simply
+redeploy the stack for updates rather than stopping and starting the
+stack.**
+
 Clean Up Problems
 -----------------
 
