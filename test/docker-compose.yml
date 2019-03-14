@@ -3,7 +3,9 @@ version: '3.3'
 services:
   proxy:
     image: traefik:1.7
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=nuvla_frontend --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -28,7 +30,9 @@ services:
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     ports:
       - "9200:9200"
     environment:
@@ -41,7 +45,9 @@ services:
 
   zk:
     image: zookeeper:3.4
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     ports:
       - "2181:2181"
     environment:
@@ -51,7 +57,9 @@ services:
 
   api:
     image: nuvladev/api:master
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     environment:
       - ES_HOST=es
       - ES_PORT=9200
@@ -72,7 +80,9 @@ services:
 
   ui:
     image: nuvladev/ui:master
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     deploy:
       labels:
         - "traefik.enable=true"
@@ -87,7 +97,9 @@ services:
 
   job-executor:
     image: nuvladev/job:master
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts es
     networks:
@@ -95,7 +107,9 @@ services:
 
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
-    restart: unless-stopped
+    restart_policy:
+      condition: on-failure
+      delay: 5s
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
     networks:
