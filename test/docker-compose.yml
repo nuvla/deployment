@@ -3,9 +3,6 @@ version: '3.3'
 services:
   proxy:
     image: traefik:1.7
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=nuvla_frontend --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -25,14 +22,14 @@ services:
       placement:
         constraints:
           - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - frontend
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     ports:
       - "9200:9200"
     environment:
@@ -40,26 +37,28 @@ services:
       - xpack.security.enabled=false
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
     networks:
       - backend
 
   zk:
     image: zookeeper:3.4
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     ports:
       - "2181:2181"
     environment:
       - ZOO_MY_ID=3
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
     networks:
       - backend
 
   api:
     image: nuvladev/api:master
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     environment:
       - ES_HOST=es
       - ES_PORT=9200
@@ -74,15 +73,15 @@ services:
         - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
         - "traefik.frontend.rule=PathPrefix:/api"
         - "traefik.frontend.priority=20"
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
     networks:
       - backend
       - frontend
 
   ui:
     image: nuvladev/ui:master
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     deploy:
       labels:
         - "traefik.enable=true"
@@ -92,26 +91,31 @@ services:
         - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
         - "traefik.frontend.rule=PathPrefix:/"
         - "traefik.frontend.priority=10"
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
     networks:
       - frontend
 
   job-executor:
     image: nuvladev/job:master
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181 --es-hosts es
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
     networks:
       - backend
 
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
-    restart_policy:
-      condition: on-failure
-      delay: 5s
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeRsupeR --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
     networks:
       - backend
 
