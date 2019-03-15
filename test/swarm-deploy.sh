@@ -70,11 +70,14 @@ deploy() {
 }
 
 terminate() {
-    machines=$($DM_BIN ls -q)
+    machines=()
+    $DM_BIN ls -q | while read m;do machines+=( $m );done
     if [ -z "$machines" ]; then
         echo "WARNING: no machines to terminate"
     else
-        $DM_BIN rm -y "$machines"
+        for m in ${machines[@]};do
+            $DM_BIN rm -y "$m"
+        done
     fi
 }
 
