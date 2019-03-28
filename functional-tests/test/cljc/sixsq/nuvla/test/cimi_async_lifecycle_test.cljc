@@ -39,7 +39,7 @@
 (def nuvla-username (env :nuvla-username "super"))
 
 
-(def nuvla-password (env :nuvla-password "supeRsupeR"))
+(def nuvla-password (env :nuvla-password "supeR8-supeR8"))
 
 
 (def nuvla-host (env :nuvla-host "localhost"))
@@ -77,7 +77,7 @@
        (is (-> cep :collections :user))
 
        ;; try logging in with incorrect credentials
-       (let [response (<! (authn/login admin-client {:href     "session-template/internal"
+       (let [response (<! (authn/login admin-client {:href     "session-template/password"
                                                      :username nuvla-username
                                                      :password (str nuvla-password "-incorrect")}))]
          (is (instance? Exception response))
@@ -85,7 +85,7 @@
          (is (false? (<! (authn/authenticated? admin-client)))))
 
        ;; log into the server with correct credentials
-       (let [response (<! (authn/login admin-client {:href     "session-template/internal"
+       (let [response (<! (authn/login admin-client {:href     "session-template/password"
                                                      :username nuvla-username
                                                      :password nuvla-password}))]
          (is (= 201 (:status response)))
