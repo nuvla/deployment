@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 endpoint=${1:?"Endpoint required: http[s]://host[:port][/resource]"}
 wait_min_max=${2:-2}
