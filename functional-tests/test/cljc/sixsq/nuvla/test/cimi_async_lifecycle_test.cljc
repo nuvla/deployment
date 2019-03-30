@@ -26,14 +26,8 @@
    :type          "state"
    :severity      "medium"
 
-   :acl           {:owner {:type      "USER"
-                           :principal "loomis"}
-                   :rules [{:right     "ALL"
-                            :type      "USER"
-                            :principal "loomis"}
-                           {:right     "ALL"
-                            :type      "ROLE"
-                            :principal "ADMIN"}]}})
+   :acl           {:owners   ["user/my-user"]
+                   :edit-acl ["group/nuvla-admin"]}})
 
 
 (def nuvla-username (env :nuvla-username "super"))

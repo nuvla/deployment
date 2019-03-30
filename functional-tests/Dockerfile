@@ -21,7 +21,7 @@ RUN chmod 0755 /root/start-tests.sh
 RUN cd /root && apt-get update && apt-get install -y curl && curl -o /usr/local/bin/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein && chmod 0755 /usr/local/bin/lein && /usr/local/bin/lein -v && apt-get remove -y curl && apt autoremove -y && rm -rf /var/lib/apt/lists/*
 
 ENV NUVLA_USERNAME=super
-ENV NUVLA_PASSWORD=supeRsupeR
+ENV NUVLA_PASSWORD=supeR8-supeR8
 ENV NUVLA_INSECURE=FALSE
 
 ENTRYPOINT ["/root/start-tests.sh"]
