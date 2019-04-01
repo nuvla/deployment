@@ -41,6 +41,22 @@ docker swarm init
 
 The `docker stack` commands below should then work.
 
+Setup
+-----
+
+The deployment requires session and service certificates.  These must
+be generated before you deploy Nuvla. They are made available to the
+deployment via Docker "secrets".
+
+To generate the certificates:
+
+```
+./generate-certificates.sh
+```
+
+This will generate the certificates in the `session` and `traefik`
+subdirectories. The server certificate is valid for 14 days. 
+
 Starting
 --------
 
@@ -71,12 +87,13 @@ your host name when running remotely.
 Bootstrapping
 -------------
 
-If SUPER_PASS env variable is set and super user doesn't already exist,
-the super user will be created at the server startup.
+If NUVLA_SUPER_PASSWORD env variable is set and super user doesn't
+already exist, the super user will be created at the server
+startup. The default value is "supeR8-supeR8", but you can use a
+different value if you wish.
 
-DON'T FORGET TO CHANGE THE DEFAULT `SUPER_PASS` PASSWORD.
-
-You can then configure your server normally via the API.
+**The default super password should not be used for long-lived
+  deployments!**
 
 Stopping
 --------

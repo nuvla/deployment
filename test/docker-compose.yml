@@ -64,6 +64,11 @@ services:
       - ES_PORT=9200
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
+    secrets:
+      - source: session.crt
+        target: /etc/nuvla/session/session.crt
+      - source: session.key
+        target: /etc/nuvla/session/session.key
     deploy:
       labels:
         - "traefik.enable=true"
@@ -132,9 +137,13 @@ configs:
 
 secrets:
   nuvla.crt:
-    file: ./traefik/nuvla.crt
+    file: ./secrets/nuvla.crt
   nuvla.key:
-    file: ./traefik/nuvla.key
+    file: ./secrets/nuvla.key
+  session.crt:
+    file: ./secrets/session.crt
+  session.key:
+    file: ./secrets/session.key
 
 networks:
   frontend:
