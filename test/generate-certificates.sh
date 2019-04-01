@@ -19,8 +19,8 @@ openssl req \
 # generate RSA certificate for session token signing
 #
 
-PRIVKEY=session/session.crt
-PUBKEY=session/session.key
+PRIVKEY=session/session.key
+PUBKEY=session/session.cert
 
 mkdir -p session
 rm -f ${PRIVKEY} ${PUBKEY}
