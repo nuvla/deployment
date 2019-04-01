@@ -1,7 +1,5 @@
 *~
-session
-nuvla.crt
-nuvla.key
+secrets
 target
 *.iml
 .idea/

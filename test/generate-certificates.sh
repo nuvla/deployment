@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+BASEDIR=secrets
+mkdir -p ${BASEDIR}
+
 # generate the SSL certificate for server
 
-PRIVKEY=traefik/nuvla.key
-PUBKEY=traefik/nuvla.crt
+PRIVKEY=${BASEDIR}/nuvla.key
+PUBKEY=${BASEDIR}/nuvla.crt
 
-mkdir -p traefik
+rm -f ${PRIVKEY} ${PUBKEY}
 openssl req \
         -newkey rsa:2048 \
         -nodes \
@@ -19,11 +22,9 @@ openssl req \
 # generate RSA certificate for session token signing
 #
 
-PRIVKEY=session/session.key
-PUBKEY=session/session.cert
+PRIVKEY=${BASEDIR}/session.key
+PUBKEY=${BASEDIR}/session.crt
 
-mkdir -p session
 rm -f ${PRIVKEY} ${PUBKEY}
 openssl genrsa -out ${PRIVKEY} 2048
 openssl rsa -pubout -in ${PRIVKEY} -out ${PUBKEY}
-chmod 400 ${PRIVKEY} ${PRIVKEY}

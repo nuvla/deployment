@@ -137,13 +137,13 @@ configs:
 
 secrets:
   nuvla.crt:
-    file: ./traefik/nuvla.crt
+    file: ./secrets/nuvla.crt
   nuvla.key:
-    file: ./traefik/nuvla.key
+    file: ./secrets/nuvla.key
   session.crt:
-    file: ./session/session.crt
+    file: ./secrets/session.crt
   session.key:
-    file: ./session/session.key
+    file: ./secrets/session.key
 
 networks:
   frontend:
