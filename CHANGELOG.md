@@ -6,6 +6,6 @@
 
 ### Changed
 
-  - Update parent to version 6.3.0.
+  - Initial release to test deployment process.
 
  
