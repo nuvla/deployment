@@ -9,9 +9,9 @@
   <url>http://sixsq.com/</url>
 
   <scm>
-    <connection>${scm.read}/nuvla.git</connection>
-    <developerConnection>${scm.write}/nuvla.git</developerConnection>
-    <url>${scm.public}/nuvla.git</url>
+    <connection>https://github.com/nuvla/deployment.git</connection>
+    <developerConnection>git@github.com:nuvla/deployment.git</developerConnection>
+    <url>https://github.com/nuvla/deployment</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -147,14 +147,23 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
       
       <plugin>
         <groupId>de.jutzig</groupId>
         <artifactId>github-release-plugin</artifactId>
         <version>1.1.1</version>
         <configuration>
-          <description>Description of your release</description>
-          <releaseName>1.0 Final</releaseName>
+          <description>Nuvla Service Deployment</description>
+          <releaseName>${project.version}</releaseName>
           <tag>${project.version}</tag>
           
           <!-- If your project has additional artifacts, such as ones produced by
@@ -170,6 +179,15 @@
             </fileSet>
           </fileSets>
         </configuration>
+        <executions>
+          <execution>
+            <id>github-release</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>release</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       
     </plugins>    
