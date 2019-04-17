@@ -12,6 +12,19 @@ detailed information about each deployment.
 
 ## Release Process
 
+**Before** trying to release the code, you must add the following to
+your `~/.m2/settings.xml` file:
+
+    <servers>
+      <server>
+        <id>github</id>
+        <username>github-username</username>
+        <privateKey>github-token</privateKey>
+      </server>
+    </servers>
+
+replacing the username and privateKey values with your own.
+
 This repository uses `mvn` to perform the release and to upload the
 artifacts to GitHub.  Although this uses the standard maven releases
 plugin, the full process can be run with:
