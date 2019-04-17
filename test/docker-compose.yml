@@ -29,7 +29,7 @@ services:
       - frontend
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
     ports:
       - "9200:9200"
     environment:
