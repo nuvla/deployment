@@ -25,6 +25,13 @@ your `~/.m2/settings.xml` file:
 
 replacing the username and privateKey values with your own.
 
+Update the `CHANGELOG.md` file **before** releasing the code.  Provide
+a good descriptions of the updates contained in the release.
+
+Ensure that the **current snapshot version** is the one that you want
+to tag, keeping in mind the guidelines for semantic versioning. Update
+the version in the `pom.xml` file if necessary.
+
 This repository uses `mvn` to perform the release and to upload the
 artifacts to GitHub.  Although this uses the standard maven releases
 plugin, the full process can be run with:
