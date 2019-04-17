@@ -1,0 +1,178 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>sixsq.nuvla</groupId>
+  <artifactId>nuvla</artifactId>
+  <version>0.9.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>nuvla</name>
+  <url>http://sixsq.com/</url>
+
+  <scm>
+    <connection>${scm.read}/nuvla.git</connection>
+    <developerConnection>${scm.write}/nuvla.git</developerConnection>
+    <url>${scm.public}/nuvla.git</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>clojars.org</id>
+      <name>Clojars Repository</name>
+      <url>http://clojars.org/repo</url>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <repositories>
+
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>nuvla.releases</id>
+      <name>Nuvla Releases</name>
+      <url>s3p://sixsq-build-artifacts/releases</url>
+    </repository>
+
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>nuvla.snapshots</id>
+      <name>Nuvla Snapshots</name>
+      <url>s3p://sixsq-build-artifacts/snapshots</url>
+    </repository>
+
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>nuvla.releases</id>
+      <name>Nuvla Releases</name>
+      <url>s3p://sixsq-build-artifacts/releases</url>
+    </repository>
+
+    <snapshotRepository>
+      <id>nuvla.snapshots</id>
+      <name>Nuvla Snapshots</name>
+      <url>s3p://sixsq-build-artifacts/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <build>
+    
+    <extensions>
+      
+      <!-- provide build time details for modules and plugins -->
+      <extension>
+        <groupId>co.leantechniques</groupId>
+        <artifactId>maven-buildtime-extension</artifactId>
+        <version>3.0.3</version>
+      </extension>
+
+      <!-- allows use of S3 for artifacts -->
+      <extension>
+        <groupId>s3-wagon-private</groupId>
+        <artifactId>s3-wagon-private</artifactId>
+        <version>1.3.2</version>
+      </extension>
+
+    </extensions>
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>parse-version</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>                                                                                
+            <configuration>
+              <outputDirectory>${basedir}</outputDirectory>
+              <encoding>UTF-8</encoding>
+              <resources>
+                <resource>
+                  <directory>src/main/resources</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>versions.sh</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+
+        <executions>
+          <execution>
+            <id>bundle</id>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/bundle.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>de.jutzig</groupId>
+        <artifactId>github-release-plugin</artifactId>
+        <version>1.1.1</version>
+        <configuration>
+          <description>Description of your release</description>
+          <releaseName>1.0 Final</releaseName>
+          <tag>${project.version}</tag>
+          
+          <!-- If your project has additional artifacts, such as ones produced by
+               the maven-assembly-plugin, you can define the following
+               (requires version 1.1.1 of the plugin or higher): -->
+          <fileSets>
+            <fileSet>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>${project.artifactId}*.tar.gz</include>
+                <include>${project.artifactId}*.zip</include>
+              </includes>
+            </fileSet>
+          </fileSets>
+        </configuration>
+      </plugin>
+      
+    </plugins>    
+  </build>
+
+</project>

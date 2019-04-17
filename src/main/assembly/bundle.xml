@@ -1,0 +1,30 @@
+<assembly>
+  <id>bundle</id>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <fileSets>
+
+    <fileSet>
+      <directory>${basedir}/test</directory>
+      <directoryMode>755</directoryMode>
+      <fileMode>644</fileMode>
+      <outputDirectory>test</outputDirectory>
+      <excludes>
+        <exclude>**/*~</exclude>
+        <exclude>**/.*</exclude>
+        <exclude>**/secrets/**/*</exclude>
+        <exclude>target</exclude>
+        <exclude>**/*.iml</exclude>
+        <exclude>**/*.log*</exclude>
+      </excludes>
+    </fileSet>
+
+  </fileSets>
+
+</assembly>
