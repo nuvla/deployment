@@ -9,8 +9,8 @@
   <url>http://sixsq.com/</url>
 
   <scm>
-    <connection>https://github.com/nuvla/deployment.git</connection>
-    <developerConnection>git@github.com:nuvla/deployment.git</developerConnection>
+    <connection>scm:git:https://github.com/nuvla/deployment.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:nuvla/deployment.git</developerConnection>
     <url>https://github.com/nuvla/deployment</url>
     <tag>HEAD</tag>
   </scm>
