@@ -10,7 +10,7 @@
 
   <scm>
     <connection>scm:git:https://github.com/nuvla/deployment.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:nuvla/deployment.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/nuvla/deployment.git</developerConnection>
     <url>https://github.com/nuvla/deployment</url>
     <tag>HEAD</tag>
   </scm>
