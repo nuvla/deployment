@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+ minio:
+  image: minio/minio:latest
+  volumes:
+   - ${NFS_ROOT:-/nfs-root}:/data
+  ports:
+   - "9000:9000"
+  environment:
+   MINIO_ACCESS_KEY: ${ADMIN_USERNAME:-admin}
+   MINIO_SECRET_KEY: ${ADMIN_PASSWORD:-admin}
+  command: server /data 
