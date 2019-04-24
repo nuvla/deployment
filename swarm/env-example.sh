@@ -1,6 +1,18 @@
 #!/bin/bash -xe
 
 #
+# SSH key to use for Swarm deployment
+#
+# You should use an SSH key that is not password
+# protected to avoid having to repeatedly enter
+# your password.
+#
+# This is the default value if not specified.
+# 
+
+# SSH_KEY=${HOME}/.ssh/id_rsa
+
+#
 # Administrator username and password
 #
 # The default username/password is admin/admin.
