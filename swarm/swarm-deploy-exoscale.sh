@@ -27,6 +27,10 @@ if [ ! -f "${SSH_KEY}" ]; then
     yes y | ssh-keygen -q -t rsa -N '' -f ${SSH_KEY} &>/dev/null
 fi
 
+#
+# A "docker-machine" security group will be created. Specify
+# --exoscale-security-group if you need a specific one.
+#
 MNAME=dockermachine-$(date +%s)
 CREATE_CMD="create --driver exoscale 
     --exoscale-ssh-user root 
@@ -34,8 +38,7 @@ CREATE_CMD="create --driver exoscale
     --exoscale-api-key ${EXOSCALE_API_KEY:?provide EXOSCALE_API_KEY value}
     --exoscale-api-secret-key ${EXOSCALE_API_SECRET:?provide EXOSCALE_API_SECRET value}
     --exoscale-availability-zone ${EXOSCALE_REGION:-CH-GVA-2} 
-    --exoscale-instance-profile Large 
-    --exoscale-security-group slipstream_managed"
+    --exoscale-instance-profile Large"
 
 deploy() {
     swarm_node_count=${1:-1}

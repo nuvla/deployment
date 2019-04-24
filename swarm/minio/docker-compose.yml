@@ -1,5 +1,9 @@
 version: '3.3'
 
+networks:
+  traefik-public:
+    external: true
+
 services:
  minio:
   image: minio/minio:latest
@@ -10,4 +14,19 @@ services:
   environment:
    MINIO_ACCESS_KEY: ${ADMIN_USERNAME:-admin}
    MINIO_SECRET_KEY: ${ADMIN_PASSWORD:-admin}
-  command: server /data 
+  command: server /data
+  deploy: 
+    labels:
+      - traefik.frontend.rule=PathPrefixStrip:/minio/
+      - traefik.enable=true
+      - traefik.port=9000
+      - traefik.docker.network=traefik-public
+      # Traefik service that listens to HTTP
+      - traefik.redirectorservice.frontend.entryPoints=http
+      - traefik.redirectorservice.frontend.redirect.entryPoint=https
+      # Traefik service that listens to HTTPS
+      - traefik.webservice.frontend.entryPoints=https
+  networks:
+    - traefik-public
+    
+

@@ -10,7 +10,7 @@
 # This is the default value if not specified.
 # 
 
-# SSH_KEY=${HOME}/.ssh/id_rsa
+# export SSH_KEY=${HOME}/.ssh/id_rsa
 
 #
 # Administrator username and password
@@ -36,3 +36,13 @@ export GF_SMTP_FROM_NAME=nuvla
 export GF_SMTP_HOST=smtp.example.com:465
 export GF_SMTP_USER=nuvla@example.com
 export GF_SMTP_PASSWORD=clear-text-password
+
+#
+# Parameters for the Exoscale cloud
+#
+# The region defaults to CH-GVA-2.
+#
+
+export EXOSCALE_API_KEY='key'
+export EXOSCALE_API_SECRET='secret'
+#export EXOSCALE_REGION=CH-GVA-2

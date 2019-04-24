@@ -84,7 +84,7 @@ services:
         reservations:
           memory: 64M
       labels:
-        - traefik.frontend.rule=Host:monitoring.${DOMAIN}
+        - traefik.frontend.rule=PathPrefixStrip:/grafana/
         - traefik.enable=true
         - traefik.port=3000
         - traefik.docker.network=traefik-public
@@ -123,7 +123,7 @@ services:
 #        reservations:
 #          memory: 64M
 #      labels:
-#        - traefik.frontend.rule=Host:alertmanager.${DOMAIN}
+#        - traefik.frontend.rule=PathPrefixStrip:/alertmanager/
 #        - traefik.enable=true
 #        - traefik.port=9093
 #        - traefik.docker.network=traefik-public
@@ -190,7 +190,7 @@ services:
         reservations:
           memory: 128M
       labels:
-        - traefik.frontend.rule=Host:prometheus.${DOMAIN}
+        - traefik.frontend.rule=PathPrefixStrip:/prometheus/
         - traefik.enable=true
         - traefik.port=9090
         - traefik.docker.network=traefik-public
