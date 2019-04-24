@@ -22,10 +22,6 @@ configuration.
 The following sections describe each step of the deployment and
 configuration of a target or host Docker Swarm infrastructure.
 
-## Setup
-
-Clone this repository to a convenient location. 
-
 ## Docker Swarm Cluster
 
 Deploy a vanilla Docker Swarm cluster using the installation method
@@ -43,8 +39,19 @@ infrastructure. The script `deploy-swarm-exoscale.sh` will use
 use a different cloud driver or other customization that you require.
 
 If you want to use the `swarm-deploy-exoscale.sh` script (or a variant
-of it) to deploy your Docker Swarm infrastructure, the command to use
-is:
+of it) to deploy your Docker Swarm infrastructure, first clone this
+repository to a convenient Linux/Unix machine.
+
+Descend into the `swarm` subdirectory and copy `env-example.sh` to
+`env.sh`. Edit this file, changing the values of the variables to
+customize your installation. Afterwards, run:
+
+    source env.sh
+
+to set all of the environmental variables for the Swarm management
+script. 
+
+The command to use to create cluster is:
 
     ./swarm-deploy-exoscale.sh deploy 3
 
@@ -68,8 +75,10 @@ command `docker-machine ls` if necessary.
 ## NFS
 
 If you are deploying a **target** infrastructure, then be sure that
-**all** nodes have the NFS client software installed. This can be
-done, for example on Ubuntu, with the command:
+**all** nodes have the NFS client software installed.
+
+This can be done, for example on Ubuntu, by accessing the nodes as
+`root` via SSH and running the command:
 
     apt-get update
     apt-get install nfs-kernel-server
@@ -107,7 +116,7 @@ Create a public overlay network with the command:
     docker network create --driver=overlay traefik-public
 
 The name "traefik-public" is hardcoded in many of the docker-compose
-files. If you want to use a different name, you'll need to updates
+files. If you want to use a different name, you'll need to update
 those files.
 
 ## Deploy Traefik
