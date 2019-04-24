@@ -1,9 +1,9 @@
 version: '3.3'
 
 services:
-  proxy:
+  traefik:
     image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=nuvla_frontend --docker.exposedByDefault=false --loglevel=info
+    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=traefik-public --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
@@ -26,7 +26,7 @@ services:
         condition: on-failure
         delay: 5s
     networks:
-      - frontend
+      - traefik-public
 
 configs:
   traefik.toml:

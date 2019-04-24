@@ -1,4 +1,7 @@
-defaultEntryPoints = ["http", "https"]
+debug = false
+logLevel = "ERROR"
+
+defaultEntryPoints = ["https", "http"]
 
 [entryPoints]
   [entryPoints.http]

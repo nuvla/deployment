@@ -1,42 +1,41 @@
 # Docker Swarm Infrastructures
 
-This directory contains files that support the deployment of Docker
-Swarm infrastructures for Nuvla.
-
-There are two types of Docker Swarm infrastructures:
+There are two types of Docker Swarm infrastructures that can be
+deployed for Nuvla:
 
  - **target**: A Docker Swarm infrastructure on which Nuvla will
    **deploy** containers.  This is a basic deployment of Swarm with
    Minio/NFS for data access and Prometheus for monitoring. Persistent
-   volumes are needed for data storage for production.
+   volumes are needed for data storage in production environments.
+   Nuvla can be configured to deploy to any number of target Docker
+   Swarm infrastructures.
 
  - **host**: A Docker Swarm infrastructure that will **host** a Nuvla
    deployment. This is a basic deployment of Swarm with Prometheus for
    monitoring. Persistent volumes are needed to back the Elasticsearch
-   database for production.
+   database in production environments.
 
 Before starting, review the entire deployment procedure. You may need
-to make changes to the provided Docker Compose files, e.g. in the NFS
-configuration.
+to customize the provided Docker Compose files.
 
 The following sections describe each step of the deployment and
-configuration of a target or host Docker Swarm infrastructure.
+configuration of a Docker Swarm infrastructure for use with Nuvla.
 
 ## Docker Swarm Cluster
 
-Deploy a vanilla Docker Swarm cluster using the installation method
-that you prefer.
+Docker Swarm clusters provide the computational platforms that Nuvla
+uses to deploy container-based applications, including Nuvla itself.
 
-See the Docker tutorial on [creating a
-swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/)
-to understand how to do this.
+Any method can be used to deploy a Docker Swarm cluster.  See the
+[Docker Swarm documentation](https://docs.docker.com/engine/swarm/)
+for an overview of Docker Swarm and how to deploy it.
 
-You may also want to look at using `docker-machine`, which automates
-the deployment of a Docker Swarm cluster on a cloud
+You may want to consider `docker-machine` for installation; it
+automates the deployment of a Docker Swarm cluster on a cloud
 infrastructure. The script `deploy-swarm-exoscale.sh` will use
 `docker-machine` to deploy a Swarm cluster on the
 [Exoscale](https://exoscale.ch) cloud. This script can be modified to
-use a different cloud driver or other customization that you require.
+use a different cloud driver or to customization the configuration.
 
 If you want to use the `swarm-deploy-exoscale.sh` script (or a variant
 of it) to deploy your Docker Swarm infrastructure, first clone this
@@ -51,22 +50,23 @@ customize your installation. Afterwards, run:
 to set all of the environmental variables for the Swarm management
 script. 
 
-The command to use to create cluster is:
-
-    ./swarm-deploy-exoscale.sh deploy 3
-
-This creates a cluster with one master and two workers (three nodes in
-total). If you do not provide the second argument, it defaults to one.
-
 Note that `docker-machine` uses SSH to communicate with the virtual
 machines of the cluster. By default the key `${HOME}/.ssh/id_rsa` will
 be used (or created if it does not exist). If you want to use a
-different key, then set the environmental variable `SSH_KEY`.
+different key, then set the environmental variable `SSH_KEY` in the
+`env.sh` file.
 
 **WARNING**: Use an SSH key **WITHOUT** a password. If you use one
 with a password, you will be prompted for the password, repeatedly. To
 generate a new SSH key without a password just set SSH_KEY to a file
 that does not exist.
+
+The command to use to create the cluster is:
+
+    ./swarm-deploy-exoscale.sh deploy 3
+
+This creates a cluster with one master and two workers (three nodes in
+total). If you do not provide the second argument, it defaults to one.
 
 You will want to note the IP addresses of the Docker Swarm master and
 workers (if any). You can recover these IP addresses by running the
@@ -125,7 +125,7 @@ Traefik is a general router and load balancer. You can deploy it
 (again for use by other components) with the command:
 
     cd traefik
-    docker stack deploy -c traefik.yml traefik
+    docker-compose up
 
 If you want to change the name of the public network, the compose file
 must be modified.
