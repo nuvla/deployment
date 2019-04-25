@@ -58,7 +58,7 @@ services:
       - backend
 
   api:
-    image: nuvladev/api:master
+    image: nuvladev/api:java-time
     environment:
       - ES_HOST=es
       - ES_PORT=9200
