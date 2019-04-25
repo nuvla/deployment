@@ -1,5 +1,9 @@
 version: '3.3'
 
+networks:
+  nuvla-backend:
+    external: true
+
 services:
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
@@ -29,7 +33,3 @@ services:
         delay: 5s    
     networks:
       - nuvla-backend
-
-networks:
-  nuvla-backend:
-    external:true
