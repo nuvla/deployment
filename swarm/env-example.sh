@@ -17,6 +17,9 @@
 #
 # The default username/password is admin/admin_admin.
 #
+# The username must have at least three characters
+# and the password at least eight.
+#
 
 export ADMIN_USERNAME=admin
 export ADMIN_PASSWORD=admin_admin
