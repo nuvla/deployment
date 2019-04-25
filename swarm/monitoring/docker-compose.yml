@@ -13,31 +13,14 @@ volumes:
     alertmanager: {}
 
 configs:
-  dockerd_config:
-    file: ./dockerd-exporter/Caddyfile
   node_rules:
     file: ./prometheus/rules/swarm_node.rules.yml
   task_rules:
     file: ./prometheus/rules/swarm_task.rules.yml
+  gf_prometheus_datasource:
+    file: ./grafana/datasources/prometheus.yaml
 
 services:
-  dockerd-exporter:
-    image: stefanprodan/caddy
-    networks:
-      - net
-    environment:
-      - DOCKER_GWBRIDGE_IP=172.18.0.1
-    configs:
-      - source: dockerd_config
-        target: /etc/caddy/Caddyfile
-    deploy:
-      mode: global
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-
   cadvisor:
     image: google/cadvisor
     networks:
@@ -63,7 +46,7 @@ services:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
-      #- GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-localhost}
+      - GF_SERVER_ROOT_URL=/grafana
       - GF_SMTP_ENABLED=${GF_SMTP_ENABLED}
       - GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS}
       - GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME}
@@ -84,7 +67,7 @@ services:
         reservations:
           memory: 64M
       labels:
-        - traefik.frontend.rule=PathPrefixStrip:/grafana/
+        - traefik.frontend.rule=PathPrefixStrip:/grafana
         - traefik.enable=true
         - traefik.port=3000
         - traefik.docker.network=traefik-public
@@ -93,15 +76,15 @@ services:
         - traefik.redirectorservice.frontend.redirect.entryPoint=https
         # Traefik service that listens to HTTPS
         - traefik.webservice.frontend.entryPoints=https
+    configs:
+      - source: gf_prometheus_datasource
+        target: /etc/grafana/provisioning/datasources/prometheus.yaml  
     networks:
-      - default
       - net
       - traefik-public
 
 #  alertmanager:
 #    image: stefanprodan/swarmprom-alertmanager:v0.14.0
-#    networks:
-#      - net
 #    environment:
 #      - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
 #      - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
@@ -134,7 +117,6 @@ services:
 #        - traefik.webservice.frontend.entryPoints=https
 #        - traefik.frontend.auth.basic.users=${ADMIN_USER:-admin}:${ADMIN_HASHED_PASSWORD:?provide ADMIN_HASHED_PASSWORD value}
 #    networks:
-#      - default
 #      - net
 #      - traefik-public
 
@@ -165,12 +147,12 @@ services:
 
   prometheus:
     image: stefanprodan/swarmprom-prometheus:v2.5.0
-    networks:
-      - net
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=24h'
+      - '--web.external-url=https://ignored.example.com/prometheus'
+      - '--web.route-prefix=/prometheus'
     volumes:
       - prometheus:/prometheus
     configs:
@@ -190,7 +172,7 @@ services:
         reservations:
           memory: 128M
       labels:
-        - traefik.frontend.rule=PathPrefixStrip:/prometheus/
+        - traefik.frontend.rule=PathPrefix:/prometheus/
         - traefik.enable=true
         - traefik.port=9090
         - traefik.docker.network=traefik-public
@@ -201,6 +183,5 @@ services:
         - traefik.webservice.frontend.entryPoints=https
         - traefik.frontend.auth.basic.users=${ADMIN_USER:-admin}:${ADMIN_HASHED_PASSWORD:?provide ADMIN_HASHED_PASSWORD value}
     networks:
-      - default
       - net
       - traefik-public
