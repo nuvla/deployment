@@ -15,11 +15,14 @@
 #
 # Administrator username and password
 #
-# The default username/password is admin/admin.
+# The default username/password is admin/admin_admin.
+#
+# The username must have at least three characters
+# and the password at least eight.
 #
 
 export ADMIN_USERNAME=admin
-export ADMIN_PASSWORD=admin
+export ADMIN_PASSWORD=admin_admin
 
 export ADMIN_HASHED_PASSWORD=`htpasswd -nbB ${ADMIN_USERNAME} ${ADMIN_PASSWORD} | head -1 | cut -d : -f 2 | sed 's/\$/\$\$/g'`
 
