@@ -13,10 +13,11 @@ defaultEntryPoints = ["https", "http"]
     [entryPoints.https.tls]
 
 [acme]
-email = "khaled@sixsq.com"
+email = "foobar@example.com"
 storage = "acme.json"
 entryPoint = "https"
 onHostRule = true
 [acme.httpChallenge]
 entryPoint = "http"
-
+[[acme.domains]]
+  main = "example.com"

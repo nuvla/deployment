@@ -6,11 +6,10 @@ services:
     command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=traefik-public --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme.json:/acme.json
     configs:
       - source: traefik.toml
         target: /traefik.toml
-      - source: acme.json
-        target: /acme.json
     ports:
       - "80:80"
       - "443:443"
@@ -28,8 +27,6 @@ services:
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
-  acme.json:
-    file: ./traefik/acme.json
 
 networks:
   traefik-public:
