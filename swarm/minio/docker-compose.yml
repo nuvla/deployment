@@ -13,11 +13,11 @@ services:
    - "9000:9000"
   environment:
    MINIO_ACCESS_KEY: ${ADMIN_USERNAME:-admin}
-   MINIO_SECRET_KEY: ${ADMIN_PASSWORD:-admin}
+   MINIO_SECRET_KEY: ${ADMIN_PASSWORD:-admin_admin}
   command: server /data
   deploy: 
     labels:
-      - traefik.frontend.rule=PathPrefixStrip:/minio/
+      - traefik.frontend.rule=PathPrefix:/minio/
       - traefik.enable=true
       - traefik.port=9000
       - traefik.docker.network=traefik-public
@@ -28,5 +28,3 @@ services:
       - traefik.webservice.frontend.entryPoints=https
   networks:
     - traefik-public
-    
-
