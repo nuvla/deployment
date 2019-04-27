@@ -89,8 +89,25 @@ To stop the server, simply do the following:
 docker stack rm nuvla
 ```
 
-This should stop the containers and remove the containers and any
-volumes that were created.
+This should stop the containers and remove the containers and
+networks.
+
+The volumes ("nuvla_esdata", "nuvla_zkdata", and "nuvla_zkdatalog")
+will remain and will be reused if the test deployment is restarted
+with the same name. To remove them,
+
+```sh
+docker volume rm nuvla_esdata nuvla_zkdata nuvla_zkdatalog
+```
+
+or to remove all unused volumes:
+
+```sh
+docker volume prune
+```
+
+Be careful with the prune command, as it will remove all unused
+volumes from all deployments.
 
 **NOTE: Because of the problem described below, you may want to simply
 redeploy the stack for updates rather than stopping and starting the
@@ -104,13 +121,14 @@ delete all the resources associated with the stack. Unfortunately,
 there are race conditions in the clean up that often cause the
 nuvla_api container to remain defined (but not running).  This in turn
 causes the nuvla_test-net network deletion to fail. Worse, it ends in
-a state where it can be listed but not deleted. Grrr...
+a state where the network can be listed but not deleted. Grrr...
 
 The discussion around this issue can be found in a [GitHub
 issue](https://github.com/moby/moby/issues/32620) and a related
 [Gist](https://gist.github.com/dperny/86bb33f195e4a3c27bbc497372652994)
 that describes the `network rm` problems.
 
-The only clean workaround is to restart the Docker daemon. However,
-you can just use a different name for a new deployment to avoid the
-restart; although this will leave dangling network definitions.
+The only clean workaround is to restart the Docker daemon.
+
+Although it will leave dangling network definitions, you can just use
+a different name for a new deployment to avoid the restart.

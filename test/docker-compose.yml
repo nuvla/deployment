@@ -35,7 +35,9 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
     networks:
       - test-net
 
@@ -48,7 +50,10 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
+    volumes:
+      - zkdata:/data
+      - zkdatalog:/datalog
     networks:
       - test-net
 
@@ -119,3 +124,11 @@ configs:
 
 networks:
   test-net:
+
+volumes:
+  esdata:
+    driver: local
+  zkdata:
+    driver: local
+  zkdatalog:
+    driver: local
