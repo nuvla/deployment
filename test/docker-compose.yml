@@ -53,7 +53,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:generate-session-keys
+    image: nuvladev/api:master
     environment:
       - ES_HOST=es
       - ES_PORT=9200
