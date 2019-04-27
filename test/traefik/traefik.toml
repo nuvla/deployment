@@ -8,6 +8,3 @@ defaultEntryPoints = ["http", "https"]
   [entryPoints.https]
   address = ":443"
     [entryPoints.https.tls]
-      [[entryPoints.https.tls.certificates]]
-      certFile = "/nuvla.crt"
-      keyFile = "/nuvla.key"
