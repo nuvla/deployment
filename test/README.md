@@ -16,9 +16,8 @@ backend services.  The deployment includes:
    `/api/` will be redirected to `/api/cloud-entry-point`.
    
  - **ui**: Nuvla browser user interface. Serves the static content of
-   the user interface. Accessible through traefik on the `/*`
-   paths. Paths that do not start with `/ui/` will be redirected to
-   `/ui/`.
+   the user interface. Accessible through traefik on the `/` and
+   `/ui/` paths.
    
  - **job-\***: Engine for asynchronous processing of jobs. Job
    executor, distributor, and cleanup containers are started as part
@@ -26,8 +25,7 @@ backend services.  The deployment includes:
    
  - **proxy**: Traefik load balancer and router. Deployed Nuvla service
    accessible on port 443 with a self-signed certificate. The web
-   interface for traefik is available on port 8080 via HTTP. This is
-   **not** a secure configuration for production.
+   interface for traefik is available on port 8080 via HTTP.
 
 Prerequisites
 -------------
@@ -41,30 +39,17 @@ docker swarm init
 
 The `docker stack` commands below should then work.
 
-Setup
------
-
-The deployment requires session and service certificates.  These must
-be generated before you deploy Nuvla. They are made available to the
-deployment via Docker "secrets".
-
-To generate the certificates:
-
-```
-./generate-certificates.sh
-```
-
-This will generate the certificates in the `session` and `traefik`
-subdirectories. The server certificate is valid for 14 days. 
-
 Starting
 --------
 
 This can be started with the command:
 
 ```sh
-docker stack deploy nuvla --compose-file docker-compose.yml
+docker stack deploy -c docker-compose.yml nuvla
 ```
+
+The stack name "nuvla" can be anything.  If you change it, adapt the
+commands below.
 
 You can view the status of the deployment with:
 
@@ -93,7 +78,7 @@ startup. The default value is "supeR8-supeR8", but you can use a
 different value if you wish.
 
 **The default super password should not be used for long-lived
-  deployments!**
+deployments!**
 
 Stopping
 --------
@@ -118,7 +103,7 @@ When running the command to remove the stack, it should asynchonously
 delete all the resources associated with the stack. Unfortunately,
 there are race conditions in the clean up that often cause the
 nuvla_api container to remain defined (but not running).  This in turn
-causes the nuvla_frontend network deletion to fail. Worse, it ends in
+causes the nuvla_test-net network deletion to fail. Worse, it ends in
 a state where it can be listed but not deleted. Grrr...
 
 The discussion around this issue can be found in a [GitHub
@@ -126,6 +111,6 @@ issue](https://github.com/moby/moby/issues/32620) and a related
 [Gist](https://gist.github.com/dperny/86bb33f195e4a3c27bbc497372652994)
 that describes the `network rm` problems.
 
-The only workaround seems to be to restart the Docker daemon to return
-to a clean state.
-
+The only clean workaround is to restart the Docker daemon. However,
+you can just use a different name for a new deployment to avoid the
+restart; although this will leave dangling network definitions.

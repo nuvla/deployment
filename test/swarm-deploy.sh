@@ -59,10 +59,8 @@ deploy() {
         --tlscert $HOME/.docker/machine/machines/$MNAME/cert.pem
         stack"
     
-    # FIXME: hardcoded to nuvla due to traefik.
     STACK_NAME=nuvla
     cd test
-    ./generate-certificates.sh
     $DSTACK_CMD deploy --compose-file docker-compose.yml $STACK_NAME
     cd -
     $DSTACK_CMD ls

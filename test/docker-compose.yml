@@ -3,17 +3,12 @@ version: '3.3'
 services:
   proxy:
     image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=nuvla_frontend --docker.exposedByDefault=false --loglevel=info
+    command: --api --web --docker --docker.swarmMode --docker.watch --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
       - source: traefik.toml
         target: /traefik.toml
-    secrets:
-      - source: nuvla.crt
-        target: /nuvla.crt
-      - source: nuvla.key
-        target: /nuvla.key
     ports:
       - "80:80"
       - "443:443"
@@ -26,7 +21,7 @@ services:
         condition: on-failure
         delay: 5s
     networks:
-      - frontend
+      - test-net
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
@@ -42,7 +37,7 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - backend
+      - test-net
 
   zk:
     image: zookeeper:3.4
@@ -55,20 +50,15 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - backend
+      - test-net
 
   api:
-    image: nuvladev/api:master
+    image: nuvladev/api:generate-session-keys
     environment:
       - ES_HOST=es
       - ES_PORT=9200
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
-    secrets:
-      - source: session.crt
-        target: /etc/nuvla/session/session.crt
-      - source: session.key
-        target: /etc/nuvla/session/session.key
     deploy:
       labels:
         - "traefik.enable=true"
@@ -81,18 +71,10 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - backend
-      - frontend
+      - test-net
 
-  # User interface takes any path not starting with /api.
-  #
-  # The tortured regex syntax is because lookaheads are
-  # not supported in RE2.
-  #
-  # Priorities with simple PathPrefix expressions and a
-  # fallback PathPrefix:/ expression does not work either.
-  # In this case the default will route to the wrong server
-  # if the api nodes are unhealthy.
+  # User interface takes the paths /, /ui/*, anything else
+  # is routed elsewhere.
   ui:
     image: nuvladev/ui:master
     deploy:
@@ -102,12 +84,12 @@ services:
         - "traefik.backend=ui"
         - "traefik.backend.healthcheck.path=/ui/index.html"
         - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=Path:/,/ui/,/{a:.},/{b:..},/{c:ui.*},/{d:([^a][^p][^i]|a[^p].|a.[^i]|[^a]p.|.p[^i]|[^a].i|.[^p]i).*}"
+        - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
       restart_policy:
         condition: on-failure
         delay: 5s    
     networks:
-      - frontend
+      - test-net
 
   job-executor:
     image: nuvladev/job:master
@@ -118,7 +100,7 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - backend
+      - test-net
 
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
@@ -129,22 +111,11 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - backend
+      - test-net
 
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
 
-secrets:
-  nuvla.crt:
-    file: ./secrets/nuvla.crt
-  nuvla.key:
-    file: ./secrets/nuvla.key
-  session.crt:
-    file: ./secrets/session.crt
-  session.key:
-    file: ./secrets/session.key
-
 networks:
-  frontend:
-  backend:
+  test-net:
