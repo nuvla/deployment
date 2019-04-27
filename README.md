@@ -1,5 +1,7 @@
 # Nuvla Deployments
 
+[![Build Status](https://travis-ci.com/nuvla/deployment.svg?branch=master)](https://travis-ci.com/nuvla/deployment)
+
 This repository contains the definitions for the deployment of the
 Nuvla platform.  See the README in each of the subdirectories for
 detailed information about each deployment.
