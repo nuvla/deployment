@@ -7,25 +7,35 @@ Nuvla deployment for TEST purposes.
 It configures traefik as a load balancer and router between the
 backend services.  The deployment includes:
 
- - **es**: Elasticsearch database. Not accessible externally.
+ - **es**: Elasticsearch database.
  
- - **zk**: Zookeeper for job processing. Not accessible externally.
+ - **zk**: Zookeeper for job processing.
  
- - **api**: Nuvla API server. It is also accessible through the
+ - **api**: Nuvla API server. It is accessible through the HTTPS
    traefik endpoint on the `/api*` paths. Paths not starting with
    `/api/` will be redirected to `/api/cloud-entry-point`.
    
  - **ui**: Nuvla browser user interface. Serves the static content of
-   the user interface. Accessible through traefik on the `/` and
-   `/ui/` paths.
+   the user interface. Accessible through the HTTPS traefik on the `/`
+   and `/ui*` paths. Unknown '/ui*' paths will be redirected to the
+   `index.html` file.
    
  - **job-\***: Engine for asynchronous processing of jobs. Job
    executor, distributor, and cleanup containers are started as part
-   of the deployment.  These are accessible only internally.
+   of the deployment.
    
  - **proxy**: Traefik load balancer and router. Deployed Nuvla service
    accessible on port 443 with a self-signed certificate. The web
    interface for traefik is available on port 8080 via HTTP.
+
+A single network `*_test-net` is created for the deployment. You can
+attach test containers to this network to debug individual services.
+For example, the command:
+
+    docker run -it --network nuvla_test-net  ubuntu:16.04
+
+will attach an ubuntu machine to the network. The network prefix
+corresponds to the stack name (see below).
 
 Prerequisites
 -------------
