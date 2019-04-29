@@ -7,5 +7,5 @@ Deployment" section of the [Nuvla
 documentation](https://nuvla.github.io/nuvla/) for information on how
 to use these.
 
-**NOTE**: This is work in progress and full production deployments of
-Nuvla are not yet supported.
+> **NOTE**: This is work in progress and full production deployments
+> of Nuvla are not yet supported.

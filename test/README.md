@@ -75,9 +75,15 @@ docker service logs -f nuvla_api
 
 changing the name of the service as necessary.
 
-The full Nuvla deployment can be accessed from `https://localhost/`,
-assuming that your running everything locally.  Change "localhost" to
-your host name when running remotely.
+The browser interface for Nuvla can be accessed from
+`https://localhost/` and the API from
+`https://localhost/api/cloud-entry-point`.  assuming that you're
+running everything locally.  Change "localhost" to your host name when
+running remotely.
+
+> **NOTE**: The demonstration deployment uses self-signed
+> certificates, so you will have to authorize a security exception in
+> your browser or from your command line tool.
 
 Bootstrapping
 -------------

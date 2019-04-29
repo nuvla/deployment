@@ -18,56 +18,44 @@ docker swarm init
 
 The `docker stack` commands below should then work.
 
-If you are not running locally, make sure your Docker Swarm satisfies
-the requirements for a **host** infrastructure.  See the instructions
-in the `swarm` directory.
-
-You will need to have a **target** Docker Swarm infrastructure
-available when using Nuvla to deploy containers.  See the instructions
-in the `swarm` directory.
-
-Setup
------
-
-The deployment requires session and service certificates.  These must
-be generated before you deploy Nuvla. They are made available to the
-deployment via Docker "secrets".
-
-To generate the certificates:
-
-```
-./generate-certificates.sh
-```
-
-This will generate the certificates in the `session` and `traefik`
-subdirectories. The server certificate is valid for 14 days. 
-
 Starting
 --------
 
 This can be started with the command:
 
 ```sh
-docker stack deploy nuvla --compose-file docker-compose.yml
+docker stack deploy -c docker-compose.yml demo
 ```
+
+> **WARNING**: You must use the stack name "demo", unless you modify
+> the `docker-compose.yml` file.
 
 You can view the status of the deployment with:
 
 ```sh
-docker stack services nuvla
+docker stack services demo
 ```
+
+If this is the first time you've run the demo, it make take some time
+to download the images and to then start the services.
 
 With the service reference, you can view the logs of any service:
 
 ```sh
-docker service logs -f nuvla_api
+docker service logs -f demo_api
 ```
 
 changing the name of the service as necessary.
 
-The full Nuvla deployment can be accessed from `https://localhost/`,
-assuming that your running everything locally.  Change "localhost" to
-your host name when running remotely.
+The browser interface for Nuvla can be accessed from
+`https://localhost/` and the API from
+`https://localhost/api/cloud-entry-point`.  assuming that you're
+running everything locally.  Change "localhost" to your host name when
+running remotely.
+
+> **NOTE**: The demonstration deployment uses self-signed
+> certificates, so you will have to authorize a security exception in
+> your browser or from your command line tool.
 
 Bootstrapping
 -------------
@@ -83,31 +71,40 @@ Stopping
 To stop the server, simply do the following:
 
 ```sh
-docker stack rm nuvla
+docker stack rm demo
 ```
 
-This should stop the containers and remove the containers and any
-volumes that were created.
+This should stop the containers and remove the containers and defined
+networks.
 
-**NOTE: Because of the problem described below, you may want to simply
-redeploy the stack for updates rather than stopping and starting the
-stack.**
+The volumes ("demo_esdata", "demo_zkdata", and "demo_zkdatalog") will
+remain and will be reused if the demonstration is restarted.  To
+remove them,
 
-Clean Up Problems
------------------
+```sh
+docker volume rm demo_esdata demo_zkdata demo_zkdatalog
+```
+
+or to remove all unused volumes:
+
+```sh
+docker volume prune
+```
+
+Be careful with the prune command, as it will remove all unused
+volumes from all deployments.
+
+Manual Clean Up
+---------------
 
 When running the command to remove the stack, it should asynchonously
 delete all the resources associated with the stack. Unfortunately,
-there are race conditions in the clean up that often cause the
-nuvla_api container to remain defined (but not running).  This in turn
-causes the nuvla_frontend network deletion to fail. Worse, it ends in
-a state where it can be listed but not deleted. Grrr...
+there are race conditions in the task management that may cause the
+"demo_frontend" network to enter a state where it cannot be deleted.
 
 The discussion around this issue can be found in a [GitHub
 issue](https://github.com/moby/moby/issues/32620) and a related
 [Gist](https://gist.github.com/dperny/86bb33f195e4a3c27bbc497372652994)
 that describes the `network rm` problems.
 
-The only workaround seems to be to restart the Docker daemon to return
-to a clean state.
-
+The only clean workaround is to restart the Docker daemon.
