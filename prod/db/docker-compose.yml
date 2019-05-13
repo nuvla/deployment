@@ -1,9 +1,5 @@
 version: '3.3'
 
-networks:
-  nuvla-backend:
-    external: true
-
 services:
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
@@ -18,6 +14,8 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s    
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
     networks:
       - nuvla-backend
 
@@ -31,5 +29,20 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s    
+    volumes:
+      - zkdata:/data
+      - zkdatalog:/datalog
     networks:
       - nuvla-backend
+
+networks:
+  nuvla-backend:
+    external: true
+
+volumes:
+  esdata:
+    driver: local
+  zkdata:
+    driver: local
+  zkdatalog:
+    driver: local
