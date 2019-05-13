@@ -58,7 +58,7 @@ services:
       - backend
 
   api:
-    image: nuvla/api:2.1.0
+    image: nuvla/api:2.1.1
     environment:
       - ES_HOST=es
       - ES_PORT=9200
