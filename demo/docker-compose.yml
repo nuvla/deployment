@@ -3,7 +3,7 @@ version: '3.3'
 services:
   proxy:
     image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.exposedByDefault=false --loglevel=info
+    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=demo_frontend --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
@@ -21,7 +21,7 @@ services:
         condition: on-failure
         delay: 5s
     networks:
-      - test-net
+      - frontend
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
@@ -35,11 +35,11 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 5s    
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
-      - test-net
+      - backend
 
   zk:
     image: zookeeper:3.4
@@ -50,15 +50,15 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 5s    
     volumes:
       - zkdata:/data
       - zkdatalog:/datalog
     networks:
-      - test-net
+      - backend
 
   api:
-    image: nuvladev/api:master
+    image: nuvla/api:2.1.1
     environment:
       - ES_HOST=es
       - ES_PORT=9200
@@ -76,12 +76,13 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - test-net
+      - backend
+      - frontend
 
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:master
+    image: nuvla/ui:0.0.2
     deploy:
       labels:
         - "traefik.enable=true"
@@ -94,10 +95,10 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - test-net
+      - frontend
 
   job-executor:
-    image: nuvladev/job:master
+    image: nuvla/job:2.0.0
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181 --es-hosts es
     deploy:
@@ -105,10 +106,10 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - test-net
+      - backend
 
   job-dist-jobs-cleanup:
-    image: nuvladev/job:master
+    image: nuvla/job:2.0.0
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181
     deploy:
@@ -116,15 +117,15 @@ services:
         condition: on-failure
         delay: 5s    
     networks:
-      - test-net
+      - backend
 
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
 
 networks:
-  test-net:
-    attachable: true
+  frontend:
+  backend:
 
 volumes:
   esdata:

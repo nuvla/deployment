@@ -1,0 +1,81 @@
+version: '3.3'
+
+networks:
+  traefik-public:
+    external: true
+  nuvla-backend:
+    external: true
+
+secrets:
+  session.crt:
+    file: ./secrets/session.crt
+  session.key:
+    file: ./secrets/session.key
+
+services:
+  api:
+    image: nuvla/api:2.1.1
+    environment:
+      - ES_HOST=es
+      - ES_PORT=9200
+      - ZK_ENDPOINTS=zk:2181
+      - NUVLA_SUPER_PASSWORD=supeR8-supeR8
+    secrets:
+      - source: session.crt
+        target: /etc/nuvla/session/session.crt
+      - source: session.key
+        target: /etc/nuvla/session/session.key
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=8200"
+        - "traefik.backend=api"
+        - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
+        - "traefik.frontend.rule=PathPrefix:/api"
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
+    networks:
+      - nuvla-backend
+      - traefik-public
+
+  # User interface takes the paths /, /ui/*, anything else
+  # is routed elsewhere.
+  ui:
+    image: nuvla/ui:0.0.2
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=80"
+        - "traefik.backend=ui"
+        - "traefik.backend.healthcheck.path=/ui/index.html"
+        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
+        - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
+    networks:
+      - traefik-public
+
+  job-executor:
+    image: nuvla/job:2.0.0
+    entrypoint: /app/job_executor.py
+    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181 --es-hosts es
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
+    networks:
+      - nuvla-backend
+
+  job-dist-jobs-cleanup:
+    image: nuvla/job:2.0.0
+    entrypoint: /app/job_distributor_jobs_cleanup.py
+    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s    
+    networks:
+      - nuvla-backend

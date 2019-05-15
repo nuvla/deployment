@@ -1,0 +1,33 @@
+version: '3.3'
+
+services:
+  traefik:
+    image: traefik:1.7
+    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=traefik-public --docker.exposedByDefault=false --loglevel=info
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme.json:/acme.json
+    configs:
+      - source: traefik.toml
+        target: /traefik.toml
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - traefik-public
+
+configs:
+  traefik.toml:
+    file: ./traefik/traefik.toml
+
+networks:
+  traefik-public:
+    external: true

@@ -1,0 +1,187 @@
+version: "3.3"
+
+networks:
+  net:
+    driver: overlay
+    attachable: true
+  traefik-public:
+    external: true
+
+volumes:
+    prometheus: {}
+    grafana: {}
+    alertmanager: {}
+
+configs:
+  node_rules:
+    file: ./prometheus/rules/swarm_node.rules.yml
+  task_rules:
+    file: ./prometheus/rules/swarm_task.rules.yml
+  gf_prometheus_datasource:
+    file: ./grafana/datasources/prometheus.yaml
+
+services:
+  cadvisor:
+    image: google/cadvisor
+    networks:
+      - net
+    command: -logtostderr -docker_only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  grafana:
+    image: stefanprodan/swarmprom-grafana:5.3.4
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin_admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=/grafana
+      - GF_SMTP_ENABLED=${GF_SMTP_ENABLED}
+      - GF_SMTP_FROM_ADDRESS=${GF_SMTP_FROM_ADDRESS}
+      - GF_SMTP_FROM_NAME=${GF_SMTP_FROM_NAME}
+      - GF_SMTP_HOST=${GF_SMTP_HOST}
+      - GF_SMTP_USER=${GF_SMTP_USER}
+      - GF_SMTP_PASSWORD=${GF_SMTP_PASSWORD}
+    volumes:
+      - grafana:/var/lib/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - traefik.frontend.rule=PathPrefixStrip:/grafana
+        - traefik.enable=true
+        - traefik.port=3000
+        - traefik.docker.network=traefik-public
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
+    configs:
+      - source: gf_prometheus_datasource
+        target: /etc/grafana/provisioning/datasources/prometheus.yaml  
+    networks:
+      - net
+      - traefik-public
+
+#  alertmanager:
+#    image: stefanprodan/swarmprom-alertmanager:v0.14.0
+#    environment:
+#      - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
+#      - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
+#      - SLACK_USER=${SLACK_USER:-alertmanager}
+#    command:
+#      - '--config.file=/etc/alertmanager/alertmanager.yml'
+#      - '--storage.path=/alertmanager'
+#    volumes:
+#      - alertmanager:/alertmanager
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#      placement:
+#        constraints:
+#          - node.role == manager
+#      resources:
+#        limits:
+#          memory: 128M
+#        reservations:
+#          memory: 64M
+#      labels:
+#        - traefik.frontend.rule=PathPrefixStrip:/alertmanager/
+#        - traefik.enable=true
+#        - traefik.port=9093
+#        - traefik.docker.network=traefik-public
+#        # Traefik service that listens to HTTP
+#        - traefik.redirectorservice.frontend.entryPoints=http
+#        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+#        # Traefik service that listens to HTTPS
+#        - traefik.webservice.frontend.entryPoints=https
+#        - traefik.frontend.auth.basic.users=${ADMIN_USER:-admin}:${ADMIN_HASHED_PASSWORD:?provide ADMIN_HASHED_PASSWORD value}
+#    networks:
+#      - net
+#      - traefik-public
+
+  node-exporter:
+    image: stefanprodan/swarmprom-node-exporter:v0.16.0
+    networks:
+      - net
+    environment:
+      - NODE_ID={{.Node.ID}}
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename
+    command:
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
+      - '--collector.textfile.directory=/etc/node-exporter/'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--no-collector.ipvs'
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+  prometheus:
+    image: stefanprodan/swarmprom-prometheus:v2.5.0
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=24h'
+      - '--web.external-url=https://ignored.example.com/prometheus'
+      - '--web.route-prefix=/prometheus'
+    volumes:
+      - prometheus:/prometheus
+    configs:
+      - source: node_rules
+        target: /etc/prometheus/swarm_node.rules.yml
+      - source: task_rules
+        target: /etc/prometheus/swarm_task.rules.yml
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+      labels:
+        - traefik.frontend.rule=PathPrefix:/prometheus/
+        - traefik.enable=true
+        - traefik.port=9090
+        - traefik.docker.network=traefik-public
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
+        - traefik.frontend.auth.basic.users=${ADMIN_USER:-admin}:${ADMIN_HASHED_PASSWORD:?provide ADMIN_HASHED_PASSWORD value}
+    networks:
+      - net
+      - traefik-public

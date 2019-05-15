@@ -1,4 +1,7 @@
-defaultEntryPoints = ["http", "https"]
+debug = false
+logLevel = "ERROR"
+
+defaultEntryPoints = ["https", "http"]
 
 [entryPoints]
   [entryPoints.http]
@@ -8,3 +11,6 @@ defaultEntryPoints = ["http", "https"]
   [entryPoints.https]
   address = ":443"
     [entryPoints.https.tls]
+      [[entryPoints.https.tls.certificates]]
+      certFile = "/nuvla.crt"
+      keyFile = "/nuvla.key"

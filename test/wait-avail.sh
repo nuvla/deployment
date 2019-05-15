@@ -17,5 +17,5 @@ while [ "$rc" -ne 0 -a "$(date +%s)" -lt "$time_max" ]; do
     rc=$?
     set -e
 done
-[ "$rc" -ne 0 ] && echo "ERROR: failed conecting to $endpoint"
+[ "$rc" -ne 0 ] && echo "ERROR: failed connecting to $endpoint"
 exit $rc
