@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  agent:
+    image: nuvlabox/agent:0.1.2
+    expose:
+      - 5000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+    environment:
+      - NUVLABOX_UUID=4ee2a085-d234-4863-913a-4c71b3ef81e7
+      - NUVLA_ENDPOINT=172.23.0.2
+      - NUVLA_ENDPOINT_INSECURE=True
+    labels:
+      - nuvlabox.component=True
+    networks:
+      - localhost
+    depends_on:
+      - system-manager
+
+  system-manager:
+    image: nuvlabox/system-manager:0.1.1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+    labels:
+      - nuvlabox.component=True
+    restart: on-failure
+    ports:
+      - 127.0.0.1:3636:3636
+    networks:
+      - localhost
+
+
+volumes:
+  nuvlabox-db:
+    driver: local
+
+
+networks:
+  localhost:
+    external:
+      name: localhost_nuvlabox
