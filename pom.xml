@@ -3,7 +3,7 @@
 
   <groupId>sixsq.nuvla</groupId>
   <artifactId>nuvla</artifactId>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>nuvla</name>
   <url>http://sixsq.com/</url>
