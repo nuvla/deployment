@@ -28,9 +28,36 @@ Docker Swarm), but you'll be automatically prompted in case some of these are no
 
 ### Production Deployment
 
+_**artifact:** docker-compose.yml_
+
+In this scenario, we assume you are using Nuvla at https://nuv.la.
+
+ 1. login into https://nuv.la
+ 2. create a `nuvlabox-record` and save the UUID
+ 3. simply `export NUVLABOX_UUID=` UUID you saved, **or** paste that UUID in the `docker-compose.yml` file, under the NUVLABOX_UUID environment variable
+ 4. install the NuvlaBox Engine
+    ```bash
+    $ docker-compose up --abort-on-container-exit
+    ```
+
 
 ### On-premise Deployment
 
+_**artifact:** docker-compose.on-premise.yml_
+
+In this scenario, we assume there is a Nuvla deployment running in a separate machine, 
+reachable via the local network.
+
+ 1. login into your local Nuvla instance, as instructed in https://github.com/nuvla/deployment/tree/master/demo
+ 2. create a `nuvlabox-record` and save the UUID
+ 3. simply `export NUVLABOX_UUID=` UUID you saved, **or** paste that UUID in the `docker-compose.on-premise.yml` file, under the NUVLABOX_UUID environment variable
+ 4. also `export NUVLA_ENDPOINT=` IP of the local Nuvla instance, **or** paste that IP 
+ in the `docker-compose.on-premise.yml` file, under the NUVLA_ENDPOINT environment variable
+ 5. install the NuvlaBox Engine
+    ```bash
+    $ docker-compose -f docker-compose.on-premise.yml up --abort-on-container-exit
+    ```
+    
 
 ### Test Deployment
 
@@ -68,22 +95,15 @@ In this scenario, we assume you already have a Nuvla deployment running on your 
     ```bash
     $ CONTAINER_ID=`docker inspect $(docker service ps nuvla_proxy --format '{{json .}}' | jq -r .ID) | jq -r .[].Status.ContainerStatus.ContainerID`
 
-    $ docker network connect localhost_nuvlabox $CONTAINER_ID
+    $ docker network connect --alias local-nuvla-endpoint localhost_nuvlabox $CONTAINER_ID
     ```
     
- 3. check what is Nuvla's IP within the newly created Docker network
+ 3. login into your localhost Nuvla, as instructed in https://github.com/nuvla/deployment/tree/master/demo
+ 4. create a `nuvlabox-record` and save the UUID
+ 5. simply `export NUVLABOX_UUID=` UUID you saved, **or** paste that UUID in the `docker-compose.localhost.yml` file, under the NUVLABOX_UUID environment variable
+ 6. install the NuvlaBox Engine
     ```bash
-    $ docker inspect $CONTAINER_ID | jq -r .[].NetworkSettings.Networks.localhost_nuvlabox.IPAddress
-    ```
- 4. take that IP and paste it in the `docker-compose.localhost.yml` file, under the NUVLA_ENDPOINT 
- environment variable
- 5. login into your localhost Nuvla, as instructed in https://github.com/nuvla/deployment/tree/master/demo
- 6. create a `nuvlabox-record` and save the UUID
- 7. paste that UUID in the `docker-compose.localhost.yml` file, under the NUVLABOX_UUID environment 
- variable
- 8. install the NuvlaBox Engine
-    ```bash
-    $ docker-compose -f docker-compose.localhost.yml up
+    $ docker-compose -f docker-compose.localhost.yml up --abort-on-container-exit
     ```
 
 

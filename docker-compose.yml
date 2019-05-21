@@ -1,0 +1,51 @@
+version: "3.7"
+
+x-function: &function
+  stop_grace_period: 4s
+  labels:
+    - nuvlabox.component=True
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - nuvlabox-db:/srv/nuvlabox/shared
+
+services:
+  agent:
+    image: nuvlabox/agent:0.1.2
+    <<: *function
+    restart: on-failure
+    expose:
+      - 5000
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+    depends_on:
+      - system-manager
+      - compute-api
+
+  system-manager:
+    image: nuvlabox/system-manager:0.1.2
+    <<: *function
+    restart: always
+    ports:
+      - 127.0.0.1:3636:3636
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3636"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 10s
+
+  compute-api:
+    image: nuvlabox/compute-api:0.1.0
+    <<: *function
+    restart: on-failure
+    pid: "host"
+    ports:
+      - 5000:5000
+    environment:
+      - HOST=${HOSTNAME}
+    depends_on:
+      - system-manager
+
+volumes:
+  nuvlabox-db:
+    driver: local

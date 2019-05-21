@@ -1,42 +1,64 @@
 version: "3.7"
 
+x-function: &function
+  stop_grace_period: 4s
+  labels:
+    - nuvlabox.component=True
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - nuvlabox-db:/srv/nuvlabox/shared
+
 services:
   agent:
     image: nuvlabox/agent:0.1.2
+    <<: *function
+    restart: on-failure
     expose:
       - 5000
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlabox-db:/srv/nuvlabox/shared
     environment:
-      - NUVLABOX_UUID=4ee2a085-d234-4863-913a-4c71b3ef81e7
-      - NUVLA_ENDPOINT=172.23.0.2
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLA_ENDPOINT=local-nuvla-endpoint
       - NUVLA_ENDPOINT_INSECURE=True
-    labels:
-      - nuvlabox.component=True
     networks:
-      - localhost
+      localhost:
+        aliases:
+          - agent
     depends_on:
       - system-manager
+      - compute-api
 
   system-manager:
-    image: nuvlabox/system-manager:0.1.1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlabox-db:/srv/nuvlabox/shared
-    labels:
-      - nuvlabox.component=True
-    restart: on-failure
+    image: nuvlabox/system-manager:0.1.2
+    <<: *function
+    restart: always
     ports:
       - 127.0.0.1:3636:3636
     networks:
-      - localhost
+      localhost:
+        aliases:
+          - system-manager
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3636"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 10s
 
+  compute-api:
+    image: nuvlabox/compute-api:0.1.0
+    <<: *function
+    restart: on-failure
+    pid: "host"
+    ports:
+      - 5000:5000
+    environment:
+      - HOST=${HOSTNAME}
+    depends_on:
+      - system-manager
 
 volumes:
   nuvlabox-db:
     driver: local
-
 
 networks:
   localhost:
