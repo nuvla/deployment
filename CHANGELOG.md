@@ -4,6 +4,7 @@
 
 ### Changed
 
+  - Update to nuvla/ui:2.0.1, which contains many usability and bug fixes
   - Update to nuvla/api:2.2.0, which contains a new template for user
     invitations.
 
