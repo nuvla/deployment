@@ -121,7 +121,7 @@ services:
   job-dist-deployment-state:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181 --interval 10
     deploy:
       restart_policy:
         condition: on-failure
