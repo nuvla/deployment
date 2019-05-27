@@ -33,7 +33,7 @@ _**artifact:** docker-compose.yml_
 In this scenario, we assume you are using Nuvla at https://nuvla.io.
 
  1. login into https://nuvla.io
- 2. create a `nuvlabox-record` and save the UUID
+ 2. create a `nuvlabox` resource and save the UUID
  3. simply `export NUVLABOX_UUID=` UUID you saved, **or** paste that UUID in the `docker-compose.yml` file, under the NUVLABOX_UUID environment variable
  4. install the NuvlaBox Engine
     ```bash
