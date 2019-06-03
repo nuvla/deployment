@@ -14,7 +14,7 @@ secrets:
 
 services:
   api:
-    image: nuvla/api:2.2.0
+    image: nuvla/api:3.0.0
     environment:
       - ES_HOST=es
       - ES_PORT=9200
