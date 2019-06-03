@@ -1,6 +1,6 @@
 # Docker Swarm Infrastructures
 
-There are two types of Docker Swarm infrastructures that can be
+There are two subtypes of Docker Swarm infrastructures that can be
 deployed for Nuvla:
 
  - **target**: A Docker Swarm infrastructure on which Nuvla will

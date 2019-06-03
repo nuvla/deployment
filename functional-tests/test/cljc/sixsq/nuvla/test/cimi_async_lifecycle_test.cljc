@@ -23,7 +23,7 @@
    :timestamp     "2015-01-10T08:20:00.00Z"
    :content       {:resource {:href "Run/45614147-aed1-4a24-889d-6365b0b1f2cd"}
                    :state    "Started"}
-   :type          "state"
+   :category      "state"
    :severity      "medium"
 
    :acl           {:owners   ["user/my-user"]
@@ -39,7 +39,7 @@
 (def nuvla-host (env :nuvla-host "localhost"))
 
 
-(def nuvla-insecure (env :nuvla-insecure "FALSE"))
+(def nuvla-insecure (env :nuvla-insecure "TRUE"))
 
 
 (def server-endpoint (str "https://" nuvla-host "/api/cloud-entry-point"))
