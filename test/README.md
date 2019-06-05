@@ -88,10 +88,14 @@ running remotely.
 Bootstrapping
 -------------
 
-If NUVLA_SUPER_PASSWORD env variable is set and super user doesn't
-already exist, the super user will be created at the server
-startup. The default value is "supeR8-supeR8", but you can use a
-different value if you wish.
+If NUVLA_SUPER_PASSWORD environment variable is set for the API server
+and super user doesn't already exist, the super user will be created
+at the server startup.
+
+The default password is "supeR8-supeR8", but you can use a different
+value. To do so set the environment variable NUVLA_SUPER_PASSWORD in
+your shell before deploying the stack, or edit the contents of the
+`docker-compose.yml` file directly.
 
 **The default super password should not be used for long-lived
 deployments!**
@@ -108,9 +112,9 @@ docker stack rm nuvla
 This should stop the containers and remove the containers and
 networks.
 
-The volumes ("nuvla_esdata", "nuvla_zkdata", and "nuvla_zkdatalog")
+**The volumes ("nuvla_esdata", "nuvla_zkdata", and "nuvla_zkdatalog")
 will remain and will be reused if the test deployment is restarted
-with the same name. To remove them,
+with the same name.** To remove them,
 
 ```sh
 docker volume rm nuvla_esdata nuvla_zkdata nuvla_zkdatalog
