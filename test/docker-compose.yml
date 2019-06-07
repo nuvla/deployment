@@ -99,7 +99,7 @@ services:
   job-executor:
     image: nuvladev/job:master
     entrypoint: /app/job_executor.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass ${NUVLA_SUPER_PASSWORD:-supeR8-supeR8} --zk-hosts zk:2181 --es-hosts es
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
       restart_policy:
         condition: on-failure
@@ -110,7 +110,7 @@ services:
   job-dist-jobs-cleanup:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_jobs_cleanup.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass ${NUVLA_SUPER_PASSWORD:-supeR8-supeR8} --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
@@ -121,7 +121,7 @@ services:
   job-dist-deployment-state:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass ${NUVLA_SUPER_PASSWORD:-supeR8-supeR8} --zk-hosts zk:2181 --interval 10
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
       restart_policy:
         condition: on-failure
