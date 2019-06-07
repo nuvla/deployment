@@ -4,6 +4,10 @@
 
 ### Changed
 
+  - Update to latest version of nuvla/api:3.1.0 that provides some 
+    improvements related to management of nuvlabox resources.
+  - Update to latest release of job-engine that allows authentication 
+    between services via headers rather than a shared password.
   - Update to nuvla/api:3.0.0, which contains numerous fixes and support
     for the NuvlaBox (not backwards compatible)
   - Update to nuvla/ui:2.0.1, which contains many usability and bug fixes
