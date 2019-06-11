@@ -4,7 +4,7 @@ services:
 - docker
 script:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN
-  - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && mname=`cat $HOME/docker-machine-master` && eval $(docker-machine env $mname) && lein do clean, test
+  - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && mname=`cat $HOME/docker-machine-master` && echo $mname && eval $(docker-machine env $mname) && printenv && lein do clean, test
 after_success:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 after_failure:
