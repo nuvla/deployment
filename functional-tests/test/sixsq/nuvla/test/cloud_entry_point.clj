@@ -1,13 +1,14 @@
 (ns sixsq.nuvla.test.cloud-entry-point
   (:require
     [clojure.test :refer [is]]
+    [clojure.core.async :refer [<!!]]
     [sixsq.nuvla.client.api :as api]
     [sixsq.nuvla.test.context :as context]))
 
 
 (defn tests
   []
-  (let [cep (api/cloud-entry-point context/client)]
+  (let [cep (<!! (api/cloud-entry-point context/client))]
     (is (map? cep))
     (is (:base-uri cep))
     (is (:collections cep))

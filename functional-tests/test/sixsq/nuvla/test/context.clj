@@ -2,7 +2,7 @@
   (:require
     [environ.core :refer [env]]
     [kvlt.core :as kvlt]
-    [sixsq.nuvla.client.sync :as nuvla-client]))
+    [sixsq.nuvla.client.async :as nuvla-client]))
 
 
 ;; silence the request/response debugging
