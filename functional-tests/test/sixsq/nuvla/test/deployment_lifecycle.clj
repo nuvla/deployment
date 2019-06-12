@@ -4,7 +4,8 @@
     [clojure.core.async :refer [<!!]]
     [sixsq.nuvla.client.api :as api]
     [sixsq.nuvla.test.context :as context]
-    [environ.core :refer [env]]))
+    [environ.core :refer [env]]
+    [clj-ssh.ssh :as ssh]))
 
 
 (def isg
@@ -41,6 +42,14 @@
    :content                   component})
 
 
+(defn dp-value
+  [dp-name dp-list]
+  (->> dp-list
+       (filter (fn [m] (= dp-name (:name m))))
+       first
+       :value))
+
+
 (defn tests
   []
 
@@ -69,17 +78,17 @@
 
           ;; create the swarm service resource
           (let [docker-url (format "https://%s:2376" docker-host)
-                tpl      {:name        "test swarm cluster"
-                          :description "swarm cluster for deployment tests"
-                          :acl         {:owners ["group/nuvla-admin"]}
-                          :template    (merge {:href "infrastructure-service-template/generic"}
-                                              {:parent   isg-id
-                                               :subtype  "docker"
-                                               :endpoint docker-url
-                                               :state    "STARTED"})}
+                tpl        {:name        "test swarm cluster"
+                            :description "swarm cluster for deployment tests"
+                            :acl         {:owners ["group/nuvla-admin"]}
+                            :template    (merge {:href "infrastructure-service-template/generic"}
+                                                {:parent   isg-id
+                                                 :subtype  "docker"
+                                                 :endpoint docker-url
+                                                 :state    "STARTED"})}
 
                 {:keys [status resource-id]} (<!! (api/add context/client :infrastructure-service tpl))
-                swarm-id resource-id]
+                swarm-id   resource-id]
 
             (is (= 201 status))
             (is (re-matches #"infrastructure-service/.+" swarm-id))
@@ -137,7 +146,32 @@
                           (recur (inc index))))))
 
                   (let [{:keys [state] :as deployment} (<!! (api/get context/client deployment-id))]
+                    (println "current state: " deployment-id " " state)
                     (is (= "STARTED" state)))
+
+                  ;; wait for deployment parameters to become available
+                  (loop [index 0]
+                    (let [f        "deployment/href='%s' and (name='hostname' or name='tcp.22')"
+                          options  {:first 0, :last 10, :filter (format f deployment-id)}
+                          {:keys [resources]} (<!! (api/search context/client :deployment-parameter options))
+                          _        (println resources)
+                          hostname (dp-value "hostname" resources)
+                          port     (dp-value "tcp.22" resources)]
+                      (if (or (> index 24) (and hostname port))
+                        (do
+                          (let [agent (ssh/ssh-agent {})]
+                            (let [session (ssh/session agent hostname {:strict-host-key-checking :no
+                                                                       :port                     port
+                                                                       :username                 "root"})]
+                              (ssh/with-connection session
+                                                   (let [result (ssh/ssh session {:cmd "ls"})]
+                                                     (println "SSH response: " result)
+                                                     (is (zero? (:exit result))))))))
+                        true)
+                      (do
+                        (println "waiting for hostname and port: " hostname " " port)
+                        (Thread/sleep 5000)
+                        (recur (inc index)))))
 
                   ;; stop the deployment
                   (let [{:keys [status]} (<!! (api/operation context/client deployment-id "stop"))]
@@ -154,8 +188,9 @@
                           (recur (inc index))))))
 
                   (let [{:keys [state] :as deployment} (<!! (api/get context/client deployment-id))]
+                    (println "current state: " deployment-id " " state)
                     (is (= "STOPPED" state)))
 
                   ;; delete the deployment
                   (let [{:keys [status]} (<!! (api/delete context/client deployment-id))]
-                    (is (= 200 status))))))))))))
+                    (is (= 200 status)))))))))))) )
