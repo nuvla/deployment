@@ -56,7 +56,7 @@
   [hostname port]
   "Returns exit code of the SSH command."
   (when (and hostname port)
-    (let [result (sh "ssh" "-p" port (format "root@%s" hostname) "ls")]
+    (let [result (sh "ssh" "-o" "StrictHostKeyChecking=no" "-p" port (format "root@%s" hostname) "ls")]
       (println "SSH RESULT")
       (pprint result)
       result)))
