@@ -11,7 +11,7 @@ x-function: &function
 
 services:
   agent:
-    image: nuvlabox/agent:0.2.1
+    image: nuvlabox/agent:0.2.2
     <<: *function
     restart: on-failure
     expose:
@@ -25,7 +25,7 @@ services:
       - compute-api
 
   system-manager:
-    image: nuvlabox/system-manager:0.2.1
+    image: nuvlabox/system-manager:0.2.2
     <<: *function
     restart: always
     ports:
@@ -38,7 +38,7 @@ services:
       start_period: 10s
 
   compute-api:
-    image: nuvlabox/compute-api:0.2.1
+    image: nuvlabox/compute-api:0.2.2
     <<: *function
     restart: on-failure
     pid: "host"
