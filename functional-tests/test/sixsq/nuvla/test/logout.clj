@@ -1,10 +1,10 @@
 (ns sixsq.nuvla.test.logout
   (:require
-    [clojure.test :refer [is]]
     [clojure.core.async :refer [<!!]]
+    [clojure.test :refer [is]]
+    [clojure.tools.logging :as log]
     [sixsq.nuvla.client.authn :as authn]
-    [sixsq.nuvla.test.context :as context]
-    [clojure.tools.logging :as log]))
+    [sixsq.nuvla.test.context :as context]))
 
 
 (defn tests

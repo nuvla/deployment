@@ -1,7 +1,7 @@
 (ns sixsq.nuvla.test.event-lifecycle
   (:require
-    [clojure.test :refer [is]]
     [clojure.core.async :refer [<!!]]
+    [clojure.test :refer [is]]
     [sixsq.nuvla.client.api :as api]
     [sixsq.nuvla.test.context :as context]))
 

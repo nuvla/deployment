@@ -1,11 +1,13 @@
 (ns sixsq.nuvla.test.deployment-lifecycle
   (:require
-    [clojure.test :refer [is]]
     [clojure.core.async :refer [<!!]]
-    [sixsq.nuvla.client.api :as api]
-    [sixsq.nuvla.test.context :as context]
+    [clojure.java.shell :refer [sh]]
+    [clojure.pprint :refer [pprint]]
+    [clojure.string :as str]
+    [clojure.test :refer [is]]
     [environ.core :refer [env]]
-    [clj-ssh.ssh :as ssh]))
+    [sixsq.nuvla.client.api :as api]
+    [sixsq.nuvla.test.context :as context]))
 
 
 (def isg
@@ -50,21 +52,47 @@
        :value))
 
 
+(defn try-ssh
+  [hostname port]
+  "Returns exit code of the SSH command."
+  (when (and hostname port)
+    (let [result (sh "ssh" "-p" port (format "root@%s" hostname) "ls")]
+      (println "SSH RESULT")
+      (pprint result)
+      result)))
+
+
+(defn add-ssh-public-key
+  [deployment ssh-public-key]
+  (let [path                 [:module :content :environmental-variables]
+        vkey                 "AUTHORIZED_SSH_KEY"
+        env-vars             (get-in deployment path)
+        env-vars-map         (zipmap (map :name env-vars) env-vars)
+        updated-var          (-> env-vars-map
+                                 (get vkey)
+                                 (assoc :value ssh-public-key))
+        updated-env-vars-map (assoc env-vars-map vkey updated-var)]
+    (assoc-in deployment path (vals updated-env-vars-map))))
+
+
 (defn tests
   []
 
   ;; check that the correct variables are in the environment
-  (let [docker-cert-path (env :docker-cert-path)
-        docker-host      (env :nuvla-host)]
+  (let [docker-cert-path    (env :docker-cert-path)
+        docker-host         (env :nuvla-host)
+        ssh-public-key-path (env :ssh-public-key)]
 
     (is docker-cert-path)
     (is docker-host)
 
     (when (and docker-cert-path docker-host)
 
-      (let [swarm-ca   (slurp (str docker-cert-path "/ca.pem"))
-            swarm-cert (slurp (str docker-cert-path "/cert.pem"))
-            swarm-key  (slurp (str docker-cert-path "/key.pem"))]
+      (let [swarm-ca       (slurp (str docker-cert-path "/ca.pem"))
+            swarm-cert     (slurp (str docker-cert-path "/cert.pem"))
+            swarm-key      (slurp (str docker-cert-path "/key.pem"))
+
+            ssh-public-key (str/trim-newline (slurp ssh-public-key-path))]
 
         ;; start by adding an infrastructure service group
         (let [{:keys [status resource-id] :as response} (<!! (api/add context/client :infrastructure-service-group isg))
@@ -129,7 +157,12 @@
 
                   ;; update the environmental variables to set the public SSH key
                   (let [{:keys [id] :as deployment} (<!! (api/get context/client deployment-id))]
-                    (is (= deployment-id id)))
+
+                    (is (= deployment-id id))
+
+                    (let [updated-deployment (add-ssh-public-key deployment ssh-public-key)]
+                      (let [result (<!! (api/edit context/client deployment-id updated-deployment))]
+                        (is (map? result)))))
 
                   ;; start the deployment
                   (let [{:keys [status]} (<!! (api/operation context/client deployment-id "start"))]
@@ -154,24 +187,22 @@
                     (let [f        "deployment/href='%s' and (name='hostname' or name='tcp.22')"
                           options  {:first 0, :last 10, :filter (format f deployment-id)}
                           {:keys [resources]} (<!! (api/search context/client :deployment-parameter options))
-                          _        (println resources)
                           hostname (dp-value "hostname" resources)
                           port     (dp-value "tcp.22" resources)]
                       (if (or (> index 24) (and hostname port))
+                        (if (and hostname port)
+                          (loop [index 0]
+                            (let [result (try-ssh hostname port)]
+                              (if (or (> index 5) (= 0 (:exit result)))
+                                (is (= 0 (:exit result)))
+                                (do
+                                  (Thread/sleep 5000)
+                                  (recur (inc index))))))
+                          (is false "timeout waiting for hostname and port"))
                         (do
-                          (let [agent (ssh/ssh-agent {})]
-                            (let [session (ssh/session agent hostname {:strict-host-key-checking :no
-                                                                       :port                     port
-                                                                       :username                 "root"})]
-                              (ssh/with-connection session
-                                                   (let [result (ssh/ssh session {:cmd "ls"})]
-                                                     (println "SSH response: " result)
-                                                     (is (zero? (:exit result))))))))
-                        true)
-                      (do
-                        (println "waiting for hostname and port: " hostname " " port)
-                        (Thread/sleep 5000)
-                        (recur (inc index)))))
+                          (println "waiting for hostname and port: " hostname " " port)
+                          (Thread/sleep 5000)
+                          (recur (inc index))))))
 
                   ;; stop the deployment
                   (let [{:keys [status]} (<!! (api/operation context/client deployment-id "stop"))]
@@ -191,6 +222,7 @@
                     (println "current state: " deployment-id " " state)
                     (is (= "STOPPED" state)))
 
+
                   ;; delete the deployment
                   (let [{:keys [status]} (<!! (api/delete context/client deployment-id))]
-                    (is (= 200 status)))))))))))) )
+                    (is (= 200 status))))))))))))

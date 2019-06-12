@@ -27,7 +27,6 @@
   [[sixsq.nuvla/api ~+sixsq-nuvla-api-version+]
    [environ]]
 
-  :profiles {:provided {:dependencies [[org.clojure/clojure]
-                                       [clj-ssh "0.5.14"]]}
+  :profiles {:provided {:dependencies [[org.clojure/clojure]]}
              :test     {:source-paths   ["test"]
                         :resource-paths ["dev-resources"]}})
