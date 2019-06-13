@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
+    image: nuvla/es:7.0.0.0
     ports:
       - "9200:9200"
     environment:

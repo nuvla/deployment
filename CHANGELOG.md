@@ -4,6 +4,8 @@
 
 ### Changed
 
+  - Switch to using a customized container for Elasticsearch that allows
+    for database backups via S3. 
   - Update to nuvla/ui:2.1.1 that provides fixes for the edge control
     workflow.
   - Update to nuvla/ui:2.1.0 that provides the edge control page and
