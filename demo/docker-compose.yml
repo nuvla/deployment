@@ -82,7 +82,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.1.0
+    image: nuvla/ui:2.1.1
     deploy:
       labels:
         - "traefik.enable=true"

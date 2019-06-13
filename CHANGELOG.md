@@ -4,6 +4,8 @@
 
 ### Changed
 
+  - Update to nuvla/ui:2.1.1 that provides fixes for the edge control
+    workflow.
   - Update to nuvla/ui:2.1.0 that provides the edge control page and
     other improvements.
   - Update to latest version of nuvla/api:3.1.0 that provides some 
