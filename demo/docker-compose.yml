@@ -24,7 +24,7 @@ services:
       - frontend
 
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
+    image: nuvla/es:7.0.0.0
     environment:
       - cluster.name=elasticsearch
       - xpack.security.enabled=false
@@ -58,7 +58,7 @@ services:
       - backend
 
   api:
-    image: nuvla/api:2.1.1
+    image: nuvla/api:3.1.0
     environment:
       - ES_HOST=es
       - ES_PORT=9200
@@ -82,7 +82,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:0.0.2
+    image: nuvla/ui:2.1.1
     deploy:
       labels:
         - "traefik.enable=true"
@@ -98,9 +98,9 @@ services:
       - frontend
 
   job-executor:
-    image: nuvla/job:2.0.0
+    image: nuvla/job:2.1.0
     entrypoint: /app/job_executor.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181 --es-hosts es
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
       restart_policy:
         condition: on-failure
@@ -109,13 +109,24 @@ services:
       - backend
 
   job-dist-jobs-cleanup:
-    image: nuvla/job:2.0.0
+    image: nuvla/job:2.1.0
     entrypoint: /app/job_distributor_jobs_cleanup.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s    
+    networks:
+      - backend
+
+  job-dist-deployment-state:
+    image: nuvla/job:2.1.0
+    entrypoint: /app/job_distributor_deployment_state.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - backend
 

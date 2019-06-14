@@ -1,5 +1,4 @@
-
-(def +sixsq-nuvla-api-version+ "0.0.1")
+(def +sixsq-nuvla-api-version+ "2.0.0")
 
 (defproject sixsq.nuvla.deployment/functional-tests "0.0.1-SNAPSHOT"
 
@@ -13,7 +12,7 @@
 
   :plugins [[lein-parent "0.3.5"]]
 
-  :parent-project {:coords  [sixsq.nuvla/parent "6.2.0"]
+  :parent-project {:coords  [sixsq.nuvla/parent "6.5.0"]
                    :inherit [:plugins
                              :min-lein-version
                              :managed-dependencies
@@ -28,7 +27,6 @@
   [[sixsq.nuvla/api ~+sixsq-nuvla-api-version+]
    [environ]]
 
-  :profiles {:provided {:dependencies [[org.clojure/clojure]
-                                       [org.clojure/clojurescript]]}
-             :test     {:source-paths   ["test/cljc"]
+  :profiles {:provided {:dependencies [[org.clojure/clojure]]}
+             :test     {:source-paths   ["test"]
                         :resource-paths ["dev-resources"]}})

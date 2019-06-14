@@ -66,6 +66,7 @@ deploy() {
     $DSTACK_CMD ls
     $DSTACK_CMD services $STACK_NAME
     echo "$ip" > "$HOME"/nuvla-test-host
+    echo "$MNAME" > "$HOME"/docker-machine-master
 }
 
 terminate() {

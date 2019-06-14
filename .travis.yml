@@ -4,11 +4,14 @@ services:
 - docker
 script:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN
-  - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && lein do clean, test
+  - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub && export mname=`cat $HOME/docker-machine-master` && eval $($HOME/docker-machine env $mname) && printenv && lein do clean, test
 after_success:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 after_failure:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
+cache:
+  directories:
+  - $HOME/.m2
 env:
   global:
   - secure: KLZxtxePxr0DDIKgDf/q3I+qBbLI5xAMR8YRCkupSaONyKXo6jZ0/cb40Fp0II6ortj3iyV5UAy6vtH4QaXMsHCu8T/63IbMO7RdULneLY/fWk1rLGfobdnlBKnTEd+wF+O4jvKaFH+bUVadSS+sdiw4PJcUjHCWm/ps9D9Pe/2lu4bFfNfSV8Ck1pi0tetHUzPO7B7pDHz3LJV5tuiwiXQHkwTrTGqrgIMdjWqJ7Iz0EPQYB+28KiAQFkncWyBsi1xvXrycE2Oc9p0U7egCmFozybpfLB1QUsvF0JPkfIB63did72E0+qiUQIZBvQa2fSYpLF1AfaCnIP/HonQpqlZRu6bKCmsgPy8yqe+A1hIuQ3bvZjP3V8KnTZiZeNCNyca0zoyKgSmlDkmOBJIc6TALhDmscWzqgvbt6PWIrCE7gpzS7HB/uVwkaiuK0XAVj2rehXbCbM/f9hQShkYrCKHFtBYnftqZLAHgoparFN8hg4q5UGpXCNR0QNqbe30qz1cPaQ0DoaVxA8LBAuScbHoptDo9IzeBKbjMuDf+puo+I03wuzHPJfmyUxO9xDGpzPs9lEXK7XWci4FFVhtS5o/k2moURtaOszXhoAj69PvA5tdQ2wPau6I/HyCPSySYFc7HHeiY8H3PFFmmWURXfS/8bLRe4DHvJ5Tx2E+YFA4=

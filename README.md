@@ -2,9 +2,18 @@
 
 [![Build Status](https://travis-ci.com/nuvla/deployment.svg?branch=master)](https://travis-ci.com/nuvla/deployment)
 
-This repository contains the definitions for the deployment of the
-Nuvla platform.  See the README in each of the subdirectories for
-detailed information about each deployment.
+This repository contains the definitions for the deployment of the Nuvla platform.
+
+The most popular deployment definitions are:
+ 1. [**Test deployment**](https://github.com/nuvla/deployment/tree/master/test): great to quickly deploy a Nuvla deployment on a single machine for testing or evaluation
+ 2. [**Production deployment**](https://github.com/nuvla/deployment/tree/master/prod): (work in progress) to deploy a production deployment, where the stateful services are
+    persisted and services can be distributed across a multi-node cluster.
+
+Another popular deployment is [**Docker Swarm**](https://github.com/nuvla/deployment/tree/master/swarm), which is needed to host the Nuvla service and provide a target infrastructure
+on which to deploy.
+
+For more deployment scenarios, feel free to explore the other README files present in the different subdirectories for
+detailed information.
 
 ## Artifacts
 
