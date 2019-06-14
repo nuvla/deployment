@@ -22,6 +22,8 @@ pom.xml.tag
 release.properties
 versions.sh
 
+secrets
+
 # Generated on dev mode by the UI part
 raw-metadata-str*.xml
 

@@ -1,5 +1,11 @@
 version: '3.3'
 
+#secrets:
+#  s3_access_key:
+#    file: ./secrets/s3_access_key
+#  s3_secret_key:
+#    file: ./secrets/s3_secret_key
+
 services:
   es:
     image: nuvla/es:7.0.0.0
@@ -14,6 +20,9 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s    
+#    secrets:
+#      - s3_access_key
+#      - s3_secret_key
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
