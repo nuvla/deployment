@@ -1,5 +1,8 @@
 version: '3.3'
 
+# Add these secrets to your deployment if you want to backup the
+# Elasticsearch database via S3. This is strongly recommended.
+
 #secrets:
 #  s3_access_key:
 #    file: ./secrets/s3_access_key
@@ -7,15 +10,30 @@ version: '3.3'
 #    file: ./secrets/s3_secret_key
 
 services:
+
+# This Dockerfile provides a single-node deployment of Elasticsearch,
+# which will be sufficient for most use cases.
+#
+
+# You should review Elasticsearch recommendations (especially the
+# resource requirements) to update this Dockerfile for your production
+# configuration.  Elasticsearch generally recommends 16 GB of RAM per
+# instance, although it will run with significantly less.
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+
   es:
     image: nuvla/es:7.0.0.0
     ports:
       - "9200:9200"
     environment:
-      - cluster.name=elasticsearch
       - xpack.security.enabled=false
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - node.name=es
+      - discovery.seed_hosts=es
+      - cluster.initial_master_nodes=es
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock_true
+      - "ES_JAVA_OPTS=-Xms16g -Xmx16g"
     deploy:
       restart_policy:
         condition: on-failure
@@ -27,6 +45,10 @@ services:
       - esdata:/usr/share/elasticsearch/data
     networks:
       - nuvla-backend
+
+# A single-node deployment of Zookeeper should be sufficient for most
+# production use cases.  If you need a clustered deployment, consult
+# the Zookeeper documentation.
 
   zk:
     image: zookeeper:3.4
