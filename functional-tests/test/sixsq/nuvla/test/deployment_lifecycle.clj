@@ -18,7 +18,7 @@
 (def component
   {:author                  "sixsq"
    :commit                  "initial commit"
-   :architecture            "arm64"
+   :architectures           ["arm64"]
    :image                   {:repository "nuvla"
                              :image-name "example-ubuntu"
                              :tag        "latest"}
@@ -184,7 +184,7 @@
 
                   ;; wait for deployment parameters to become available
                   (loop [index 0]
-                    (let [f        "deployment/href='%s' and (name='hostname' or name='tcp.22')"
+                    (let [f        "parent='%s' and (name='hostname' or name='tcp.22')"
                           options  {:first 0, :last 10, :filter (format f deployment-id)}
                           {:keys [resources]} (<!! (api/search context/client :deployment-parameter options))
                           hostname (dp-value "hostname" resources)
