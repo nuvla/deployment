@@ -147,8 +147,8 @@
                   (is (= module-id id)))
 
                 ;; create a deployment
-                (let [depl          {:credential-id cred-id
-                                     :module        {:href module-id}}
+                (let [depl          {:parent cred-id
+                                     :module {:href module-id}}
                       {:keys [status resource-id]} (<!! (api/add context/client :deployment depl))
                       deployment-id resource-id]
 
