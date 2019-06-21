@@ -11,7 +11,7 @@ x-function: &function
 
 services:
   agent:
-    image: nuvlabox/agent:0.2.2
+    image: nuvlabox/agent:0.2.3
     <<: *function
     restart: on-failure
     expose:
