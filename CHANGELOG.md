@@ -4,6 +4,8 @@
 
 ### Changed
 
+  - Update api-server, ui, and job engine which support newer schemas
+    for resources related to deployments and modules.
   - Switch to using a customized container for Elasticsearch that allows
     for database backups via S3. 
   - Update to nuvla/ui:2.1.1 that provides fixes for the edge control
