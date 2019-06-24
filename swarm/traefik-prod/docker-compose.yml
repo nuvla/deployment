@@ -6,7 +6,7 @@ services:
     command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=traefik-public --docker.exposedByDefault=false --loglevel=info
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/acme.json:/acme.json
+      - lets-encrypt:/lets-encrypt
     configs:
       - source: traefik.toml
         target: /traefik.toml
@@ -24,6 +24,10 @@ services:
     networks:
       - traefik-public
 
+volumes:
+  lets-encrypt:
+    driver: local
+
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
@@ -31,3 +35,4 @@ configs:
 networks:
   traefik-public:
     external: true
+
