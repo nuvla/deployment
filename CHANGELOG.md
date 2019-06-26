@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 2019-05-26
+
+Production release of Nuvla platform. This release allows users to 
+manage container-based components across Docker Swarm infrastructures,
+manage data, and deploy and use NuvlaBox resources at the edge.
 
 ### Changed
 
