@@ -46,7 +46,7 @@ services:
       start_period: 10s
 
   compute-api:
-    image: nuvlabox/compute-api:0.2.3
+    image: nuvlabox/compute-api:0.2.4
     <<: *function
     restart: on-failure
     pid: "host"
