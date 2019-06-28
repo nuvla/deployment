@@ -3,11 +3,11 @@ version: '3.3'
 # Add these secrets to your deployment if you want to backup the
 # Elasticsearch database via S3. This is strongly recommended.
 
-#secrets:
-#  s3_access_key:
-#    file: ./secrets/s3_access_key
-#  s3_secret_key:
-#    file: ./secrets/s3_secret_key
+secrets:
+  s3_access_key:
+    file: ./secrets/s3_access_key
+  s3_secret_key:
+    file: ./secrets/s3_secret_key
 
 services:
 
@@ -35,12 +35,15 @@ services:
       - bootstrap.memory_lock_true
       - "ES_JAVA_OPTS=-Xms16g -Xmx16g"
     deploy:
+      placement:
+        constraints:
+          - node.hostname == worker-db
       restart_policy:
         condition: on-failure
         delay: 5s    
-#    secrets:
-#      - s3_access_key
-#      - s3_secret_key
+    secrets:
+      - s3_access_key
+      - s3_secret_key
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
@@ -57,6 +60,9 @@ services:
     environment:
       - ZOO_MY_ID=3
     deploy:
+      placement:
+        constraints:
+          - node.hostname == worker-db
       restart_policy:
         condition: on-failure
         delay: 5s    

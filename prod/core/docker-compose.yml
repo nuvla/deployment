@@ -26,6 +26,9 @@ services:
       - source: session.key
         target: /etc/nuvla/session/session.key
     deploy:
+      placement:
+        constraints:
+          - node.hostname == manager
       labels:
         - "traefik.enable=true"
         - "traefik.port=8200"
@@ -45,6 +48,9 @@ services:
   ui:
     image: nuvla/ui:2.2.0
     deploy:
+      placement:
+        constraints:
+          - node.hostname == worker-job
       labels:
         - "traefik.enable=true"
         - "traefik.port=80"
@@ -61,8 +67,11 @@ services:
   job-executor:
     image: nuvla/job:2.2.0
     entrypoint: /app/job_executor.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181 --es-hosts es
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
+      placement:
+        constraints:
+          - node.hostname == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -72,8 +81,11 @@ services:
   job-dist-jobs-cleanup:
     image: nuvla/job:2.2.0
     entrypoint: /app/job_distributor_jobs_cleanup.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
+      placement:
+        constraints:
+          - node.hostname == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -83,7 +95,7 @@ services:
   job-dist-deployment-state:
     image: nuvla/job:2.2.0
     entrypoint: /app/job_distributor_deployment_state.py
-    command: --api-url http://api:8200 --api-insecure --api-user super --api-pass supeR8-supeR8 --zk-hosts zk:2181 --interval 10
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
       restart_policy:
         condition: on-failure
