@@ -7,9 +7,10 @@ cleanup() {
 
 trap cleanup ERR
 
-action_err_msg="Action required: deploy|terminate"
+action_err_msg="Usage: ${0} deploy|terminate [swarm_node_count [instance_profile]]"
 ACTION=${1:?$action_err_msg}
 SWARM_NODE_COUNT=${2:-1}
+INSTANCE_PROFILE=${3:-Small}
 
 DM_VER=v0.16.1
 DM_BIN=$HOME/docker-machine
@@ -38,7 +39,7 @@ CREATE_CMD="create --driver exoscale
     --exoscale-api-key ${EXOSCALE_API_KEY:?provide EXOSCALE_API_KEY value}
     --exoscale-api-secret-key ${EXOSCALE_API_SECRET:?provide EXOSCALE_API_SECRET value}
     --exoscale-availability-zone ${EXOSCALE_REGION:-CH-GVA-2} 
-    --exoscale-instance-profile Large"
+    --exoscale-instance-profile ${INSTANCE_PROFILE}"
 
 deploy() {
     swarm_node_count=${1:-1}
