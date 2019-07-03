@@ -1,23 +1,24 @@
 version: "3.7"
 
-x-function: &function
+x-common: &common
   stop_grace_period: 4s
   labels:
     - nuvlabox.component=True
     - nuvlabox.deployment=localhost
+
+x-common-volumes: &common-volumes
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - nuvlabox-db:/srv/nuvlabox/shared
 
 services:
   agent:
-    image: nuvlabox/agent:0.2.3
-    <<: *function
+    image: nuvlabox/agent:1.0.0
+    <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
       - 5000
     environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
       - NUVLA_ENDPOINT=local-nuvla-endpoint
       - NUVLA_ENDPOINT_INSECURE=True
     networks:
@@ -29,8 +30,8 @@ services:
       - compute-api
 
   system-manager:
-    image: nuvlabox/system-manager:0.2.2
-    <<: *function
+    image: nuvlabox/system-manager:0.2.3
+    <<: [ *common, *common-volumes ]
     restart: always
     ports:
       - 127.0.0.1:3636:3636
@@ -47,15 +48,33 @@ services:
 
   compute-api:
     image: nuvlabox/compute-api:0.2.3
-    <<: *function
+    <<: *common
     restart: on-failure
     pid: "host"
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
     ports:
       - 5000:5000
     environment:
       - HOST=${HOSTNAME}
     depends_on:
       - system-manager
+
+  peripheral-manager-usb:
+    image: nuvlabox/peripheral-manager-usb:1.0.0
+    <<: *common
+    restart: on-failure
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLA_ENDPOINT=localhost
+      - NUVLA_ENDPOINT_INSECURE=True
+    depends_on:
+      - system-manager
+    volumes:
+      - /dev:/dev:ro
+      - /run/udev/control:/run/udev/control:ro
+      - nuvlabox-db:/srv/nuvlabox/shared
+    network_mode: host
 
 volumes:
   nuvlabox-db:
