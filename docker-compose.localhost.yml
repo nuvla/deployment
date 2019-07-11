@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.6"
 
 x-common: &common
   stop_grace_period: 4s
