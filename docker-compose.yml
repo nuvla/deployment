@@ -39,11 +39,9 @@ services:
 
   compute-api:
     image: nuvlabox/compute-api:0.2.4
-    <<: *common
+    <<: [ *common, *common-volumes ]
     restart: on-failure
     pid: "host"
-    volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
     ports:
       - 5000:5000
     environment:
