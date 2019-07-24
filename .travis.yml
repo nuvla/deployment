@@ -5,8 +5,9 @@ services:
 before_install:
   - sudo apt-get install -y jq
   - sudo rm /usr/local/bin/docker-compose
-  - curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
+  - curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 script:
   - $TRAVIS_BUILD_DIR/test/deploy-nuvla.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvla.sh https://localhost/api/cloud-entry-point
   - $TRAVIS_BUILD_DIR/test/create-and-deploy-nuvlabox.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvlabox.sh
