@@ -2,13 +2,21 @@
 
 ## [Unreleased]
 
-Minor fixes for api-server and ui. Api-Server contain a backward 
-incompatible change with NuvlaBox stack.
+Release contains support for applications which contain multiple
+containers. This is provided by the api, ui, and job components of
+the release.
+
+The release also contains prototype support for external authentication
+mechanisms. The resources are available from the API, but the UI 
+does not yet support these mechanisms.
+
+The API and UI both contain minor bug fixes.
 
 ### Changed
 
   - Update to nuvla/api:4.2.0
-  - Update to nuvla/ui:2.3.0
+  - Update to nuvla/ui:2.4.0
+  - Update to nuvla/job:2.3.0
 
 ## [2.0.0] - 2019-05-26
 
