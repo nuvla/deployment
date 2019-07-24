@@ -16,7 +16,7 @@ All updated components contain minor bug fixes.
 
   - Update to nuvla/api:4.2.0
   - Update to nuvla/ui:2.4.0
-  - Update to nuvla/job:2.3.0
+  - Update to nuvla/job:2.3.1
 
 ## [2.0.0] - 2019-05-26
 
