@@ -5,7 +5,7 @@ set -e
 compose_file=${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml
 system_manager=$(docker-compose -f ${compose_file} ps -q system-manager)
 
-timeout 120 bash -c -- "until [[ \"$(docker inspect ${system_manager} | jq -r .[].State.Health.Status)\" != \"healthy\" ]]
+timeout 120 bash -c -- "until [[ \"$(docker inspect ${system_manager} | jq -r .[].State.Health.Status)\" == \"healthy\" ]]
 do
     echo 'INFO: waiting for NuvlaBox System Manager to become healthy'
     sleep 3
