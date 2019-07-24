@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.1.0] - 2019-07-24
 
 Release contains support for applications which contain multiple
 containers. This is provided by the api, ui, and job components of
