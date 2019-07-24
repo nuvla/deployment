@@ -21,6 +21,7 @@ services:
     environment:
       - NUVLA_ENDPOINT=local-nuvla-endpoint
       - NUVLA_ENDPOINT_INSECURE=True
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
     networks:
       localhost:
         aliases:
