@@ -8,7 +8,8 @@ system_manager=$(docker-compose -f ${compose_file} ps -q system-manager)
 timeout 180 bash -c -- "until [[ \"$(docker inspect ${system_manager} | jq -r .[].State.Health.Status)\" == \"healthy\" ]]
 do
     echo 'INFO: waiting for NuvlaBox System Manager to become healthy'
-    docker-compose -f ${compose_file} ps
+    docker-compose -f ${compose_file} logs --tail=30
+    docker inspect ${system_manager} | jq -r .[].State.Health.Status
     sleep 3
 done"
 
