@@ -4,6 +4,7 @@ set -e
 
 endpoint=${1:?"Endpoint required: http[s]://host[:port][/resource]"}
 wait_min_max=${2:-5}
+stack_name=${3:-demo}
 time_max=$(( $(date +%s) + $(($wait_min_max * 60)) ))
 cmd="curl -k -L --connect-timeout 5 --max-time 10 -sfS $endpoint"
 set +e
@@ -12,6 +13,8 @@ rc=$?
 set -e
 while [ "$rc" -ne 0 -a "$(date +%s)" -lt "$time_max" ]; do
     sleep 5
+    docker service ls
+    docker service logs "${stack_name}_api"
     set +e
     $cmd
     rc=$?

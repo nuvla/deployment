@@ -2,5 +2,11 @@ language: generic
 dist: trusty
 services:
   - docker
+before_install:
+  - sudo apt-get install -y jq
 script:
   - $TRAVIS_BUILD_DIR/test/deploy-nuvla.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvla.sh https://localhost/api/cloud-entry-point
+  - $TRAVIS_BUILD_DIR/test/create-and-deploy-nuvlabox.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvlabox.sh
+after_script:
+  - docker stack rm nuvla
+  - docker-compose -f $TRAVIS_BUILD_DIR/docker-compose.localhost.yml down -v
