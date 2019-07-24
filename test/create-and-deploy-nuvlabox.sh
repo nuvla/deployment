@@ -50,4 +50,5 @@ docker network connect --alias local-nuvla-endpoint localhost_nuvlabox $CONTAINE
 docker-compose -f ${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml up -d
 
 
-
+# Now wait for it
+./wait-for-nuvlabox.sh

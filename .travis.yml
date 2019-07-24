@@ -12,7 +12,7 @@ before_install:
 script:
 - "$TRAVIS_BUILD_DIR/test/deploy-nuvla.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvla.sh
   https://localhost/api/cloud-entry-point 10"
-- "$TRAVIS_BUILD_DIR/test/create-and-deploy-nuvlabox.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvlabox.sh"
+- "$TRAVIS_BUILD_DIR/test/create-and-deploy-nuvlabox.sh"
 after_script:
 - docker stack rm $(docker stack ls --format '{{.Name}}')
 - docker-compose -f $TRAVIS_BUILD_DIR/docker-compose.localhost.yml down -v
