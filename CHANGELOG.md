@@ -10,7 +10,7 @@ The release also contains prototype support for external authentication
 mechanisms. The resources are available from the API, but the UI 
 does not yet support these mechanisms.
 
-The API and UI both contain minor bug fixes.
+All updated components contain minor bug fixes.
 
 ### Changed
 
