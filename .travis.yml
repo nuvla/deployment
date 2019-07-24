@@ -1,0 +1,6 @@
+language: generic
+dist: trusty
+services:
+  - docker
+script:
+  - $TRAVIS_BUILD_DIR/test/deploy-nuvla.sh
