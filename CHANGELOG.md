@@ -7,7 +7,7 @@ incompatible change with NuvlaBox stack.
 
 ### Changed
 
-  - Update to nuvla/api:4.1.0
+  - Update to nuvla/api:4.2.0
   - Update to nuvla/ui:2.3.0
 
 ## [2.0.0] - 2019-05-26
