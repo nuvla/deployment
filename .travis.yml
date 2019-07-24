@@ -3,4 +3,4 @@ dist: trusty
 services:
   - docker
 script:
-  - $TRAVIS_BUILD_DIR/test/deploy-nuvla.sh
+  - $TRAVIS_BUILD_DIR/test/deploy-nuvla.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvla.sh https://localhost/api/cloud-entry-point
