@@ -51,4 +51,4 @@ docker-compose -f ${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml up -d
 
 
 # Now wait for it
-./wait-for-nuvlabox.sh
+${TRAVIS_BUILD_DIR}/test/wait-for-nuvlabox.sh
