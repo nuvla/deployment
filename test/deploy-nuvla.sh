@@ -2,9 +2,9 @@
 
 git clone https://github.com/nuvla/deployment.git
 
-cd deployment
+cd deployment/demo
 
 docker swarm init
 
-docker stack deploy --compose-file demo/docker-compose.yml nuvla
+docker stack deploy --compose-file docker-compose.yml nuvla
 
