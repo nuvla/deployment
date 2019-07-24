@@ -14,17 +14,19 @@ session_template='{
     }
 }'
 
+export COOKIES_FILE=$(pwd)/cookies
+
 curl -XPOST --fail \
     ${nuvla_endpoint}/api/session \
     -H content-type:application/json \
     -H accept:application/json \
-    -c cookies -k \
+    -c ${COOKIES_FILE} -k \
     -d "${session_template}"
 
-user=$(curl  --fail -XGET \
+user=$(curl --fail -XGET \
         ${nuvla_endpoint}/api/user \
         -H accept:application/json \
-        -b cookies -k | jq -r .resources[].id)
+        -b ${COOKIES_FILE} -k | jq -r .resources[].id)
 
 nb_template='{
     "owner": "'${user}'"
@@ -35,7 +37,7 @@ export NUVLABOX_UUID=$(curl -XPOST --fail \
                         ${nuvla_endpoint}/api/nuvlabox \
                         -H content-type:application/json \
                         -H accept:application/json \
-                        -b cookies -k \
+                        -b ${COOKIES_FILE} -k \
                         -d "${nb_template}" | jq -r '."resource-id"')
 
 docker network create localhost_nuvlabox --attachable
@@ -45,5 +47,7 @@ CONTAINER_ID=`docker inspect $(docker service ps ${nuvla_stack_name}_proxy --for
 docker network connect --alias local-nuvla-endpoint localhost_nuvlabox $CONTAINER_ID
 
 # Deploy NuvlaBox
-docker-compose -f ${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml up --abort-on-container-exit -d
+docker-compose -f ${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml up -d
+
+
 
