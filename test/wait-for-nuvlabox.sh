@@ -4,11 +4,9 @@
 timeout 180 bash -c -- "
 set -ex
 
-system_manager=$(docker-compose -p nuvlabox ps -q system-manager)
-
 while true
 do
-    (docker inspect ${system_manager} | jq -e '.[].State.Health.Status==\"healthy\"') && break
+    (docker inspect $(docker-compose -p nuvlabox ps -q system-manager) | jq -e '.[].State.Health.Status==\"healthy\"') && break
 
     echo 'INFO: waiting for NuvlaBox System Manager to become healthy'
     docker-compose -p nuvlabox logs --tail=10
