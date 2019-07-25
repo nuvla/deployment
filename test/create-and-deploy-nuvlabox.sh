@@ -47,7 +47,7 @@ CONTAINER_ID=`docker inspect $(docker service ps ${nuvla_stack_name}_proxy --for
 docker network connect --alias local-nuvla-endpoint localhost_nuvlabox $CONTAINER_ID
 
 # Deploy NuvlaBox
-docker-compose -f ${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml up -d
+docker-compose -f ${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml -p nuvlabox up -d
 
 
 # Now wait for it
