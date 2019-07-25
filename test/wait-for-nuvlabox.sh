@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
-compose_file=${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml
-system_manager=$(docker-compose -f ${compose_file} ps -q system-manager)
+export compose_file=${TRAVIS_BUILD_DIR}/docker-compose.localhost.yml
+export system_manager=$(docker-compose -f ${compose_file} ps -q system-manager)
 
 timeout 180 bash -c -- "while true
 do
@@ -16,8 +16,6 @@ do
     docker-compose -f ${compose_file} logs --tail=20
     sleep 3
 done"
-
-set -x
 
 cookies_file=${COOKIES_FILE:-cookies}
 nb_uuid=${NUVLABOX_UUID:?"Can not run this without the NB ID"}
