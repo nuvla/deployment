@@ -2,7 +2,7 @@
 
 ## [2.1.1] - 2019-07-25
 
-Relese contains a minor patch in job component.
+Release contains a minor patch in job component.
 
 ### Changed
 
