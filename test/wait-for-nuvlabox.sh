@@ -8,7 +8,7 @@ system_manager=$(docker-compose -f ${compose_file} ps -q system-manager)
 
 while true
 do
-    (docker inspect ${system_manager} | jq '.[].State.Health.Status==\"healthy\"') && break
+    (docker inspect ${system_manager} | jq -e '.[].State.Health.Status==\"healthy\"') && break
 
     echo 'INFO: waiting for NuvlaBox System Manager to become healthy'
     docker-compose -f ${compose_file} logs --tail=10
