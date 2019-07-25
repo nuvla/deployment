@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.1] - 2019-07-25
+
+Relese contains a minor patch in job component.
+
+### Changed
+
+  - Update to nuvla/job:2.3.2
+
 ## [2.1.0] - 2019-07-24
 
 Release contains support for applications which contain multiple

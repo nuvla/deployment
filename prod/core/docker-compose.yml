@@ -65,7 +65,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:2.3.1
+    image: nuvla/job:2.3.2
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
@@ -79,7 +79,7 @@ services:
       - nuvla-backend
 
   job-dist-jobs-cleanup:
-    image: nuvla/job:2.3.1
+    image: nuvla/job:2.3.2
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -93,7 +93,7 @@ services:
       - nuvla-backend
 
   job-dist-deployment-state:
-    image: nuvla/job:2.3.1
+    image: nuvla/job:2.3.2
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
