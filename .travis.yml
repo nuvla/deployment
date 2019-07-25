@@ -1,0 +1,25 @@
+language: generic
+dist: trusty
+services:
+- docker
+before_install:
+- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+- sudo apt-get update
+- sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+- sudo apt-get install -y jq
+- sudo rm /usr/local/bin/docker-compose
+- curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname
+  -s)-$(uname -m)" > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+script:
+- "$TRAVIS_BUILD_DIR/test/deploy-nuvla.sh && $TRAVIS_BUILD_DIR/test/wait-for-nuvla.sh
+  https://localhost/api/cloud-entry-point 10"
+- "$TRAVIS_BUILD_DIR/test/create-and-deploy-nuvlabox.sh"
+after_script:
+- docker stack rm $(docker stack ls --format '{{.Name}}')
+- docker-compose -f $TRAVIS_BUILD_DIR/docker-compose.localhost.yml down -v
+notifications:
+  slack:
+    secure: GoXaHXaqwhxYeGw+02wvdlxAzVfQuKZgZEzhqS27eYBXDM2p3UkqOLJsH3EdfqtXoJZ+owEOoLvcKwqUUAWKc87L3oPmqfrE4Wfrr8AMTtjY17iNfGh0c4Ripysaw5VBSujlGgroKxN747T0QJvniD6UKz5N4vMQf8mWrtvbUPk9AeidAyypH8oTdRlAB6YKNgwJ5xcvbnwEP3UaDudhsj9cNgIVWie5ybZFPL3K8YkAuitcLWlEOsNFVYw/W6gAktf2gAuBx5h9+w2waZr8BHfdqCsDT/rvWy4YN5L1x/we6sWTGsgFBacccX2cAKCz3//hmQXQBB2fu/+AMqLutZ+U93F2NJO0Nwp3VdUImIM0DBFp/8u9f2PxDnfwU3ym94JcuCJgWRwScQyedVjyilTHueuiMlSeSGVwDAwe7cSVxA9weiR5TtZIjQJDOiaUBgVYoYP+XbrleCowbxXkQI6TlVJv1GAc0G/92QQlKB2vE3hDJ2J2EiX3dMNYl50kDjVr8k1eR3VNSVM3t9HxZ/KoCDWabA9riGxgSbn3zQ1s56LZddlITSZ8LDbkFkRTnaTZG9zb/NWRf6KyfAln08iD0oHobdbVLEiA8Q6X29lW+KB0AzF+xre6o3YP9JFqdYEHofZZvkuha32JUJ+LQKNCeZdsuIZinwlHfEnnObI=
