@@ -1,5 +1,17 @@
 # Changelog
 
+
+## [2.1.2] - 2019-07-29
+
+Release resolve deployment related issues job-engine and ui side. 
+The api fix some issues related to external authentication and resource-metadata related updates.
+
+### Changed
+
+  - Update to nuvla/api:4.2.1
+  - Update to nuvla/job:2.3.3
+  - Update to nuvla/ui:2.4.1
+
 ## [2.1.1] - 2019-07-25
 
 Release contains a minor patch in job component.

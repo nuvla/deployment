@@ -58,7 +58,7 @@ services:
       - backend
 
   api:
-    image: nuvla/api:4.2.0
+    image: nuvla/api:4.2.1
     environment:
       - ES_HOST=es
       - ES_PORT=9200
@@ -82,7 +82,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.4.0
+    image: nuvla/ui:2.4.1
     deploy:
       labels:
         - "traefik.enable=true"
@@ -98,7 +98,7 @@ services:
       - frontend
 
   job-executor:
-    image: nuvla/job:2.3.2
+    image: nuvla/job:2.3.3
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
