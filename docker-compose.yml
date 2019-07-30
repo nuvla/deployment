@@ -32,6 +32,7 @@ services:
     restart: always
     ports:
       - 127.0.0.1:3636:3636
+      - 3637:3637
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3636"]
       interval: 30s

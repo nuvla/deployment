@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: nuvlabox/agent:1.0.0
+    image: nuvlabox/agent:1.0.1
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
@@ -31,11 +31,12 @@ services:
       - compute-api
 
   system-manager:
-    image: nuvlabox/system-manager:0.3.1
+    image: nuvlabox/system-manager:0.4.0
     <<: [ *common, *common-volumes ]
     restart: always
     ports:
       - 127.0.0.1:3636:3636
+      - 3637:3637
     networks:
       localhost:
         aliases:
