@@ -1,14 +1,42 @@
 # Changelog
 
-## [Unreleased]
 
-Minor fixes for api-server and ui. Api-Server contain a backward 
-incompatible change with NuvlaBox stack.
+## [2.1.2] - 2019-07-29
+
+Release resolve deployment related issues job-engine and ui side. 
+The api fix some issues related to external authentication and resource-metadata related updates.
 
 ### Changed
 
-  - Update to nuvla/api:4.1.0
-  - Update to nuvla/ui:2.3.0
+  - Update to nuvla/api:4.2.1
+  - Update to nuvla/job:2.3.3
+  - Update to nuvla/ui:2.4.1
+
+## [2.1.1] - 2019-07-25
+
+Release contains a minor patch in job component.
+
+### Changed
+
+  - Update to nuvla/job:2.3.2
+
+## [2.1.0] - 2019-07-24
+
+Release contains support for applications which contain multiple
+containers. This is provided by the api, ui, and job components of
+the release.
+
+The release also contains prototype support for external authentication
+mechanisms. The resources are available from the API, but the UI 
+does not yet support these mechanisms.
+
+All updated components contain minor bug fixes.
+
+### Changed
+
+  - Update to nuvla/api:4.2.0
+  - Update to nuvla/ui:2.4.0
+  - Update to nuvla/job:2.3.1
 
 ## [2.0.0] - 2019-05-26
 
