@@ -13,19 +13,21 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: nuvlabox/agent:1.0.0
+    image: nuvlabox/agent:1.0.1
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
       - 5000
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=False
     depends_on:
       - system-manager
       - compute-api
 
   system-manager:
-    image: nuvlabox/system-manager:0.3.1
+    image: nuvlabox/system-manager:0.4.0
     <<: [ *common, *common-volumes ]
     restart: always
     ports:
@@ -55,6 +57,8 @@ services:
 #    restart: on-failure
 #    environment:
 #      - NUVLABOX_UUID=${NUVLABOX_UUID}
+#      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+#      - NUVLA_ENDPOINT_INSECURE=False
 #    depends_on:
 #      - system-manager
 #    volumes:
