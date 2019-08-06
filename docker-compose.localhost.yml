@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: nuvlabox/agent:1.0.1
+    image: nuvlabox/agent:1.0.2
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
