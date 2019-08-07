@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.3] - 2019-08-07
+
+Release add nuvlabox-peripheral resource and updated the version numbers (v1) for the other 
+nuvlabox resources. And other fixes. UI got a refactored sidebar and footer and support external 
+authentication redirection. Login modal visible when needed. Job-Engine got some fixes. 
+Nuvlabox decommission action delete linked nuvlabox-peripheral.
+
+### Changed
+
+  - Update to nuvla/api:4.2.2
+  - Update to nuvla/job:2.3.4
+  - Update to nuvla/ui:2.4.2
 
 ## [2.1.2] - 2019-07-29
 
