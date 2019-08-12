@@ -1,5 +1,16 @@
 # NuvlaBox Engine
 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/nuvlabox/deployment/graphs/commit-activity)
+
+
+[![CI](https://img.shields.io/travis/com/nuvlabox/deployment?style=for-the-badge&logo=travis-ci&logoColor=white)](https://travis-ci.com/nuvlabox/deployment)
+[![GitHub issues](https://img.shields.io/github/issues/nuvlabox/deployment?style=for-the-badge&logo=github&logoColor=white)](https://GitHub.com/nuvlabox/deployment/issues/)
+[![GitHub release](https://img.shields.io/github/release/nuvlabox/deployment?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nuvlabox/deployment/releases/tag/1.1.0)
+[![GitHub release](https://img.shields.io/github/release-date/nuvlabox/deployment?logo=github&logoColor=white&style=for-the-badge)](https://github.com/nuvlabox/deployment/releases)
+
+
+![logo](https://uc977612ad25e6fb53ac9275cd4c.previews.dropboxusercontent.com/p/thumb/AAhLDh0-m61kGliju2bmLxVEc36VssSKVjGd9r6JnxmpdVExwfKsZWXtVtc2gz0IR1PN7tviqaJJY3YSXHZhxTwO1x_8bHHt3W49SZDgrMqPW84Jw9vg-Dmv_2J4siLp44GvufcOPr8Rw96xIGfG1JIm_xrADjdl0tpgW8LrJnojoMl5l7hCs0cNLMQm54P_QH8hhg5cc8Nkvk2M5F5YBp4MM5M62AMQXZRihBz4QsbvHeVNIj3Z8lI-gbcY9rYjiQmLYeAdP_REq2eEYcrADrMHHI6oJRuFQAAzrEPcyc6_3KQzMENiGflpKZAE2BcAJAJ956KodJjixpH8PPC_3sGlhijEZ2LTE_jwb00-znmVRV-BYNr8MO16HCZIBQeRgSc/p.png?fv_content=true&size_mode=5)
+
 This repository container the definitions for the installation of the NuvlaBox Engine.
 
 For further details, go to the [online documentation](https://docs.nuvla.io/docs/dave/nuvlabox.html).
@@ -87,44 +98,6 @@ In this scenario, we assume you already have a Nuvla deployment running on your 
     $ docker-compose -f docker-compose.localhost.yml up --abort-on-container-exit
     ```
 
-
-## Contributing
-
-### Source Code Changes
-
-To contribute code to this repository, please follow these steps:
-
- 1. Create a branch from master with a descriptive, kebab-cased name
-    to hold all your changes.
-
- 2. Follow the developer guidelines concerning formatting, etc. when
-    modifying the code.
-   
- 3. Once the changes are ready to be reviewed, create a GitHub pull
-    request.  With the pull request, provide a description of the
-    changes and links to any relevant issues (in this repository or
-    others). 
-   
- 4. Ensure that the triggered CI checks all pass.  These are triggered
-    automatically with the results shown directly in the pull request.
-
- 5. Once the checks pass, assign the pull request to the repository
-    coordinator (who may then assign it to someone else).
-
- 6. Interact with the reviewer to address any comments.
-
-When the reviewer is happy with the pull request, he/she will "squash
-& merge" the pull request and delete the corresponding branch.
-
-### Testing
-
-Add appropriate tests that verify the changes or additions you make to
-the source code.
-
-### Code Formatting
-
-This repository contains mostly Docker container descriptions and bash
-scripts. When modifying a file, keep the style of the existing code.
 
 ## Copyright
 
