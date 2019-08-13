@@ -3,6 +3,7 @@
     [clojure.core.async :refer [<!!]]
     [clojure.java.shell :refer [sh]]
     [clojure.pprint :refer [pprint]]
+    [clojure.test :refer [is]]
     [sixsq.nuvla.client.api :as api]
     [sixsq.nuvla.test.context :as context]))
 
@@ -26,4 +27,5 @@
           result (sh "python" script :env env)]
       (println "RESULT FOR " script)
       (pprint result)
+      (is (zero? (:exit result)))
       result)))
