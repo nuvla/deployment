@@ -20,11 +20,12 @@
   "Returns exit code, stdout, and stderr of the command `python
    ${path}/add-module.py`."
   (when path
-    (let [script (format "%s/add-module.py" path)
-          env    {"NUVLA_ENDPOINT" context/python-api-endpoint
-                  "NUVLA_USERNAME" context/nuvla-username
-                  "NUVLA_PASSWORD" context/nuvla-password}
-          result (sh "python" script :env env)]
+    (let [script      (format "%s/add-module.py" path)
+          current-env (into {} (System/getenv))
+          env         (assoc current-env "NUVLA_ENDPOINT" context/python-api-endpoint
+                                         "NUVLA_USERNAME" context/nuvla-username
+                                         "NUVLA_PASSWORD" context/nuvla-password)
+          result      (sh "python" script :env env)]
       (println "RESULT FOR " script)
       (pprint result)
       (is (zero? (:exit result)))
