@@ -2,9 +2,14 @@ language: generic
 dist: trusty
 services:
 - docker
+before_install:
+  - git clone https://github.com/nuvla/example-ubuntu.git ${HOME}/example-ubuntu
+  - git clone https://github.com/nuvla/example-centos.git ${HOME}/example-centos
+  - git clone https://github.com/nuvla/example-rstudio.git ${HOME}/example-rstudio
+  - git clone https://github.com/nuvla/example-jupyter.git ${HOME}/example-jupyter
 script:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN
-  - cd functional-tests && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub && export mname=`cat $HOME/docker-machine-master` && eval $($HOME/docker-machine env $mname) && printenv && lein do clean, test
+  - cd functional-tests && export EXAMPLES_ROOT=${HOME} && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub && export mname=`cat $HOME/docker-machine-master` && eval $($HOME/docker-machine env $mname) && printenv && lein do clean, test
 after_success:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 after_failure:
