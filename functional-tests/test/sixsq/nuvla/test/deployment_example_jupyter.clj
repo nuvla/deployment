@@ -42,7 +42,10 @@
 
             (loop [index 0]
               (let [url    (format "https://%s:%s/?token=%s" hostname port access-token)
-                    result (http/get url {:throw-exceptions false, :insecure? true})]
+                    result (try
+                             (http/get url {:throw-exceptions false, :insecure? true})
+                             (catch Exception _
+                               nil))]
                 (println "JUPYTER HTTP RESULT: " url " " (:status result))
                 (if (or (> index 50) (= 200 (:status result)))
                   (do
