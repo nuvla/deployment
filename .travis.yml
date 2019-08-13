@@ -1,4 +1,6 @@
-language: generic
+language: python
+python:
+ - "3.6"
 dist: trusty
 services:
 - docker
@@ -7,6 +9,7 @@ before_install:
   - git clone https://github.com/nuvla/example-centos.git ${HOME}/example-centos
   - git clone https://github.com/nuvla/example-rstudio.git ${HOME}/example-rstudio
   - git clone https://github.com/nuvla/example-jupyter.git ${HOME}/example-jupyter
+install:
   - pip install nuvla-api
 script:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN
