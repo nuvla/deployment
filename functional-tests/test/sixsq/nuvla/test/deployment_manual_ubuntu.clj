@@ -76,8 +76,8 @@
 
           ;; wait for deployment parameters to become available
           (when-let [dps (depl/wait-for-dps deployment-id ["hostname" "tcp.22"])]
-            (let [hostname (:value (get dps "hostname"))
-                  port     (:value (get dps "tcp.22"))]
+            (let [hostname (get dps "hostname")
+                  port     (get dps "tcp.22")]
 
               (loop [index 0]
                 (let [result (ssh/try-ssh hostname port)]

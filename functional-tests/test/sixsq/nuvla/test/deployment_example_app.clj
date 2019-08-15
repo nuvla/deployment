@@ -1,4 +1,4 @@
-(ns sixsq.nuvla.test.deployment-example-rstudio
+(ns sixsq.nuvla.test.deployment-example-app
   (:require
     [clojure.core.async :refer [<!!]]
     [clojure.string :as str]
@@ -16,9 +16,9 @@
 
   (let [examples-root (env :examples-root)]
 
-    (module/add-module (str/join "/" [examples-root "example-rstudio"]))
+    (module/add-module (str/join "/" [examples-root "example-app"]))
 
-    (when-let [module-id (module/get-module-by-path "examples/rstudio")]
+    (when-let [module-id (module/get-module-by-path "examples/my-first-application")]
 
       (let [depl          {:parent cred-id
                            :module {:href module-id}}
@@ -35,14 +35,15 @@
         (depl/verify-state deployment-id "STARTED")
 
         ;; wait for deployment parameters to become available
-        (when-let [dps (depl/wait-for-dps deployment-id ["hostname" "tcp.8787" "password"])]
-          (let [hostname (get dps "hostname")
-                port     (get dps "tcp.8787")
-                password (get dps "password")]
+        (when-let [dps (depl/wait-for-dps deployment-id ["hostname"
+                                                         "nginx_simple.tcp.80"
+                                                         "jupyter_advanced.tcp.8888"])]
+          (let [hostname     (get dps "hostname")
+                nginx-port   (get dps "nginx_simple.tcp.80")
+                jupyter-port (get dps "jupyter_advanced.tcp.8888")]
 
-            (println "rstudio password: " password)
-
-            (depl/check-url "RSTUDIO" (format "http://%s:%s" hostname port))))
+            (depl/check-url "NGINX" (format "http://%s:%s" hostname nginx-port))
+            (depl/check-url "JUPYTER" (format "http://%s:%s" hostname jupyter-port))))
 
         (depl/do-action deployment-id "stop")
 

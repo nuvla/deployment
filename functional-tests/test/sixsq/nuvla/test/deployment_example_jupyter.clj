@@ -36,24 +36,11 @@
 
         ;; wait for deployment parameters to become available
         (when-let [dps (depl/wait-for-dps deployment-id ["hostname" "tcp.8888" "access-token"])]
-          (let [hostname     (:value (get dps "hostname"))
-                port         (:value (get dps "tcp.8888"))
-                access-token (:value (get dps "access-token"))]
+          (let [hostname     (get dps "hostname")
+                port         (get dps "tcp.8888")
+                access-token (get dps "access-token")]
 
-            (loop [index 0]
-              (let [url    (format "https://%s:%s/?token=%s" hostname port access-token)
-                    result (try
-                             (http/get url {:throw-exceptions false, :insecure? true})
-                             (catch Exception _
-                               nil))]
-                (println "JUPYTER HTTP RESULT: " url " " (:status result))
-                (if (or (> index 50) (= 200 (:status result)))
-                  (do
-                    (is (= 200 (:status result)))
-                    (is (:body result)))
-                  (do
-                    (Thread/sleep 5000)
-                    (recur (inc index))))))))
+            (depl/check-url "JUPYTER" (format "https://%s:%s/?token=%s" hostname port access-token))))
 
         (depl/do-action deployment-id "stop")
 

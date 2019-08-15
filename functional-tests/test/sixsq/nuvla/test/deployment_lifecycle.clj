@@ -5,6 +5,7 @@
     [environ.core :refer [env]]
     [sixsq.nuvla.client.api :as api]
     [sixsq.nuvla.test.context :as context]
+    [sixsq.nuvla.test.deployment-example-app :as app]
     [sixsq.nuvla.test.deployment-example-centos :as centos]
     [sixsq.nuvla.test.deployment-example-jupyter :as jupyter]
     [sixsq.nuvla.test.deployment-example-rstudio :as rstudio]
@@ -81,5 +82,6 @@
               (centos/tests cred-id)
               (rstudio/tests cred-id)
               (jupyter/tests cred-id)
+              (app/tests cred-id)
 
               )))))))

@@ -32,7 +32,7 @@
     (let [options {:first 0, :last 100, :filter (format "parent='%s'" deployment-id)}
           {:keys [resources]} (<!! (api/search context/client :deployment-parameter options))
           dps-map (select-keys (->> resources
-                                    (map (juxt :name identity))
+                                    (map (juxt :name :value))
                                     (into {}))
                                dps)]
       (if (= (count dps) (count dps-map))
@@ -45,6 +45,23 @@
             (println "waiting... parameters currently available: " (keys dps-map))
             (Thread/sleep (or sleep-ms 5000))
             (recur (inc index))))))))
+
+
+(defn check-url
+  [tag url]
+  (loop [index 0]
+    (let [result (try
+                   (http/get url {:throw-exceptions false, :insecure? true})
+                   (catch Exception _
+                     nil))]
+      (println tag " HTTP RESULT: " url " " (:status result))
+      (if (or (> index 50) (= 200 (:status result)))
+        (do
+          (is (= 200 (:status result)))
+          (is (:body result)))
+        (do
+          (Thread/sleep 5000)
+          (recur (inc index)))))))
 
 
 (defn do-action
