@@ -7,8 +7,7 @@
     [sixsq.nuvla.client.api :as api]
     [sixsq.nuvla.test.context :as context]
     [sixsq.nuvla.test.deployment-utils :as depl]
-    [sixsq.nuvla.test.module-utils :as module]
-    [clj-http.client :as http]))
+    [sixsq.nuvla.test.module-utils :as module]))
 
 
 (defn tests

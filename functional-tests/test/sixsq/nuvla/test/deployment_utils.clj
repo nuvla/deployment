@@ -1,5 +1,6 @@
 (ns sixsq.nuvla.test.deployment-utils
   (:require
+    [clj-http.client :as http]
     [clojure.core.async :refer [<!!]]
     [clojure.test :refer [is]]
     [environ.core :refer [env]]
