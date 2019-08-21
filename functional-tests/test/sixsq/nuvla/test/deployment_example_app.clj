@@ -27,6 +27,15 @@
         (is (= 201 status))
         (is (re-matches #"deployment/.+" deployment-id))
 
+        ;; update the values of the GIVE_ME_SOME_INPUT environmental variable
+        (let [depl          (<!! (api/get context/client deployment-id))
+              env-vars-path [:module :content :environmental-variables]
+              env-vars      (get-in depl env-vars-path)
+              env-var-map   (into {} (map (juxt :name identity) env-vars))
+              new-map       (assoc-in env-var-map ["GIVE_ME_SOME_INPUT" :value] "some-input")
+              updated-depl  (assoc-in depl env-vars-path (vals new-map))]
+          (<!! (api/edit context/client deployment-id updated-depl)))
+
         (depl/do-action deployment-id "start")
 
         (depl/wait-for-state deployment-id "STARTED")
@@ -34,9 +43,9 @@
         (depl/verify-state deployment-id "STARTED")
 
         ;; wait for deployment parameters to become available
-        (when-let [dps (depl/wait-for-dps deployment-id ["hostname"
-                                                         "nginx_simple.tcp.80"
-                                                         "jupyter_advanced.tcp.8888"])]
+        (when-let [dps (depl/wait-for-dps deployment-id
+                                          ["hostname" "nginx_simple.tcp.80" "jupyter_advanced.tcp.8888"]
+                                          10000)]
           (let [hostname     (get dps "hostname")
                 nginx-port   (get dps "nginx_simple.tcp.80")
                 jupyter-port (get dps "jupyter_advanced.tcp.8888")]
