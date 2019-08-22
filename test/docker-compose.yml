@@ -58,7 +58,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:new-image-callbacks
+    image: nuvladev/api:master
     environment:
       - ES_HOST=es
       - ES_PORT=9200
@@ -97,7 +97,7 @@ services:
       - test-net
 
   job-executor:
-    image: nuvladev/job:new-image-update
+    image: nuvladev/job:master
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
@@ -108,7 +108,7 @@ services:
       - test-net
 
   job-dist-jobs-cleanup:
-    image: nuvladev/job:new-image-update
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -119,7 +119,7 @@ services:
       - test-net
 
   job-dist-deployment-state:
-    image: nuvladev/job:new-image-update
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
@@ -130,26 +130,26 @@ services:
       - test-net
 
   job-dist-component-image-state:
-    image: nuvladev/job:new-image-update
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_component_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
     networks:
-      - backend
+      - test-net
 
   job-dist-service-image-state:
-    image: nuvladev/job:new-image-update
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_service_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
       restart_policy:
         condition: on-failure
         delay: 5s
     networks:
-      - backend
+      - test-net
 
 configs:
   traefik.toml:
