@@ -1,5 +1,16 @@
 # NuvlaBox Engine
 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/nuvlabox/deployment/graphs/commit-activity)
+
+
+[![CI](https://img.shields.io/travis/com/nuvlabox/deployment?style=for-the-badge&logo=travis-ci&logoColor=white)](https://travis-ci.com/nuvlabox/deployment)
+[![GitHub issues](https://img.shields.io/github/issues/nuvlabox/deployment?style=for-the-badge&logo=github&logoColor=white)](https://GitHub.com/nuvlabox/deployment/issues/)
+[![GitHub release](https://img.shields.io/github/release/nuvlabox/deployment?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nuvlabox/deployment/releases/tag/1.1.0)
+[![GitHub release](https://img.shields.io/github/release-date/nuvlabox/deployment?logo=github&logoColor=white&style=for-the-badge)](https://github.com/nuvlabox/deployment/releases)
+
+
+![logo](https://media.sixsq.com/hubfs/SixSq_General/nuvlabox_logo_red_on_transparent_2500px.png)
+
 This repository container the definitions for the installation of the NuvlaBox Engine.
 
 For further details, go to the [online documentation](https://docs.nuvla.io/docs/dave/nuvlabox.html).
@@ -87,44 +98,6 @@ In this scenario, we assume you already have a Nuvla deployment running on your 
     $ docker-compose -f docker-compose.localhost.yml up --abort-on-container-exit
     ```
 
-
-## Contributing
-
-### Source Code Changes
-
-To contribute code to this repository, please follow these steps:
-
- 1. Create a branch from master with a descriptive, kebab-cased name
-    to hold all your changes.
-
- 2. Follow the developer guidelines concerning formatting, etc. when
-    modifying the code.
-   
- 3. Once the changes are ready to be reviewed, create a GitHub pull
-    request.  With the pull request, provide a description of the
-    changes and links to any relevant issues (in this repository or
-    others). 
-   
- 4. Ensure that the triggered CI checks all pass.  These are triggered
-    automatically with the results shown directly in the pull request.
-
- 5. Once the checks pass, assign the pull request to the repository
-    coordinator (who may then assign it to someone else).
-
- 6. Interact with the reviewer to address any comments.
-
-When the reviewer is happy with the pull request, he/she will "squash
-& merge" the pull request and delete the corresponding branch.
-
-### Testing
-
-Add appropriate tests that verify the changes or additions you make to
-the source code.
-
-### Code Formatting
-
-This repository contains mostly Docker container descriptions and bash
-scripts. When modifying a file, keep the style of the existing code.
 
 ## Copyright
 
