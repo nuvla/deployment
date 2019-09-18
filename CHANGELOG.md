@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.5] - 2019-09-18
+
+Release fix in api-server cloud-entry-point base-uri when server port is being forwarded and 
+allow users to delete deployment log. This release adds two new job distributors for module 
+component and deployment service to create notifications. Docker job distributors have been 
+renamed. UI got a new favicon and some dependencies updates and notification better management.
+
+### Changed
+
+  - Update to nuvla/api:4.2.4
+  - Update to nuvla/job:2.3.6
+  - Update to nuvla/ui:2.4.4
+
 
 ## [2.1.4] - 2019-09-04
 

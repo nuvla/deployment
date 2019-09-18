@@ -107,7 +107,7 @@ services:
     networks:
       - test-net
 
-  job-dist-jobs-cleanup:
+  jobd-jobs-cleanup:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
@@ -118,10 +118,32 @@ services:
     networks:
       - test-net
 
-  job-dist-deployment-state:
+  jobd-deployment-state:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-comp-image-state:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_component_image_state.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-srvc-image-state:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_service_image_state.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
       restart_policy:
         condition: on-failure
