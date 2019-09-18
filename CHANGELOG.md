@@ -1,5 +1,34 @@
 # Changelog
 
+## [2.1.5] - 2019-09-18
+
+Release fix in api-server cloud-entry-point base-uri when server port is being forwarded and 
+allow users to delete deployment log. This release adds two new job distributors for module 
+component and deployment service to create notifications. Docker job distributors have been 
+renamed. UI got a new favicon and some dependencies updates and notification better management.
+
+### Changed
+
+  - Update to nuvla/api:4.2.4
+  - Update to nuvla/job:2.3.6
+  - Update to nuvla/ui:2.4.4
+
+
+## [2.1.4] - 2019-09-04
+
+Release allows users to see deployment logs and to get notifications when a new version of Docker 
+image is available allowing him to update a module or a running component. A new voucher report 
+resource has been added to the server. Job-Engine got some fixes around deployment state and 
+NuvlaBox decommission. User can now give a name to Nuvlabox at creation time and all sub-resources 
+will get this name to facilitate the identification of the box. UI got some fixes in styling and 
+raw textarea allow now users to search and to see the search result highlighted.
+
+### Changed
+
+  - Update to nuvla/api:4.2.3
+  - Update to nuvla/job:2.3.5
+  - Update to nuvla/ui:2.4.3
+
 ## [2.1.3] - 2019-08-07
 
 Release add nuvlabox-peripheral resource and updated the version numbers (v1) for the other 
