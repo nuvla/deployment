@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.6] - 2019-10-10
+
+Api-server support bulk delete for data-record resource. Session validity was extended from 
+1 day to a 1 week. Group resource allow to set acl at creation time. Callbacks for user 
+registration are now re-executable. UI allow infrastructure service group to have more than 
+one subtype of service. Job-engine use python library (nuvla-api) which support bulk delete. 
+
+### Changed
+
+  - Update to nuvla/api:4.2.5
+  - Update to nuvla/job:2.3.7
+  - Update to nuvla/ui:2.4.5
+
 ## [2.1.5] - 2019-09-18
 
 Release fix in api-server cloud-entry-point base-uri when server port is being forwarded and 
