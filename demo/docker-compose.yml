@@ -78,6 +78,10 @@ services:
     networks:
       - backend
       - frontend
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: wget --spider http://localhost:8201/api/cloud-entry-point && wget --spider http://localhost:8201/api/user-template/email-password || exit 1
 
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
