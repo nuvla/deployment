@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 
 services:
   proxy:
@@ -78,6 +78,10 @@ services:
     networks:
       - backend
       - frontend
+    healthcheck:
+      start_period: 30s
+      retries: 5
+      test: curl -sSf http://localhost:8200/api/cloud-entry-point || exit 1
 
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
