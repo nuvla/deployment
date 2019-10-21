@@ -52,21 +52,21 @@ services:
     depends_on:
       - system-manager
 
- peripheral-manager-usb:
-   image: nuvlabox/peripheral-manager-usb:1.0.0
-   <<: *common
-   restart: on-failure
-   environment:
-     - NUVLABOX_UUID=${NUVLABOX_UUID}
-     - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-     - NUVLA_ENDPOINT_INSECURE=False
-   depends_on:
-     - system-manager
-   volumes:
-     - /dev:/dev:ro
-     - /run/udev/control:/run/udev/control:ro
-     - nuvlabox-db:/srv/nuvlabox/shared
-   network_mode: host
+  peripheral-manager-usb:
+    image: nuvlabox/peripheral-manager-usb:1.0.0
+    <<: *common
+    restart: on-failure
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=False
+    depends_on:
+      - system-manager
+    volumes:
+      - /dev:/dev:ro
+      - /run/udev/control:/run/udev/control:ro
+      - nuvlabox-db:/srv/nuvlabox/shared
+    network_mode: host
 
 volumes:
   nuvlabox-db:
