@@ -60,8 +60,7 @@ services:
   api:
     image: nuvladev/api:master
     environment:
-      - ES_HOST=es
-      - ES_PORT=9200
+      - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=${NUVLA_SUPER_PASSWORD:-supeR8-supeR8}
     deploy:
