@@ -13,7 +13,7 @@ before_install:
   - pip install nuvla-api
   - python -c 'import nuvla.api;'
 script:
-  - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || exit 1
+  - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN
   - cd functional-tests && export EXAMPLES_ROOT=${HOME} && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub && export mname=`cat $HOME/docker-machine-master` && eval $($HOME/docker-machine env $mname) && printenv && lein do clean, test
 after_success:
   - $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
