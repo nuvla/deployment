@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.1.7] - 2019-11-13
+
+Api-server bulk delete extended for most resources. VPN support for NuvlaBox resource was 
+added by adding credential templates and infrastructure service of subtype VPN. NuvlaBox 
+resources name was simplified. This release also fix stale job caused by race condition.
+UI got support for NuvlaBox peripherals. Infrastructure page got a fix to resolve 
+inconsistency between pages. Api page got bulk delete support. OCRE page visible for users
+in group/ocre-user. Appstore cards are now ordered by created time. Application yaml 
+syntax is checked to show erros and hints messages.
+
+### Changed
+
+  - Update to nuvla/api:4.2.6
+  - Update to nuvla/job:2.3.8
+  - Update to nuvla/ui:2.4.6
+
 ## [2.1.6] - 2019-10-10
 
 Api-server support bulk delete for data-record resource. Session validity was extended from 
