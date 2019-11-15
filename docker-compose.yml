@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: nuvlabox/agent:1.0.3
+    image: agentcris:latest
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
@@ -52,21 +52,51 @@ services:
     depends_on:
       - system-manager
 
-  peripheral-manager-usb:
-    image: nuvlabox/peripheral-manager-usb:1.0.0
+#  peripheral-manager-usb:
+#    image: nuvlabox/peripheral-manager-usb:1.0.0
+#    <<: *common
+#    restart: on-failure
+#    environment:
+#      - NUVLABOX_UUID=${NUVLABOX_UUID}
+#      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+#      - NUVLA_ENDPOINT_INSECURE=False
+#    depends_on:
+#      - system-manager
+#    volumes:
+#      - /dev:/dev:ro
+#      - /run/udev/control:/run/udev/control:ro
+#      - nuvlabox-db:/srv/nuvlabox/shared
+#    network_mode: host
+
+  network-manager:
+    image: netman:latest
     <<: *common
-    restart: on-failure
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=False
-    depends_on:
-      - system-manager
     volumes:
-      - /dev:/dev:ro
-      - /run/udev/control:/run/udev/control:ro
       - nuvlabox-db:/srv/nuvlabox/shared
+    labels:
+      - nuvlabox.component=True
+      - nuvlabox.deployment=production
+
+  vpn-client:
+    image: nuvladev/vpn-client:master
+    <<: *common
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+    depends_on:
+      - network-manager
+    restart: always
+    cap_add:
+      - NET_ADMIN
     network_mode: host
+    devices:
+      - /dev/net/tun
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    labels:
+      - nuvlabox.component=True
+      - nuvlabox.deployment=production
 
 volumes:
   nuvlabox-db:
