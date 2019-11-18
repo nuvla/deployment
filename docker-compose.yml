@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: agentcris:latest
+    image: nuvladev/agent:master
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
@@ -69,7 +69,7 @@ services:
 #    network_mode: host
 
   network-manager:
-    image: netman:latest
+    image: nuvladev/network-manager:master
     <<: *common
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
