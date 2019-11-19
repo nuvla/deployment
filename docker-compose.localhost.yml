@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: nuvlabox/agent:1.0.3
+    image: nuvlabox/agent:1.1.0
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
@@ -31,7 +31,7 @@ services:
       - compute-api
 
   system-manager:
-    image: nuvlabox/system-manager:0.4.0
+    image: nuvlabox/system-manager:0.4.1
     <<: [ *common, *common-volumes ]
     restart: always
     ports:
@@ -49,7 +49,7 @@ services:
       start_period: 10s
 
   compute-api:
-    image: nuvlabox/compute-api:0.2.4
+    image: nuvlabox/compute-api:0.2.5
     <<: [ *common, *common-volumes ]
     restart: on-failure
     pid: "host"
@@ -61,7 +61,7 @@ services:
       - system-manager
 
   peripheral-manager-usb:
-    image: nuvlabox/peripheral-manager-usb:1.0.0
+    image: nuvlabox/peripheral-manager-usb:1.0.1
     <<: *common
     restart: on-failure
     environment:
@@ -75,6 +75,36 @@ services:
       - /run/udev/control:/run/udev/control:ro
       - nuvlabox-db:/srv/nuvlabox/shared
     network_mode: host
+
+  network-manager:
+    image: nuvlabox/network-manager:0.0.1
+    <<: *common
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    labels:
+      - nuvlabox.component=True
+      - nuvlabox.deployment=production
+
+  vpn-client:
+    image: nuvlabox/vpn-client:0.0.1
+    <<: *common
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+    depends_on:
+      - network-manager
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    network_mode: host
+    devices:
+      - /dev/net/tun
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    labels:
+      - nuvlabox.component=True
+      - nuvlabox.deployment=production
 
 volumes:
   nuvlabox-db:
