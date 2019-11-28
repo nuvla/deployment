@@ -88,7 +88,7 @@ services:
       - nuvlabox.deployment=production
 
   vpn-client:
-    image: nuvlabox/vpn-client:0.0.1
+    image: nuvlabox/vpn-client:0.0.2
     <<: *common
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
