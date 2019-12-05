@@ -25,7 +25,8 @@
 
   :dependencies
   [[sixsq.nuvla/api ~+sixsq-nuvla-api-version+]
-   [environ]]
+   [environ]
+   [clj-http]]
 
   :profiles {:provided {:dependencies [[org.clojure/clojure]]}
              :test     {:source-paths   ["test"]

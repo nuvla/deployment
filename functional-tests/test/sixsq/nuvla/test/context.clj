@@ -24,6 +24,9 @@
 (def server-endpoint (str "https://" nuvla-host "/api/cloud-entry-point"))
 
 
+(def python-api-endpoint (str "https://" nuvla-host))
+
+
 (def options (when (= "TRUE" nuvla-insecure) {:insecure? true}))
 
 

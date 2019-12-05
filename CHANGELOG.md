@@ -1,5 +1,75 @@
 # Changelog
 
+## [2.1.7] - 2019-11-13
+
+Api-server bulk delete extended for most resources. VPN support for NuvlaBox resource was 
+added by adding credential templates and infrastructure service of subtype VPN. NuvlaBox 
+resources name was simplified. This release also fix stale job caused by race condition.
+UI got support for NuvlaBox peripherals. Infrastructure page got a fix to resolve 
+inconsistency between pages. Api page got bulk delete support. OCRE page visible for users
+in group/ocre-user. Appstore cards are now ordered by created time. Application yaml 
+syntax is checked to show erros and hints messages.
+
+### Changed
+
+  - Update to nuvla/api:4.2.6
+  - Update to nuvla/job:2.3.8
+  - Update to nuvla/ui:2.4.6
+
+## [2.1.6] - 2019-10-10
+
+Api-server support bulk delete for data-record resource. Session validity was extended from 
+1 day to a 1 week. Group resource allow to set acl at creation time. Callbacks for user 
+registration are now re-executable. UI allow infrastructure service group to have more than 
+one subtype of service. Job-engine use python library (nuvla-api) which support bulk delete. 
+
+### Changed
+
+  - Update to nuvla/api:4.2.5
+  - Update to nuvla/job:2.3.7
+  - Update to nuvla/ui:2.4.5
+
+## [2.1.5] - 2019-09-18
+
+Release fix in api-server cloud-entry-point base-uri when server port is being forwarded and 
+allow users to delete deployment log. This release adds two new job distributors for module 
+component and deployment service to create notifications. Docker job distributors have been 
+renamed. UI got a new favicon and some dependencies updates and notification better management.
+
+### Changed
+
+  - Update to nuvla/api:4.2.4
+  - Update to nuvla/job:2.3.6
+  - Update to nuvla/ui:2.4.4
+
+
+## [2.1.4] - 2019-09-04
+
+Release allows users to see deployment logs and to get notifications when a new version of Docker 
+image is available allowing him to update a module or a running component. A new voucher report 
+resource has been added to the server. Job-Engine got some fixes around deployment state and 
+NuvlaBox decommission. User can now give a name to Nuvlabox at creation time and all sub-resources 
+will get this name to facilitate the identification of the box. UI got some fixes in styling and 
+raw textarea allow now users to search and to see the search result highlighted.
+
+### Changed
+
+  - Update to nuvla/api:4.2.3
+  - Update to nuvla/job:2.3.5
+  - Update to nuvla/ui:2.4.3
+
+## [2.1.3] - 2019-08-07
+
+Release add nuvlabox-peripheral resource and updated the version numbers (v1) for the other 
+nuvlabox resources. And other fixes. UI got a refactored sidebar and footer and support external 
+authentication redirection. Login modal visible when needed. Job-Engine got some fixes. 
+Nuvlabox decommission action delete linked nuvlabox-peripheral.
+
+### Changed
+
+  - Update to nuvla/api:4.2.2
+  - Update to nuvla/job:2.3.4
+  - Update to nuvla/ui:2.4.2
 
 ## [2.1.2] - 2019-07-29
 
