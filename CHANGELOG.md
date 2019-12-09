@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.9] - 2019-12-09
+
+Patch release to fix an issue in stopping docker application from job engine.
+
+### Changed
+
+  - Update to nuvla/api:4.2.7
+  - Update to nuvla/job:2.3.10
+  - Update to nuvla/ui:2.4.7
+
 ## [2.1.8] - 2019-12-09
 
 Alpha support for Kubernetes added to all components. OpenVPN added for NuvlaBox workflow. 
