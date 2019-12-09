@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.1.8] - 2019-12-09
+
+Alpha support for Kubernetes added to all components. OpenVPN added for NuvlaBox workflow. 
+UI got a lot of minors fixes and OCRE page got a PIE chart summary.
+
+### Changed
+
+  - Update to nuvla/api:4.2.7
+  - Update to nuvla/job:2.3.9
+  - Update to nuvla/ui:2.4.7
+
 ## [2.1.7] - 2019-11-13
 
 Api-server bulk delete extended for most resources. VPN support for NuvlaBox resource was 
