@@ -13,7 +13,7 @@ x-common-volumes: &common-volumes
 
 services:
   agent:
-    image: nuvlabox/agent:1.1.0
+    image: nuvlabox/agent:1.2.0
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:
@@ -77,7 +77,7 @@ services:
     network_mode: host
 
   network-manager:
-    image: nuvlabox/network-manager:0.0.1
+    image: nuvlabox/network-manager:0.0.2
     <<: *common
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
@@ -88,7 +88,8 @@ services:
       - nuvlabox.deployment=production
 
   vpn-client:
-    image: nuvlabox/vpn-client:0.0.2
+    image: nuvlabox/vpn-client:0.0.3
+    container_name: vpn-client
     <<: *common
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
