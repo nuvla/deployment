@@ -61,7 +61,7 @@ services:
       - system-manager
 
   peripheral-manager-usb:
-    image: nuvlabox/peripheral-manager-usb:1.0.1
+    image: nuvlabox/peripheral-manager-usb:1.0.2
     <<: *common
     restart: on-failure
     environment:
@@ -75,6 +75,18 @@ services:
       - /run/udev/control:/run/udev/control:ro
       - nuvlabox-db:/srv/nuvlabox/shared
     network_mode: host
+
+  peripheral-manager-modbus:
+    image: nuvlabox/peripheral-manager-modbus:0.0.1
+    <<: *common
+    restart: on-failure
+    environment:
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+    depends_on:
+      - system-manager
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
 
   network-manager:
     image: nuvlabox/network-manager:0.0.2
