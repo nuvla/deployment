@@ -12,6 +12,26 @@ x-common-volumes: &common-volumes
     - nuvlabox-db:/srv/nuvlabox/shared
 
 services:
+  data-gateway:
+    image: traefik:2.1.1
+    container_name: datagateway
+    command:
+      - --entrypoints.mqtt.address=:1883
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  nb-mosquitto:
+    image: eclipse-mosquitto:1.6.8
+    container_name: nbmosquitto
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mytcprouter.entrypoints=mqtt"
+      - "traefik.tcp.routers.mytcprouter.service=mosquitto"
+      - "traefik.tcp.services.mosquitto.loadbalancer.server.port=1883"
+
   agent:
     image: nuvlabox/agent:1.2.0
     <<: [ *common, *common-volumes ]
