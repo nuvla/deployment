@@ -17,6 +17,7 @@ services:
     container_name: datagateway
     command:
       - --entrypoints.mqtt.address=:1883
+      - --entrypoints.web.address=:80
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
     volumes:
