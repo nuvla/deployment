@@ -15,6 +15,9 @@ services:
   data-gateway:
     image: traefik:2.1.1
     container_name: datagateway
+    networks:
+      - default
+      - nuvlabox-shared-network
     command:
       - --entrypoints.mqtt.address=:1883
       - --entrypoints.web.address=:80
@@ -90,7 +93,7 @@ services:
     network_mode: host
 
   peripheral-manager-modbus:
-    image: nuvlabox/peripheral-manager-modbus:0.0.1
+    image: nuvlabox/peripheral-manager-modbus:0.0.2
     <<: *common
     restart: on-failure
     environment:
@@ -107,6 +110,7 @@ services:
     restart: on-failure
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - VPN_INTERFACE_NAME=${NUVLABOX_VPN_IFACE:-vpn}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
     labels:
@@ -136,3 +140,9 @@ services:
 volumes:
   nuvlabox-db:
     driver: local
+
+networks:
+  nuvlabox-shared-network:
+    driver: overlay
+    name: nuvlabox-shared-network
+    attachable: true
