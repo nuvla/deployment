@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.10] - 2020-01-10
+
+Share a NuvlaBox is now easier and acls are propagated to NuvlaBox subresources. 
+Kubernetes connector support environment variables substitution and support 
+Kubernetes logging on UI. UI got new login and sign up pages. 
+
+### Changed
+
+  - Update to nuvla/api:4.2.8
+  - Update to nuvla/ui:2.4.8
+  - Update to nuvla/job:2.3.11
+
 ## [2.1.9] - 2019-12-09
 
 Patch release to fix an issue in stopping docker application from job engine.
