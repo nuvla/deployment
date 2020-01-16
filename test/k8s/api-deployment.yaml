@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: nuvla
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+      annotations:
+        description: Nuvla API service
+        tags: api
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: api
+          image: nuvladev/api:master-1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ES_ENDPOINTS
+              value: es
+            - name: SNIFF_INTERVAL
+              value: "5000"
+            - name: SNIFF_AFTER_FAILURE_DELAY
+              value: "1000"
+            - name: ZK_ENDPOINTS
+              value: zk:2181
+            - name: NUVLA_SUPER_PASSWORD
+              value: supeR8-supeR8
+

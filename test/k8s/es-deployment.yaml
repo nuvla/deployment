@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: es-deployment
+  labels:
+    app: es
+spec:
+  selector:
+    matchLabels:
+      app: es
+  template:
+    metadata:
+      labels:
+        app: es
+      annotations:
+        description: Elasticsearch for Nuvla
+        tags: db
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: es
+          image: nuvla/es:7.0.0.0
+          env:
+            - name: cluster.name
+              value: elasticsearch
+            - name: xpack.security.enabled
+              value: "false"
+            - name: discovery.type
+              value: single-node
+            - name: ES_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+          ports:
+            - containerPort: 9200
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: esdata-volume
+      volumes:
+        - name: esdata-volume
+          hostPath:
+            path: /tmp/es-data
+
