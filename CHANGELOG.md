@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.11] - 2020-01-23
+
+This release add a new check operation on credential of infrastructure services.
+UI warn user before dangerous actions and deployment modal checks credentials 
+before launch. Job engine got a default timeout for bash commands of 2 minutes 
+for connectors. To know more check changelog for each component updated.
+
+### Changed
+
+  - Update to nuvla/api:4.2.9
+  - Update to nuvla/ui:2.4.9
+  - Update to nuvla/job:2.3.12
+
 ## [2.1.10] - 2020-01-10
 
 Share a NuvlaBox is now easier and acls are propagated to NuvlaBox subresources. 
