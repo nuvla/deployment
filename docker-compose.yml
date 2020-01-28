@@ -37,7 +37,7 @@ services:
       - "traefik.tcp.services.mosquitto.loadbalancer.server.port=1883"
 
   agent:
-    image: nuvlabox/agent:1.2.0
+    image: nuvlabox/agent:1.2.1
     <<: [ *common, *common-volumes ]
     restart: on-failure
     expose:

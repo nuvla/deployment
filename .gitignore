@@ -16,6 +16,7 @@ logs/
 *.logs
 *.log
 docker-compose.test.yml
+.docker-compose.test.yml
 
 pom.xml.next
 pom.xml.releaseBackup
