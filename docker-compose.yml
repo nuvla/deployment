@@ -105,7 +105,7 @@ services:
       - nuvlabox-db:/srv/nuvlabox/shared
 
   network-manager:
-    image: nuvlabox/network-manager:0.0.2
+    image: nuvlabox/network-manager:0.0.4
     <<: *common
     restart: on-failure
     environment:
