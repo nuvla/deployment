@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.12] - 2020-02-07
+
+This release fix credential acl for NuvlaBox to allow viewers to check the 
+credential at deployment time. NuvlaBox agent is able to push labels as 
+tags at commission time. NuvlaBox schema got a new attribute to register 
+the endpoint of data gateway. User is able to set NuvlaBox location. 
+NuvlaBox status got schema update to add topic raw-sample. Voucher resource 
+got country mapping and a new resource which is voucher discipline.
+UI display NuvlaBox location on a Map and allow user to move them.
+
 ## [2.1.11] - 2020-01-23
 
 This release add a new check operation on credential of infrastructure services.
