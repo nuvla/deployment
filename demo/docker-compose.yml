@@ -58,7 +58,7 @@ services:
       - backend
 
   api:
-    image: nuvla/api:4.2.9
+    image: nuvla/api:4.2.11
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -85,7 +85,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.4.9
+    image: nuvla/ui:2.4.10
     deploy:
       labels:
         - "traefik.enable=true"
