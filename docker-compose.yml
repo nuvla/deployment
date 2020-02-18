@@ -68,19 +68,13 @@ services:
       start_period: 10s
 
   management-api:
-    image: nuvlabox/management-api:0.0.1
+    image: nuvlabox/management-api:0.0.2
     <<: [ *common ]
     volumes:
       - /proc/sysrq-trigger:/sysrq
       - ${HOME}/.ssh/authorized_keys:/rootfs/.ssh/authorized_keys
       - nuvlabox-db:/srv/nuvlabox/shared
     restart: on-failure
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
-      start_period: 10s
     ports:
       - 5001:5001
 
