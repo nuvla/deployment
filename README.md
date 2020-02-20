@@ -48,56 +48,9 @@ In this scenario, we assume you are using Nuvla at https://nuvla.io.
  4. If you are using your own Nuvla installation also `export NUVLA_ENDPOINT=` IP of the local Nuvla instance, **or** paste that IP in the `docker-compose.yml` file, under the NUVLA_ENDPOINT environment variable 
  5. install the NuvlaBox Engine
     ```bash
-    $ docker-compose up --abort-on-container-exit
+    $ docker-compose -p nuvlabox -f docker-compose.yml up
     ```
-
-### Test Deployment
-
-_**artifact:** docker-compose.localhost.yml_
-
-In this scenario, we assume you already have a Nuvla deployment running on your machine.
-
- 1. double check your local Nuvla deployment is up and running
-    ```bash
-    $ docker stack ls
-    
-    NAME                SERVICES            ORCHESTRATOR
-    nuvla               7                   Swarm
-    ```
-    ```bash
-    $ docker stack ps nuvla -f 'desired-state=running'
-    
-    ID                  NAME                            IMAGE                                                 NODE                    DESIRED STATE       CURRENT STATE            ERROR               PORTS
-    jbnuz172zv90        nuvla_job-dist-jobs-cleanup.1   nuvla/job:2.0.0                                       linuxkit-025000000001   Running             Running 43 seconds ago                       
-    rs52vxbv8mxz        nuvla_job-executor.1            nuvla/job:2.0.0                                       linuxkit-025000000001   Running             Running 45 seconds ago                       
-    t684lthjs4le        nuvla_zk.1                      zookeeper:3.4                                         linuxkit-025000000001   Running             Running 2 minutes ago                        
-    5q9xh8wxv8ep        nuvla_es.1                      docker.elastic.co/elasticsearch/elasticsearch:7.0.0   linuxkit-025000000001   Running             Running 2 minutes ago                        
-    jbon8zz91smr        nuvla_proxy.1                   traefik:1.7                                           linuxkit-025000000001   Running             Running 2 minutes ago                        
-    uc0wz9tl7e1c        nuvla_ui.1                      nuvla/ui:0.0.2                                        linuxkit-025000000001   Running             Running 3 minutes ago                        
-    oefzrm9dlkig        nuvla_api.1                     nuvladev/api:nuvlabox-record                          linuxkit-025000000001   Running             Running 2 minutes ago        
-    
-    ```
-    
- 2. because the NuvlaBox containers will need to reach out to the Nuvla containers, they all need 
- to be in the same network, so let's create a dedicated one, and attach `nuvla_proxy` to it
- 
-    ```bash
-    $ docker network create localhost_nuvlabox --attachable
-    ```
-    ```bash
-    $ CONTAINER_ID=`docker inspect $(docker service ps nuvla_proxy --format '{{json .}}' | jq -r .ID) | jq -r .[].Status.ContainerStatus.ContainerID`
-
-    $ docker network connect --alias local-nuvla-endpoint localhost_nuvlabox $CONTAINER_ID
-    ```
-    
- 3. login into your localhost Nuvla, as instructed in https://github.com/nuvla/deployment/tree/master/demo
- 4. create a `nuvlabox-record` and save the UUID
- 5. simply `export NUVLABOX_UUID=` UUID you saved, **or** paste that UUID in the `docker-compose.localhost.yml` file, under the NUVLABOX_UUID environment variable
- 6. install the NuvlaBox Engine
-    ```bash
-    $ docker-compose -f docker-compose.localhost.yml up --abort-on-container-exit
-    ```
-
+    NOTE: add `-f docker-compose.usb.yml -f ... `, to the command above, in order to add the auto peripheral discovery components
 
 ## Copyright
 

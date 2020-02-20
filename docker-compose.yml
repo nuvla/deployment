@@ -2,154 +2,13 @@ version: "3.6"
 
 x-common: &common
   stop_grace_period: 4s
+  logging:
+    options:
+      max-size: "250k"
+      max-file: "10"
   labels:
-    - nuvlabox.component=True
-    - nuvlabox.deployment=production
-
-x-common-volumes: &common-volumes
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - nuvlabox-db:/srv/nuvlabox/shared
-
-services:
-  data-gateway:
-    image: traefik:2.1.1
-    container_name: datagateway
-    networks:
-      - default
-      - nuvlabox-shared-network
-    command:
-      - --entrypoints.mqtt.address=:1883
-      - --entrypoints.web.address=:80
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  nb-mosquitto:
-    image: eclipse-mosquitto:1.6.8
-    container_name: nbmosquitto
-    labels:
-      - "traefik.enable=true"
-      - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.mytcprouter.entrypoints=mqtt"
-      - "traefik.tcp.routers.mytcprouter.service=mosquitto"
-      - "traefik.tcp.services.mosquitto.loadbalancer.server.port=1883"
-
-  agent:
-    image: nuvlabox/agent:1.3.2
-    <<: [ *common ]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlabox-db:/srv/nuvlabox/shared
-      - /:/rootfs:ro
-    restart: on-failure
-    expose:
-      - 5000
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
-    depends_on:
-      - system-manager
-      - compute-api
-
-  system-manager:
-    image: nuvlabox/system-manager:1.0.0
-    <<: [ *common, *common-volumes ]
-    restart: always
-    ports:
-      - 127.0.0.1:3636:3636
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3636"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
-      start_period: 10s
-
-  management-api:
-    image: nuvlabox/management-api:0.0.2
-    <<: [ *common ]
-    volumes:
-      - /proc/sysrq-trigger:/sysrq
-      - ${HOME}/.ssh/authorized_keys:/rootfs/.ssh/authorized_keys
-      - nuvlabox-db:/srv/nuvlabox/shared
-    restart: on-failure
-    ports:
-      - 5001:5001
-
-  compute-api:
-    image: nuvlabox/compute-api:0.2.5
-    <<: [ *common, *common-volumes ]
-    restart: on-failure
-    pid: "host"
-    ports:
-      - 5000:5000
-    environment:
-      - HOST=${HOSTNAME:-nuvlabox}
-    depends_on:
-      - system-manager
-
-  peripheral-manager-usb:
-    image: nuvlabox/peripheral-manager-usb:1.0.2
-    <<: *common
-    restart: on-failure
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
-    depends_on:
-      - system-manager
-    volumes:
-      - /dev:/dev:ro
-      - /run/udev/control:/run/udev/control:ro
-      - nuvlabox-db:/srv/nuvlabox/shared
-    network_mode: host
-
-  peripheral-manager-modbus:
-    image: nuvlabox/peripheral-manager-modbus:0.0.2
-    <<: *common
-    restart: on-failure
-    environment:
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
-    depends_on:
-      - system-manager
-    volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
-
-  network-manager:
-    image: nuvlabox/network-manager:0.0.4
-    <<: *common
-    restart: on-failure
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - VPN_INTERFACE_NAME=${NUVLABOX_VPN_IFACE:-vpn}
-    volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
-    labels:
-      - nuvlabox.component=True
-      - nuvlabox.deployment=production
-
-  vpn-client:
-    image: nuvlabox/vpn-client:0.0.4
-    container_name: vpn-client
-    <<: *common
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-    depends_on:
-      - network-manager
-    restart: always
-    cap_add:
-      - NET_ADMIN
-    network_mode: host
-    devices:
-      - /dev/net/tun
-    volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
-    labels:
-      - nuvlabox.component=True
-      - nuvlabox.deployment=production
+    - "nuvlabox.component=True"
+    - "nuvlabox.deployment=production"
 
 volumes:
   nuvlabox-db:
@@ -160,3 +19,133 @@ networks:
     driver: overlay
     name: nuvlabox-shared-network
     attachable: true
+
+services:
+  data-gateway:
+    <<: *common
+    image: traefik:2.1.1
+    container_name: datagateway
+    restart: on-failure
+    command:
+      - --entrypoints.mqtt.address=:1883
+      - --entrypoints.web.address=:80
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - default
+      - nuvlabox-shared-network
+
+  nb-mosquitto:
+    <<: *common
+    image: eclipse-mosquitto:1.6.8
+    container_name: nbmosquitto
+    restart: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mytcprouter.entrypoints=mqtt"
+      - "traefik.tcp.routers.mytcprouter.service=mosquitto"
+      - "traefik.tcp.services.mosquitto.loadbalancer.server.port=1883"
+      - "nuvlabox.component=True"
+      - "nuvlabox.deployment=production"
+    healthcheck:
+      test: ["CMD-SHELL", "timeout -t 5 mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1"]
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+
+  system-manager:
+    <<: *common
+    image: nuvlabox/system-manager:1.0.0
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+    ports:
+      - 127.0.0.1:3636:3636
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3636"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 10s
+
+  agent:
+    <<: *common
+    image: nuvlabox/agent:1.3.2
+    restart: on-failure
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+      - /:/rootfs:ro
+    expose:
+      - 5000
+    depends_on:
+      - system-manager
+      - compute-api
+
+  management-api:
+    <<: *common
+    image: nuvlabox/management-api:0.0.2
+    restart: on-failure
+    volumes:
+      - /proc/sysrq-trigger:/sysrq
+      - ${HOME}/.ssh/authorized_keys:/rootfs/.ssh/authorized_keys
+      - nuvlabox-db:/srv/nuvlabox/shared
+    ports:
+      - 5001:5001
+    healthcheck:
+      test: curl -k https://localhost:5001 2>&1 | grep SSL
+      interval: 20s
+      timeout: 10s
+      start_period: 30s
+
+  compute-api:
+    <<: *common
+    image: nuvlabox/compute-api:0.2.5
+    restart: on-failure
+    pid: "host"
+    environment:
+      - HOST=${HOSTNAME:-nuvlabox}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+    ports:
+      - 5000:5000
+    depends_on:
+      - system-manager
+
+  network-manager:
+    <<: *common
+    image: nuvlabox/network-manager:0.0.4
+    restart: on-failure
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - VPN_INTERFACE_NAME=${NUVLABOX_VPN_IFACE:-vpn}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    depends_on:
+      - system-manager
+
+  vpn-client:
+    <<: *common
+    image: nuvlabox/vpn-client:0.0.4
+    container_name: vpn-client
+    restart: always
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    depends_on:
+      - network-manager

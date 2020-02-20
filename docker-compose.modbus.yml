@@ -1,0 +1,24 @@
+version: "3.6"
+
+x-common: &common
+  stop_grace_period: 4s
+  logging:
+    options:
+      max-size: "250k"
+      max-file: "10"
+  labels:
+    - "nuvlabox.component=True"
+    - "nuvlabox.deployment=production"
+    - "nuvlabox.peripheral.component=True"
+    - "nuvlabox.peripheral.type=modbus"
+
+services:
+  peripheral-manager-modbus:
+    <<: *common
+    image: nuvlabox/peripheral-manager-modbus:0.0.2
+    restart: on-failure
+    environment:
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
