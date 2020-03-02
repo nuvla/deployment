@@ -56,7 +56,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:master
+    image: nuvladev/api:nuvlabox-actions
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -94,7 +94,7 @@ services:
       - test-net
 
   job-executor:
-    image: nuvladev/job:master
+    image: nuvladev/job:nuvlabox-connector
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
