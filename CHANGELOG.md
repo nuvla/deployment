@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [2.1.13] - 2020-03-06
+
+This release add support for private registries in all Nuvla components.
+A new `nuvlabox-release` resource have been added to assist NuvlaBox creation.
+NuvlaBox got new actions as check-api and reboot and new attributes to support 
+data-gateway. Deployment resource got data workflow attribute deprecated and 
+been replaced by `data-records-filter` attribute.
+
 ### Added
 
   - Job distributor jobd-nuvlabox-releases
@@ -9,6 +17,9 @@
 ### Updated
 
   - Functional tests - wait for deployment params to have a value
+  - Update to nuvla/api:4.2.12
+  - Update to nuvla/ui:2.4.11
+  - Update to nuvla/job:2.3.13
 
 ## [2.1.12] - 2020-02-07
 
