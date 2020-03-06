@@ -155,6 +155,17 @@ services:
     networks:
       - backend
 
+  jobd-nuvlabox-releases:
+    image: nuvla/job:2.3.12
+    entrypoint: /app/job_distributor_nuvlabox_releases.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - backend
+
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml

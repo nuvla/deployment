@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+  - Job distributor jobd-nuvlabox-releases
+
 ## [2.1.12] - 2020-02-07
 
 This release fix credential acl for NuvlaBox to allow viewers to check the 
