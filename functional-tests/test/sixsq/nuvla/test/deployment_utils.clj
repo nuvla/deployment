@@ -34,6 +34,7 @@
           {:keys [resources]} (<!! (api/search context/client :deployment-parameter options))
           dps-map (select-keys (->> resources
                                     (map (juxt :name :value))
+                                    (remove (fn [[_ v]] (nil? v)))
                                     (into {}))
                                dps)]
       (if (= (count dps) (count dps-map))
