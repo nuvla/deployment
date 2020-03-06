@@ -6,6 +6,10 @@
 
   - Job distributor jobd-nuvlabox-releases
 
+### Updated
+
+  - Functional tests - wait for deployment params to have a value
+
 ## [2.1.12] - 2020-02-07
 
 This release fix credential acl for NuvlaBox to allow viewers to check the 
