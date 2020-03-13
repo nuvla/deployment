@@ -92,12 +92,16 @@ services:
 
   management-api:
     <<: *common
-    image: nuvlabox/management-api:0.0.2
+    image: nuvlabox/management-api:0.1.0
     restart: on-failure
+    environment:
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
       - /proc/sysrq-trigger:/sysrq
       - ${HOME}/.ssh/authorized_keys:/rootfs/.ssh/authorized_keys
       - nuvlabox-db:/srv/nuvlabox/shared
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 5001:5001
     healthcheck:
