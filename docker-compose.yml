@@ -58,7 +58,7 @@ services:
 
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:1.0.0
+    image: nuvlabox/system-manager:1.0.1
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
