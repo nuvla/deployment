@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## [2.1.14] - 2020-03-27
+## [2.1.15] - 2020-03-27
 
 This release update nuvla components to following versions:
   - [nuvla/api-server:4.2.13](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#4213---2020-03-27)
