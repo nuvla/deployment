@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [2.1.14] - 2020-03-27
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:4.2.13](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#4213---2020-03-27)
+  - [nuvla/job-engine:2.3.14](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2314---2020-03-27)
+  - [nuvla/ui:2.4.12](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2412---2020-03-27)
+
 ## [2.1.13] - 2020-03-06
 
 This release add support for private registries in all Nuvla components.
