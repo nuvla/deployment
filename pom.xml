@@ -3,7 +3,7 @@
 
   <groupId>sixsq.nuvla</groupId>
   <artifactId>nuvla</artifactId>
-  <version>2.1.14-SNAPSHOT</version>
+  <version>2.1.14</version>
   <packaging>pom</packaging>
   <name>nuvla</name>
   <url>http://sixsq.com/</url>
@@ -12,7 +12,7 @@
     <connection>scm:git:https://github.com/nuvla/deployment.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/nuvla/deployment.git</developerConnection>
     <url>https://github.com/nuvla/deployment</url>
-    <tag>HEAD</tag>
+    <tag>2.1.14</tag>
   </scm>
 
   <pluginRepositories>
