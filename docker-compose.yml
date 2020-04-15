@@ -74,7 +74,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.4.1
+    image: nuvlabox/agent:1.5.0
     restart: on-failure
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
@@ -127,7 +127,7 @@ services:
 
   network-manager:
     <<: *common
-    image: nuvlabox/network-manager:0.0.4
+    image: nuvlabox/network-manager:1.0.0
     restart: on-failure
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}

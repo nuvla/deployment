@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-modbus:
     <<: *common
-    image: nuvlabox/peripheral-manager-modbus:0.0.2
+    image: nuvlabox/peripheral-manager-modbus:1.0.0
     restart: on-failure
     environment:
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
