@@ -1,0 +1,22 @@
+version: "3.6"
+
+x-common: &common
+  stop_grace_period: 4s
+  logging:
+    options:
+      max-size: "250k"
+      max-file: "10"
+  labels:
+    - "nuvlabox.component=True"
+    - "nuvlabox.deployment=production"
+    - "nuvlabox.peripheral.component=True"
+    - "nuvlabox.peripheral.type=gpu"
+
+services:
+  peripheral-manager-gpu:
+    <<: *common
+    image: nuvlabox/peripheral-manager-gpu:0.0.1
+    restart: on-failure
+    volumes:
+      - /etc:/etc:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
