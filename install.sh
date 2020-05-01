@@ -82,17 +82,17 @@ do
   command_compose_files="${command_compose_files} -f ${file}"
 done
 
-if [ "${action}" == "REMOVE" ]
+if [ "${action}" = "REMOVE" ]
 then
   echo "INFO: removing NuvlaBox installation completely"
   docker-compose -p nuvlabox ${command_compose_files} down -v
-elif [ "${action}" == "HALT" ]
+elif [ "${action}" = "HALT" ]
 then
   echo "INFO: halting NuvlaBox. You can bring it back later by simply re-installing with the same parameters as before"
   docker-compose -p nuvlabox ${command_compose_files} down
-elif [ "${action}" == "INSTALL" ]
+elif [ "${action}" = "INSTALL" ]
 then
-  if [ "${strategy}" == "UPDATE" ]
+  if [ "${strategy}" = "UPDATE" ]
   then
     existing_projects=$(docker-compose -p nuvlabox ${command_compose_files} ps -a -q)
     if [ ! -z "${existing_projects}" ]
@@ -102,7 +102,7 @@ then
       echo "INFO: no active NuvlaBox installations found. Installing from scratch"
     fi
     docker-compose -p nuvlabox ${command_compose_files} up -d
-  elif [ "${strategy}" == "OVERWRITE" ]
+  elif [ "${strategy}" = "OVERWRITE" ]
   then
     echo "WARNING: about to delete any existing NuvlaBox installations...press Ctrl+c in the next 5 seconds to stop"
     sleep 5
