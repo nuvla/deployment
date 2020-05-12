@@ -14,7 +14,7 @@ secrets:
 
 services:
   api:
-    image: nuvla/api:4.2.15
+    image: nuvla/api:4.2.16
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
