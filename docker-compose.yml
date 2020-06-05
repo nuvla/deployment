@@ -97,9 +97,11 @@ services:
     environment:
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+      - NUVLABOX_SSH_PUB_KEY=
+      - HOST_USER=$USER
     volumes:
       - /proc/sysrq-trigger:/sysrq
-      - ${HOME}/.ssh/authorized_keys:/rootfs/.ssh/authorized_keys
+      - ${HOME}/.ssh/authorized_keys:/hostfs/.ssh/authorized_keys
       - nuvlabox-db:/srv/nuvlabox/shared
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
