@@ -97,7 +97,7 @@ services:
     environment:
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
-      - NUVLABOX_SSH_PUB_KEY=
+      - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
       - HOST_USER=$USER
     volumes:
       - /proc/sysrq-trigger:/sysrq
