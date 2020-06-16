@@ -101,7 +101,7 @@ services:
       - HOST_USER=$USER
     volumes:
       - /proc/sysrq-trigger:/sysrq
-      - ${HOME}/.ssh/authorized_keys:/hostfs/.ssh/authorized_keys
+      - ${HOME}/.ssh/:/hostfs/.ssh/
       - nuvlabox-db:/srv/nuvlabox/shared
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
