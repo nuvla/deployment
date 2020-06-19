@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+  - Job distributor jobd-usage-report and action usage report
+
 ## [2.1.17] - 2020-05-12
 
 This release update nuvla components to following versions:

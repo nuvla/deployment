@@ -159,6 +159,17 @@ services:
     networks:
       - test-net
 
+  jobd-usage-report:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_usage_report.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
