@@ -134,3 +134,14 @@ services:
         delay: 5s
     networks:
       - nuvla-backend
+
+  jobd-usage-report:
+    image: nuvla/job:2.3.16
+    entrypoint: /app/job_distributor_usage_report.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - nuvla-backend
