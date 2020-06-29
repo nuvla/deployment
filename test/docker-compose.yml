@@ -56,7 +56,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:master
+    image: nuvladev/api:coe-on-csp
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -78,7 +78,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:master
+    image: nuvladev/ui:coe-create
     deploy:
       labels:
         - "traefik.enable=true"
@@ -94,7 +94,7 @@ services:
       - test-net
 
   job-executor:
-    image: nuvladev/job:master
+    image: nuvladev/job:coe
     entrypoint: /app/job_executor.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
@@ -105,7 +105,7 @@ services:
       - test-net
 
   jobd-jobs-cleanup:
-    image: nuvladev/job:master
+    image: nuvladev/job:coe
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -116,7 +116,7 @@ services:
       - test-net
 
   jobd-deployment-state:
-    image: nuvladev/job:master
+    image: nuvladev/job:coe
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
@@ -127,7 +127,7 @@ services:
       - test-net
 
   jobd-comp-image-state:
-    image: nuvladev/job:master
+    image: nuvladev/job:coe
     entrypoint: /app/job_distributor_component_image_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -138,7 +138,7 @@ services:
       - test-net
 
   jobd-srvc-image-state:
-    image: nuvladev/job:master
+    image: nuvladev/job:coe
     entrypoint: /app/job_distributor_service_image_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -149,7 +149,7 @@ services:
       - test-net
 
   jobd-nuvlabox-releases:
-    image: nuvladev/job:master
+    image: nuvladev/job:coe
     entrypoint: /app/job_distributor_nuvlabox_releases.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
