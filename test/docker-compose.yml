@@ -94,9 +94,9 @@ services:
       - test-net
 
   job-executor:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_executor.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_executor.py
+    command: -- /app/job_executor.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
     deploy:
       restart_policy:
         condition: on-failure
@@ -105,20 +105,20 @@ services:
       - test-net
 
   jobd-jobs-cleanup:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_distributor_jobs_cleanup.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_distributor_jobs_cleanup.py
+    command: -- /app/job_distributor_jobs_cleanup.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
   jobd-deployment-state:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_distributor_deployment_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_distributor_deployment_state.py
+    command: -- /app/job_distributor_deployment_state.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
       restart_policy:
         condition: on-failure
@@ -127,9 +127,9 @@ services:
       - test-net
 
   jobd-comp-image-state:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_distributor_component_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_distributor_component_image_state.py
+    command: -- /app/job_distributor_component_image_state.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
       restart_policy:
         condition: on-failure
@@ -138,9 +138,9 @@ services:
       - test-net
 
   jobd-srvc-image-state:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_distributor_service_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_distributor_service_image_state.py
+    command: -- /app/job_distributor_service_image_state.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
       restart_policy:
         condition: on-failure
@@ -149,9 +149,9 @@ services:
       - test-net
 
   jobd-nuvlabox-releases:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_distributor_nuvlabox_releases.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_distributor_nuvlabox_releases.py
+    command: -- /app/job_distributor_nuvlabox_releases.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
@@ -160,9 +160,9 @@ services:
       - test-net
 
   jobd-usage-report:
-    image: konstan/job:coe-1.2
-    entrypoint: /app/job_distributor_usage_report.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    image: konstan/job:coe-1.3
+#    entrypoint: /app/job_distributor_usage_report.py
+    command: -- /app/job_distributor_usage_report.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
