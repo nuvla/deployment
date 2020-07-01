@@ -41,7 +41,7 @@ services:
     <<: *common
     image: eclipse-mosquitto:1.6.8
     container_name: nbmosquitto
-    restart: on-failure
+    restart: always
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
