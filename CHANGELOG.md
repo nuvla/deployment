@@ -2,9 +2,20 @@
 
 ## Unreleased
 
+## [2.2.0] - 2020-07-06
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.0.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#500---2020-07-06)
+  - [nuvla/job-engine:2.4.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#240---2020-07-06)
+  - [nuvla/ui:2.5.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#250---2020-07-06)
+
 ### Added
 
-  - Job distributor jobd-usage-report and action usage report
+  - Job distributor jobd-usage-report
+
+### Updated
+
+  - Job executor entrypoint changed
 
 ## [2.1.17] - 2020-05-12
 
