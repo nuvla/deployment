@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
   - Deployment state job was split into two for "new" and "old" deployments with
     10 and 60 seconds check intervals respectively. This was done to reduce
-    unnecessary load on the server and remote COEs.
+    unnecessary load on the server and remote COEs. This resulted in two services
+    jobd-deployment-state_10 and jobd-deployment-state_60 in the compose files.
 
 ## [2.2.0] - 2020-07-06
 
