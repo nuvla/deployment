@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+  - Deployment state job was split into two for "new" and "old" deployments with
+    10 and 60 seconds check intervals respectively. This was done to reduce
+    unnecessary load on the server and remote COEs.
+
 ## [2.2.0] - 2020-07-06
 
 This release update nuvla components to following versions:
