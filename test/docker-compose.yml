@@ -115,10 +115,21 @@ services:
     networks:
       - test-net
 
-  jobd-deployment-state:
+  jobd-deployment-state_10:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-deployment-state_60:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_deployment_state.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
       restart_policy:
         condition: on-failure
