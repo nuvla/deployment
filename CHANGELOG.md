@@ -8,6 +8,8 @@
     10 and 60 seconds check intervals respectively. This was done to reduce
     unnecessary load on the server and remote COEs. This resulted in two services
     jobd-deployment-state_10 and jobd-deployment-state_60 in the compose files.
+  - Jobs cleanup executor no longer connects directly to ES DB. Updated test, 
+    demo and prod compose files by removing ES related param to executor.
 
 ## [2.2.0] - 2020-07-06
 
