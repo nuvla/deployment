@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Changed
+
+  - Deployment state job was split into two for "new" and "old" deployments with
+    10 and 60 seconds check intervals respectively. This was done to reduce
+    unnecessary load on the server and remote COEs. This resulted in two services
+    jobd-deployment-state_10 and jobd-deployment-state_60 in the compose files.
+  - Jobs cleanup executor no longer connects directly to ES DB. Updated test, 
+    demo and prod compose files by removing ES related param to executor.
+
+## [2.2.0] - 2020-07-06
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.0.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#500---2020-07-06)
+  - [nuvla/job-engine:2.4.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#240---2020-07-06)
+  - [nuvla/ui:2.5.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#250---2020-07-06)
+
+### Added
+
+  - Job distributor jobd-usage-report
+
+### Updated
+
+  - Job executor entrypoint changed
+
 ## [2.1.17] - 2020-05-12
 
 This release update nuvla components to following versions:

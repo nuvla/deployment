@@ -1,0 +1,26 @@
+- name: Deploy Nuvla
+  hosts: master
+  remote_user: root
+  vars:
+    deploy_dest: /tmp/nuvla-test
+    stack_name: test
+  tasks:
+
+  - name: copy scripts and configs
+    copy:
+      src: "{{ item }}"
+      dest: "{{ deploy_dest }}"
+    with_items:
+      - traefik
+      - docker-compose.yml
+    tags:
+      - files
+
+  - name: "Deploy Nuvla {{ stack_name }} stack on remote"
+    shell: |
+      export STATSD_HOST="{{ ansible_default_ipv4.address }}"
+      docker stack deploy --compose-file docker-compose.yml {{ stack_name }}
+    args:
+      chdir: "{{ deploy_dest }}"
+    tags:
+      - deploy

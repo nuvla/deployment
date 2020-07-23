@@ -94,10 +94,10 @@ services:
       - test-net
 
   job-executor:
-    image: nuvladev/job:nuvlabox-connector
-    entrypoint: /app/job_executor.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --es-hosts es
+    image: nuvladev/job:master
+    command: -- /app/job_executor.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
+      replicas: 2
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -111,14 +111,25 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
-  jobd-deployment-state:
+  jobd-deployment-state_10:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-deployment-state_60:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_deployment_state.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
       restart_policy:
         condition: on-failure
@@ -151,6 +162,17 @@ services:
   jobd-nuvlabox-releases:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_nuvlabox_releases.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-usage-report:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_usage_report.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
