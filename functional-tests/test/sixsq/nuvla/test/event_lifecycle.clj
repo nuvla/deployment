@@ -23,7 +23,7 @@
 
 
 (defn strip-fields [m]
-  (dissoc m :id :created :updated :acl :operations))
+  (dissoc m :id :created :updated :acl :operations :created-by))
 
 
 (defn tests
