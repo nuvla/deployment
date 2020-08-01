@@ -16,7 +16,7 @@
 
 
 (defn wait-for-state
-  [deployment-id desired-state & sleep-ms]
+  [deployment-id desired-state & [sleep-ms]]
   (loop [index 0]
     (let [{:keys [state] :as deployment} (<!! (api/get context/client deployment-id))]
       (if (or (> index 24) (#{desired-state "ERROR"} state))
@@ -28,7 +28,7 @@
 
 
 (defn wait-for-dps
-  [deployment-id dps & sleep-ms]
+  [deployment-id dps & [sleep-ms]]
   (loop [index 0]
     (let [options {:first 0, :last 100, :filter (format "parent='%s'" deployment-id)}
           {:keys [resources]} (<!! (api/search context/client :deployment-parameter options))
