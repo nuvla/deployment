@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-## [2.3.0] - 2020-07-31
+## [2.2.2] - 2020-08-03
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.5.1](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#251---2020-08-03)
+
+
+## [2.2.1] - 2020-07-31
 
 This release update nuvla components to following versions:
   - [nuvla/api-server:5.1.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#510---2020-07-31)
