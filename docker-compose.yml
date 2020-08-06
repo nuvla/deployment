@@ -58,7 +58,7 @@ services:
 
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:1.0.2
+    image: nuvlabox/system-manager:1.1.0
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -76,6 +76,7 @@ services:
     <<: *common
     image: nuvlabox/agent:1.5.1
     restart: on-failure
+    privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
@@ -114,7 +115,8 @@ services:
 
   compute-api:
     <<: *common
-    image: nuvlabox/compute-api:0.2.5
+    image: nuvlabox/compute-api:1.0.0
+    container_name: compute-api
     restart: on-failure
     pid: "host"
     environment:
