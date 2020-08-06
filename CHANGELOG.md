@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## [2.2.4] - 2020-08-03
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.5.3](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#253---2020-08-03)
+
+## [2.2.3] - 2020-08-03
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.5.2](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#252---2020-08-03)
+
+## [2.2.2] - 2020-08-03
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.5.1](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#251---2020-08-03)
+
+
+## [2.2.1] - 2020-07-31
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.1.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#510---2020-07-31)
+  - [nuvla/job-engine:2.5.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#250---2020-07-31)
+  - [nuvla/ui:2.6.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#260---2020-07-31)
+
 ### Changed
 
   - Deployment state job was split into two for "new" and "old" deployments with
