@@ -74,7 +74,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.5.1
+    image: nuvlabox/agent:1.6.0
     restart: on-failure
     privileged: true
     environment:
