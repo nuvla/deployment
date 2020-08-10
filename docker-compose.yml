@@ -58,7 +58,7 @@ services:
 
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:1.1.0
+    image: nuvlabox/system-manager:1.1.1
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -74,7 +74,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.6.0
+    image: nuvlabox/agent:1.6.1
     restart: on-failure
     privileged: true
     environment:
@@ -93,7 +93,7 @@ services:
 
   management-api:
     <<: *common
-    image: nuvlabox/management-api:0.3.0
+    image: nuvlabox/management-api:0.3.1
     restart: on-failure
     environment:
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
