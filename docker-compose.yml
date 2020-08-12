@@ -74,11 +74,12 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.6.1
+    image: nuvlabox/agent:1.7.0
     restart: on-failure
     privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLABOX_ENGINE_VERSION=1.9.3
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
