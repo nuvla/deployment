@@ -3,7 +3,8 @@
     [clojure.core.async :refer [<!!]]
     [clojure.test :refer [is]]
     [sixsq.nuvla.client.authn :as authn]
-    [sixsq.nuvla.test.context :as context]))
+    [sixsq.nuvla.test.context :as context]
+    [sixsq.nuvla.client.api :as api]))
 
 
 (defn tests
@@ -25,5 +26,7 @@
 
     (is (= 201 (:status response)))
     (is (re-matches #"session/.+" (:resource-id response)))
+    (is (= 200 (<!! (api/operation context/client (:resource-id response)
+                                   "switch-group" {:claim "group/nuvla-admin"}))))
     (is (true? (<!! (authn/authenticated? context/client))))))
 
