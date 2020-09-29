@@ -12,10 +12,14 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
+          title: "v1.2.3 ${{ github.event.release.tag_name }}"
           files: |
             install.sh
             *.yml
