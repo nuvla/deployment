@@ -9,8 +9,6 @@
 [![GitHub release](https://img.shields.io/github/release-date/nuvlabox/deployment?logo=github&logoColor=white&style=for-the-badge)](https://github.com/nuvlabox/deployment/releases)
 
 
-![logo](https://media.sixsq.com/hubfs/SixSq_General/nuvlabox_logo_red_on_transparent_2500px.png)
-
 This repository container the definitions for the installation of the NuvlaBox Engine.
 
 For further details, go to the [online documentation](https://docs.nuvla.io/docs/dave/nuvlabox.html).
@@ -21,9 +19,18 @@ In this repository you will find three different compose files:
  - **docker-compose.yml**: this is meant for a production NuvlaBox Engine installation, 
  where `nuvla.io` is the default Nuvla endpoint
  
- - **docker-compose.localhost.yml**: this is meant for testing purposes, where Nuvla is 
- running on the same machine that will install the NuvlaBox Engine
- 
+ - **docker-compose.*.yml**: these are optional peripheral managers
+
+## Releasing 
+
+To trigger an automatic release of the NuvlaBox Engine, simply run:
+
+```bash
+./trigger-release.sh VERSION
+```
+
+where `VERSION` is the tag version to be released, with semantic versioning (e.g. 1.0.0).
+
 ## Deploying
 
 ### Prerequisites 
