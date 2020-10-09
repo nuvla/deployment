@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+  - Docker-machine version update v0.16.2 and ubuntu version updated to 18.04
+
 ## [2.2.6] - 2020-09-04
 
 This release update nuvla components to following versions:
