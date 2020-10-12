@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## [2.2.8] - 2020-10-12
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.7.1](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#270---2020-10-12)
+
 ## [2.2.7] - 2020-10-09
 
 This release update nuvla components to following versions:
