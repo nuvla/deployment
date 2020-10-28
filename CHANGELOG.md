@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+ - Job distributor for populating and updating Nuvla DB of vulnerabilities
+
 ## [2.2.8] - 2020-10-12
 
 This release update nuvla components to following versions:

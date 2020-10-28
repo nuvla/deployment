@@ -56,7 +56,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:nuvlabox-actions
+    image: nuvladev/api:master
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -173,6 +173,17 @@ services:
   jobd-usage-report:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_usage_report.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-vulnerabilities-database:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_vulnerabilities_database.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
