@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## [2.2.8] - 2020-10-12
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.7.1](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#270---2020-10-12)
+
+## [2.2.7] - 2020-10-09
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.3.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#530---2020-10-09)
+  - [nuvla/job-engine:2.7.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#270---2020-10-09)
+  - [nuvla/ui:2.8.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#280---2020-10-09)
+
+### Changed
+
+  - Docker-machine version update v0.16.2 and ubuntu version updated to 18.04
+
+## [2.2.6] - 2020-09-04
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.2.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#520---2020-09-04)
+  - [nuvla/job-engine:2.6.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#260---2020-09-04)
+  - [nuvla/ui:2.7.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#270---2020-09-04)
+
+## [2.2.5] - 2020-08-28
+
+This release update nuvla components to following versions:
+  - [nuvla/job-engine:2.5.4](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#254---2020-08-28)
+
 ## [2.2.4] - 2020-08-03
 
 This release update nuvla components to following versions:
