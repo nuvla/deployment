@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [2.2.9] - 2020-10-28
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.4.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#540---2020-10-28)
+  - [nuvla/ui:2.9.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#290---2020-10-28)
+
+
 ## [2.2.8] - 2020-10-12
 
 This release update nuvla components to following versions:
