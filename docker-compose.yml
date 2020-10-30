@@ -76,7 +76,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.9.0
+    image: nuvlabox/agent:1.9.1
     restart: on-failure
     privileged: true
     environment:
@@ -160,3 +160,15 @@ services:
       - nuvlabox-db:/srv/nuvlabox/shared
     depends_on:
       - network-manager
+
+  security:
+    <<: *common
+    image: nuvlabox/security:0.0.1
+    restart: on-failure
+    network_mode: host
+    environment:
+      - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CSV_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=False
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
