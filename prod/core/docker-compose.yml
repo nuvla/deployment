@@ -14,7 +14,7 @@ secrets:
 
 services:
   api:
-    image: nuvla/api:5.3.0
+    image: nuvla/api:5.4.0
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -45,7 +45,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.8.0
+    image: nuvla/ui:2.9.0
     deploy:
       placement:
         constraints:
