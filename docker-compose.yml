@@ -76,7 +76,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.9.1
+    image: nuvlabox/agent:1.10.0
     restart: on-failure
     privileged: true
     environment:
@@ -163,7 +163,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:0.0.1
+    image: nuvlabox/security:0.0.2
     restart: on-failure
     network_mode: host
     environment:
