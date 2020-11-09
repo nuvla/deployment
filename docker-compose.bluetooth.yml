@@ -13,9 +13,9 @@ x-common: &common
     - "nuvlabox.peripheral.type=bluetooth"
 
 services:
-  peripheral-manager-usb:
+  peripheral-manager-bluetooth:
     <<: *common
-    image: nuvladev/peripheral-manager-bluetooth:dev
+    image: nuvlabox/peripheral-manager-bluetooth:0.0.1
     restart: on-failure
     network_mode: host
     environment:
