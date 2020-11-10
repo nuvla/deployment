@@ -81,7 +81,7 @@ services:
     privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLABOX_ENGINE_VERSION=1.11.0
+      - NUVLABOX_ENGINE_VERSION=1.12.0
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
