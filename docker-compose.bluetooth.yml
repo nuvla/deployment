@@ -10,12 +10,12 @@ x-common: &common
     - "nuvlabox.component=True"
     - "nuvlabox.deployment=production"
     - "nuvlabox.peripheral.component=True"
-    - "nuvlabox.peripheral.type=usb"
+    - "nuvlabox.peripheral.type=bluetooth"
 
 services:
-  peripheral-manager-usb:
+  peripheral-manager-bluetooth:
     <<: *common
-    image: nuvlabox/peripheral-manager-usb:1.1.2
+    image: nuvlabox/peripheral-manager-bluetooth:0.0.1
     restart: on-failure
     network_mode: host
     environment:
@@ -23,6 +23,4 @@ services:
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
-      - /dev:/dev:ro
-      - /run/udev/control:/run/udev/control:ro
       - nuvlabox-db:/srv/nuvlabox/shared
