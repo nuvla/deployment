@@ -1,0 +1,25 @@
+version: "3.6"
+
+x-common: &common
+  stop_grace_period: 4s
+  logging:
+    options:
+      max-size: "250k"
+      max-file: "10"
+  labels:
+    - "nuvlabox.component=True"
+    - "nuvlabox.deployment=production"
+    - "nuvlabox.peripheral.component=True"
+    - "nuvlabox.peripheral.type=bluetooth"
+
+services:
+  peripheral-manager-network:
+    <<: *common
+    image: nuvlabox/peripheral-manager-network:0.0.1
+    restart: on-failure
+    network_mode: host
+    environment:
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
