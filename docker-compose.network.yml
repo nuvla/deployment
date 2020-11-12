@@ -10,7 +10,7 @@ x-common: &common
     - "nuvlabox.component=True"
     - "nuvlabox.deployment=production"
     - "nuvlabox.peripheral.component=True"
-    - "nuvlabox.peripheral.type=bluetooth"
+    - "nuvlabox.peripheral.type=network"
 
 services:
   peripheral-manager-network:
