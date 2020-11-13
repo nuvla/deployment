@@ -1,4 +1,4 @@
-version: "3.6"
+version: "3.7"
 
 x-common: &common
   stop_grace_period: 4s
@@ -42,6 +42,7 @@ services:
     image: eclipse-mosquitto:1.6.8
     container_name: nbmosquitto
     restart: always
+    init: true
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
