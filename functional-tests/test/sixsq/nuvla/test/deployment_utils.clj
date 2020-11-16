@@ -39,7 +39,7 @@
                                dps)]
       (if (= (count dps) (count dps-map))
         dps-map
-        (if (> index 30)
+        (if (> index 36)
           (do
             (is false "timeout waiting for hostname and port")
             nil)
