@@ -6,7 +6,7 @@
 
 This release update nuvla components to following versions:
   - [nuvla/api-server:5.5.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#550---2020-11-16)
-  - [nuvla/ui:2.10.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2100---2020-11-16)
+  - [nuvla/ui:2.10.1](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2101---2020-11-16)
   - [nuvla/job-engine:2.8.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#280---2020-11-16)
 
 ### Added
