@@ -6,6 +6,8 @@ networks:
     attachable: true
   traefik-public:
     external: true
+  nuvla-backend:
+    external: true
 
 volumes:
     prometheus: {}
@@ -19,6 +21,8 @@ configs:
     file: ./prometheus/rules/swarm_task.rules.yml
   gf_prometheus_datasource:
     file: ./grafana/datasources/prometheus.yaml
+  prometheus_config:
+    file: ./prometheus/prometheus.yml
 
 services:
   cadvisor:
@@ -145,10 +149,23 @@ services:
         reservations:
           memory: 64M
 
+  elasticsearch_exporter:
+    image: justwatch/elasticsearch_exporter:1.1.0
+    command:
+      - '--es.uri=http://es:9200'
+    restart: always
+    ports:
+      - "9114:9114"
+    networks:
+      - net
+      # Must correspond to the network in which ES running.
+      - nuvla-backend
+
   prometheus:
     image: stefanprodan/swarmprom-prometheus:v2.5.0
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      # see https://github.com/stefanprodan/swarmprom/issues/25#issuecomment-539104269
+      - '--config.file=/etc/prometheus/prometheus_custom.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=24h'
       - '--web.external-url=https://ignored.example.com/prometheus'
@@ -160,6 +177,8 @@ services:
         target: /etc/prometheus/swarm_node.rules.yml
       - source: task_rules
         target: /etc/prometheus/swarm_task.rules.yml
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus_custom.yml
     deploy:
       mode: replicated
       replicas: 1
