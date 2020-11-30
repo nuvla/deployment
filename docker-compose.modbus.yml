@@ -17,8 +17,5 @@ services:
     <<: *common
     image: nuvlabox/peripheral-manager-modbus:1.0.0
     restart: on-failure
-    environment:
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared

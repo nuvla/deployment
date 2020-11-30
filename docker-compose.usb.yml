@@ -18,10 +18,6 @@ services:
     image: nuvlabox/peripheral-manager-usb:1.2.0
     restart: on-failure
     network_mode: host
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
       - /dev:/dev:ro
       - /run/udev/control:/run/udev/control:ro

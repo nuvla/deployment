@@ -18,9 +18,5 @@ services:
     image: nuvlabox/peripheral-manager-bluetooth:0.0.3
     restart: on-failure
     network_mode: host
-    environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared

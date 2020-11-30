@@ -100,8 +100,6 @@ services:
     image: nuvlabox/management-api:0.3.1
     restart: on-failure
     environment:
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
       - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
       - HOST_USER=$USER
     volumes:
@@ -171,7 +169,5 @@ services:
       - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CSV_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
       - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-300}
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=False
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared

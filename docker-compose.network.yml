@@ -18,8 +18,5 @@ services:
     image: nuvlabox/peripheral-manager-network:0.0.2
     restart: on-failure
     network_mode: host
-    environment:
-      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
-      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
