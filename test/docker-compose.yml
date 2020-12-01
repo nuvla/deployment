@@ -43,8 +43,6 @@ services:
     image: zookeeper:3.4
     environment:
       - ZOO_MY_ID=3
-    ports:
-      - "2181:2181"
     deploy:
       restart_policy:
         condition: on-failure
@@ -56,11 +54,12 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:master
+    image: nuvladev/api:subscription
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=${NUVLA_SUPER_PASSWORD:-supeR8-supeR8}
+      - KAFKA_ENDPOINTS=kafka:9092,nuvla-kafka:9092
     deploy:
       labels:
         - "traefik.enable=true"
@@ -78,7 +77,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:master
+    image: nuvladev/ui:notif-subscription
     deploy:
       labels:
         - "traefik.enable=true"
@@ -148,47 +147,65 @@ services:
     networks:
       - test-net
 
-  jobd-srvc-image-state:
-    image: nuvladev/job:master
-    entrypoint: /app/job_distributor_service_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+
+  kafka-zk:
+    image: confluentinc/cp-zookeeper:6.0.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     networks:
       - test-net
 
-  jobd-nuvlabox-releases:
-    image: nuvladev/job:master
-    entrypoint: /app/job_distributor_nuvlabox_releases.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+  kafka:
+    image: confluentinc/cp-server:6.0.0
+    ports:
+      - "9092:9092"
+#      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'kafka-zk:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+#      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
     networks:
       - test-net
 
-  jobd-usage-report:
-    image: nuvladev/job:master
-    entrypoint: /app/job_distributor_usage_report.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:6.0.0
+#    ports:
+#      - "8088:8088"
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
     networks:
       - test-net
 
-  jobd-vulnerabilities-database:
-    image: nuvladev/job:master
-    entrypoint: /app/job_distributor_vulnerabilities_database.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
+  ksqldb-cli:
+    image: confluentinc/cp-ksqldb-cli:6.0.0
+    entrypoint: /bin/sh
+    tty: true
     networks:
       - test-net
 
