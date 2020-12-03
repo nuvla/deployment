@@ -1,0 +1,14 @@
+{
+  "outputs": [
+    {
+      "topic": "NOTIFICATIONS_SLACK_S",
+      "key": "notification-method/01",
+      "value": {
+        "EVENT_ID": "deployment/01",
+        "METHOD":"slack",
+        "ADDRESS":"https://slack.com/url?token=abc",
+        "MESSAGE":"deployment/01 in state: created"
+      }
+    }
+  ]
+}
