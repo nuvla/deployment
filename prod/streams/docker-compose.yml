@@ -1,6 +1,10 @@
 ---
 version: '3.7'
 
+networks:
+  nuvla-backend:
+    external: true
+
 services:
 
   zookeeper:
@@ -10,12 +14,16 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - nuvla-backend
 
   kafka:
     image: confluentinc/cp-server:6.0.0
     ports:
       - "9092:9092"
       - "9101:9101"
+    networks:
+      - nuvla-backend
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -40,6 +48,8 @@ services:
     image: confluentinc/cp-schema-registry:6.0.0
     ports:
       - "8081:8081"
+    networks:
+      - nuvla-backend
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:29092'
@@ -49,6 +59,8 @@ services:
     image: confluentinc/cp-enterprise-control-center:6.0.0
     ports:
       - "9021:9021"
+    networks:
+      - nuvla-backend
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:29092'
       CONTROL_CENTER_KSQL_KSQLDB1_URL: "http://ksqldb-server:8088"
@@ -64,6 +76,8 @@ services:
     image: confluentinc/cp-ksqldb-server:6.0.0
     ports:
       - "8088:8088"
+    networks:
+      - nuvla-backend
     environment:
       KSQL_CONFIG_DIR: "/etc/ksql"
       KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
@@ -82,11 +96,15 @@ services:
     image: confluentinc/cp-ksqldb-cli:6.0.0
     entrypoint: /bin/sh
     tty: true
+    networks:
+      - nuvla-backend
 
   rest-proxy:
     image: confluentinc/cp-kafka-rest:6.0.0
     ports:
       - 8082:8082
+    networks:
+      - nuvla-backend
     environment:
       KAFKA_REST_HOST_NAME: rest-proxy
       KAFKA_REST_BOOTSTRAP_SERVERS: 'kafka:29092'
@@ -96,16 +114,19 @@ services:
   notify-slack:
     image: nuvladev/kafka-notify:master
     networks:
-      - test-net
+      - nuvla-backend
     command:
       - slack
 
   notify-email:
     image: nuvladev/kafka-notify:master
     networks:
-      - test-net
+      - nuvla-backend
     command:
       - email
     environment:
-      SMTP_HOST: smtp.gmail.com
-
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_SSL: "${SMTP_SSL}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
