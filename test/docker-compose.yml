@@ -199,8 +199,26 @@ services:
     networks:
       - test-net
 
+  notify-slack:
+    image: nuvladev/kafka-notify:master
     networks:
       - test-net
+    command:
+      - slack
+
+  notify-email:
+    image: nuvladev/kafka-notify:master
+    networks:
+      - test-net
+    environment:
+      # If not provided, will be taken from configuration/nuvla resource if defined there.
+      # - SMTP_HOST:
+      # - SMTP_PORT:
+      # - SMTP_SSL:
+      # - SMTP_USER:
+      # - SMTP_PASSWORD:
+    command:
+      - email
 
 configs:
   traefik.toml:
