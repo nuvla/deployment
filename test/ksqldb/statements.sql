@@ -34,7 +34,7 @@ WITH (KAFKA_TOPIC='subscription', PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
 CREATE TABLE SUBS_EVENT_NOTIF_STATE_T
 WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
 AS SELECT *
-FROM SUBSCRIPTION_T as s
+FROM SUBSCRIPTION_T AS s
 WHERE s.kind = 'event' AND s.type = 'notification' AND s.category = 'state';
 
 --
@@ -42,68 +42,73 @@ WHERE s.kind = 'event' AND s.type = 'notification' AND s.category = 'state';
 -- from events topic
 CREATE STREAM EVENT_S
 (id VARCHAR,
-category VARCHAR,
-content STRUCT<
-resource STRUCT<
-href VARCHAR
->,
-state VARCHAR
->,
-severity VARCHAR,
-timestamp VARCHAR,
-acl STRUCT<
-owners ARRAY<VARCHAR>
->
+  category VARCHAR,
+  content STRUCT<
+    resource STRUCT<
+      href VARCHAR
+      >,
+      state VARCHAR
+  >,
+  severity VARCHAR,
+  timestamp VARCHAR,
+  acl STRUCT<
+    owners ARRAY<VARCHAR>
+  >
 )
 WITH (KAFKA_TOPIC='event', PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON');
 
 --
 -- events for subscription on deployment state stream
 -- as join between events stream and subscriptions to deployment state table
-CREATE STREAM SUBS_EVENT_NOTIF_STATE_EVENT_S AS
-SELECT
-s.resource AS ID,
-s.method AS method_id,
-e.content AS event_content
-FROM EVENT_S as e
-JOIN SUBS_EVENT_NOTIF_STATE_T as s
+CREATE STREAM SUBS_EVENT_NOTIF_STATE_EVENT_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT
+  s.resource AS ID,
+  s.method AS method_id,
+  e.content AS event_content
+FROM EVENT_S AS e
+JOIN SUBS_EVENT_NOTIF_STATE_T AS s
 ON s.resource = e.content->resource->href
 WHERE ARRAY_CONTAINS(e.acl->owners, s.acl->owners[1]) AND s.status = 'enabled';
 
 -- NB! Consider merging with the above join.
 -- notifications stream
 -- as join between events for subscription on deployment state stream and notification configuration table
-CREATE STREAM NOTIFICATIONS_S AS
-SELECT
-         se.id AS event_id,
-         n.id AS notif_config_id,
-         n.method AS method,
-         n.destination AS destination,
-         se.event_content->resource->href AS resource_id,
-         se.event_content->state AS resource_state
-FROM SUBS_EVENT_NOTIF_STATE_EVENT_S as se
-JOIN NOTIFICATION_METHOD_T as n ON n.id = se.method_id;
+CREATE STREAM NOTIFICATIONS_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT
+  se.id AS event_id,
+  n.id AS notif_config_id,
+  n.method AS method,
+  n.destination AS destination,
+  se.event_content->resource->href AS resource_id,
+  se.event_content->state AS resource_state
+FROM SUBS_EVENT_NOTIF_STATE_EVENT_S AS se
+JOIN NOTIFICATION_METHOD_T AS n ON n.id = se.method_id;
 
 --
 -- email notifications
 -- select from notifications stream
-CREATE STREAM NOTIFICATIONS_EMAIL_S AS
-SELECT *
+CREATE STREAM NOTIFICATIONS_EMAIL_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT *
 FROM NOTIFICATIONS_S
 WHERE LCASE(method) = 'email';
 
 --
 -- slack notifications
 -- select from notifications stream
-CREATE STREAM NOTIFICATIONS_SLACK_S AS
-SELECT *
+CREATE STREAM NOTIFICATIONS_SLACK_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT *
 FROM NOTIFICATIONS_S
 WHERE LCASE(method) = 'slack';
 
 --
 -- other notifications
 -- select from notifications stream
-CREATE STREAM NOTIFICATIONS_OTHER_S AS
-SELECT *
+CREATE STREAM NOTIFICATIONS_OTHER_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT *
 FROM NOTIFICATIONS_S
 WHERE LCASE(method) != 'slack' AND LCASE(method) != 'email';
