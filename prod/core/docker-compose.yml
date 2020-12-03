@@ -27,7 +27,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname == manager
+          - node.role == manager
       labels:
         - "traefik.enable=true"
         - "traefik.port=8200"
@@ -49,7 +49,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname == worker-job
+          - node.labels.type == worker-job
       labels:
         - "traefik.enable=true"
         - "traefik.port=80"
@@ -70,7 +70,7 @@ services:
       replicas: 5
       placement:
         constraints:
-          - node.hostname == worker-job
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -84,7 +84,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname == worker-job
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -96,6 +96,9 @@ services:
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -107,6 +110,9 @@ services:
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -118,6 +124,9 @@ services:
     entrypoint: /app/job_distributor_component_image_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -129,6 +138,9 @@ services:
     entrypoint: /app/job_distributor_service_image_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -140,6 +152,9 @@ services:
     entrypoint: /app/job_distributor_nuvlabox_releases.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -151,6 +166,9 @@ services:
     entrypoint: /app/job_distributor_usage_report.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -162,6 +180,9 @@ services:
     entrypoint: /app/job_distributor_vulnerabilities_database.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s

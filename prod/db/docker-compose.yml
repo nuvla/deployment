@@ -37,7 +37,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname == worker-db
+          - node.labels.type == worker-db
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -62,7 +62,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.hostname == worker-db
+          - node.labels.type == worker-db
       restart_policy:
         condition: on-failure
         delay: 5s    
