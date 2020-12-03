@@ -147,7 +147,6 @@ services:
     networks:
       - test-net
 
-
   kafka-zk:
     image: confluentinc/cp-zookeeper:6.0.0
     environment:
@@ -160,7 +159,6 @@ services:
     image: confluentinc/cp-server:6.0.0
     ports:
       - "9092:9092"
-#      - "9101:9101"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'kafka-zk:2181'
@@ -175,7 +173,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9101
       KAFKA_JMX_HOSTNAME: localhost
-#      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
@@ -185,33 +182,31 @@ services:
 
   ksqldb-server:
     image: confluentinc/cp-ksqldb-server:6.0.0
-#    ports:
-#      - "8088:8088"
+    configs:
+      - source: ksql.queries.file
+        target: /etc/ksqldb/nuvla-statements.sql
     environment:
       KSQL_CONFIG_DIR: "/etc/ksql"
       KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
       KSQL_HOST_NAME: ksqldb-server
-      KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
-      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
       KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+      KSQL_KSQL_QUERIES_FILE: /etc/ksqldb/nuvla-statements.sql
     networks:
       - test-net
 
-  ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:6.0.0
-    entrypoint: /bin/sh
-    tty: true
     networks:
       - test-net
 
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
+  ksql.queries.file:
+    file: ./ksqldb/statements.sql
 
 networks:
   test-net:
