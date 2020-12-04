@@ -19,6 +19,7 @@ services:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
+      - KAFKA_ENDPOINTS=kafka:9092
     secrets:
       - source: session.crt
         target: /etc/nuvla/session/session.crt
@@ -188,3 +189,23 @@ services:
         delay: 5s
     networks:
       - nuvla-backend
+
+  notify-slack:
+    image: nuvladev/kafka-notify:master
+    networks:
+      - nuvla-backend
+    command:
+      - slack
+
+  notify-email:
+    image: nuvladev/kafka-notify:master
+    networks:
+      - nuvla-backend
+    command:
+      - email
+    environment:
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_SSL: "${SMTP_SSL}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
