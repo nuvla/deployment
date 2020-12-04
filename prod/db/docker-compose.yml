@@ -24,8 +24,6 @@ services:
 
   es:
     image: nuvla/es:7.7.0.0
-    ports:
-      - "9200:9200"
     environment:
       - xpack.security.enabled=false
       - node.name=es
@@ -55,8 +53,6 @@ services:
 
   zk:
     image: zookeeper:3.4
-    ports:
-      - "2181:2181"
     environment:
       - ZOO_MY_ID=3
     deploy:
