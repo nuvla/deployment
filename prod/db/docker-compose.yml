@@ -32,7 +32,8 @@ services:
       - cluster.initial_master_nodes=es
       - cluster.name=elasticsearch
       - bootstrap.memory_lock_true
-      - "ES_JAVA_OPTS=-Xms16g -Xmx16g"
+      # FIXME: revert to 16
+      - "ES_JAVA_OPTS=-Xms6g -Xmx6g"
     deploy:
       placement:
         constraints:
