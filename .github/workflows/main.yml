@@ -70,8 +70,11 @@ jobs:
           export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub
           export mname=$(cat $HOME/docker-machine-master)
           echo $mname
-          which docker-machine || true
           ls -al $HOME/docker-machine
+          $HOME/docker-machine ls || true
+          $HOME/docker-machine env $mname || true
+          echo hello
+          ${HOME}/docker-machine env ${mname}
           lein do clean, test
 
       - name: Terminate Docker swarm testing cluster
