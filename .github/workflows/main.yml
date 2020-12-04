@@ -52,7 +52,7 @@ jobs:
       - name: Deploy Docker swarm testing cluster
         env:
           TRAVIS_BUILD_DIR: .
-          SWARM_SIZE: 2
+          SWARM_SIZE: 1
           WAIT_AVAIL_MIN: 5
           EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
           EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
@@ -69,14 +69,14 @@ jobs:
           EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
         run: $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 
-#  slack-workflow-status:
-#    if: always()
-#    name: Post Workflow Status To Slack
-#    needs:
-#      - build
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: Gamesight/slack-workflow-status@master
-#        with:
-#          repo_token: ${{secrets.GITHUB_TOKEN}}
-#          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
+  slack-workflow-status:
+    if: always()
+    name: Post Workflow Status To Slack
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
