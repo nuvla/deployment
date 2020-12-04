@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-modbus:
     <<: *common
-    image: nuvlabox/peripheral-manager-modbus:1.0.0
+    image: nuvlabox/peripheral-manager-modbus:1.1.0
     restart: on-failure
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared

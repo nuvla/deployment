@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+
+import requests
+import sys
+import inspect
+
+func = inspect.currentframe().f_code
+
+try:
+    comma_sep_config_files = sys.argv[1]
+    save_dir = sys.argv[2]
+    base_url = sys.argv[3]
+
+    for config_file in comma_sep_config_files.split(','):
+        full_url = f'{base_url}/{config_file}'
+        r = requests.get(full_url, allow_redirects=True)
+        r.raise_for_status()
+        with open(f'{save_dir}/{config_file}', 'wb') as cf:
+            cf.write(r.content)
+except Exception as e:
+    # making sure that only the error message is printed and not the whole exception
+    sys.exit(f'Critical error in {func.co_filename}: {str(e)}')

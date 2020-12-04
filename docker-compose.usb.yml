@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-usb:
     <<: *common
-    image: nuvlabox/peripheral-manager-usb:1.2.0
+    image: nuvlabox/peripheral-manager-usb:1.3.0
     restart: on-failure
     network_mode: host
     volumes:

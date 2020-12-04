@@ -77,7 +77,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.12.0
+    image: nuvlabox/agent:1.13.0
     restart: on-failure
     privileged: true
     environment:
@@ -97,7 +97,7 @@ services:
 
   management-api:
     <<: *common
-    image: nuvlabox/management-api:0.3.1
+    image: nuvlabox/management-api:0.4.0
     restart: on-failure
     environment:
       - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
@@ -162,7 +162,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:0.0.2
+    image: nuvlabox/security:0.1.0
     restart: on-failure
     network_mode: host
     environment:
