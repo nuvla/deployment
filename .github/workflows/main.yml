@@ -62,6 +62,7 @@ jobs:
           $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || { >&2 echo "failed to provision Nuvla."; $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate; exit 1; }
 
       - name: Run Nuvla functional tests
+        shell: bash
         run: |
           cd functional-tests
           export EXAMPLES_ROOT=${HOME}
@@ -70,11 +71,12 @@ jobs:
           export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub
           export mname=$(cat $HOME/docker-machine-master)
           echo $mname
+          echo $SHELL
           ls -al $HOME/docker-machine
           $HOME/docker-machine ls || true
           $HOME/docker-machine env $mname || true
           echo hello
-          ${HOME}/docker-machine env ${mname}
+          eval $($HOME/docker-machine env $mname)
           lein do clean, test
 
       - name: Terminate Docker swarm testing cluster
