@@ -33,20 +33,20 @@ jobs:
         with:
           java-version: 1.8
 
-      -name: Prepare for execution of functionnal tests
-        run: |
-          git clone https://github.com/nuvla/example-ubuntu.git ${HOME}/example-ubuntu
-          git clone https://github.com/nuvla/example-centos.git ${HOME}/example-centos
-          git clone https://github.com/nuvla/example-rstudio.git ${HOME}/example-rstudio
-          git clone https://github.com/nuvla/example-jupyter.git ${HOME}/example-jupyter
-          git clone https://github.com/nuvla/example-app.git ${HOME}/example-app
-          pip install nuvla-api
-          python -c 'import nuvla.api;'
-          echo $(ls -al .)
-
-      -name: Deploy Docker swarm test cluster
-        env:
-          TODO: later
+#      -name: Prepare for execution of functionnal tests
+#        run: |
+#          git clone https://github.com/nuvla/example-ubuntu.git ${HOME}/example-ubuntu
+#          git clone https://github.com/nuvla/example-centos.git ${HOME}/example-centos
+#          git clone https://github.com/nuvla/example-rstudio.git ${HOME}/example-rstudio
+#          git clone https://github.com/nuvla/example-jupyter.git ${HOME}/example-jupyter
+#          git clone https://github.com/nuvla/example-app.git ${HOME}/example-app
+#          pip install nuvla-api
+#          python -c 'import nuvla.api;'
+#          echo $(ls -al .)
+#
+#      -name: Deploy Docker swarm test cluster
+#        env:
+#          TODO: later
 
 #  slack-workflow-status:
 #    if: always()
