@@ -17,7 +17,7 @@ Prerequisites:
 * Labeled nodes
     * one node for running Nuvla front-end and back-end layers:
         * `docker node update --label-add type=frontend <node1>`
-    * one node for running Nuvla async workers layer:
+    * one node for running Nuvla async and streaming layer:
         * `docker node update --label-add type=worker-job <node2>`
     * one node for running Nuvla DB layer:
         * `docker node update --label-add type=worker-db <node3>`
