@@ -3,7 +3,7 @@
 set -ex
 
 ksql_host=${1:-ksqldb-server:8088}
-ksql_file=./statements.sql
+ksql_file=${2:-./statements.sql}
 
 yum install -yq jq
 

@@ -22,6 +22,11 @@ export SMTP_SSL=true
 export SMTP_USER=mailer@example.com
 export SMTP_PASSWORD=password
 
+# Use replication for messages in the streaming platform. The replication
+# requires multiple instances of the brokers, hence increases resource
+# requirements.
+export STREAMS_REPLICATION=false
+
 #
 # Deploy traefik.
 #
@@ -60,9 +65,14 @@ cd -
 #
 
 cd streams
-docker stack deploy -c docker-compose.single.yml streams
+if [ "$STREAMS_REPLICATION" == "false" ]
+then
+    docker stack deploy -c docker-compose.single.yml streams
+else
+    docker stack deploy -c docker-compose.replicated.yml streams
+fi
 cd ksqldb
-./deploy.sh
+./deploy.sh $STREAMS_REPLICATION
 cd ../../
 
 #
