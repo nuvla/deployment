@@ -33,6 +33,11 @@ jobs:
         with:
           java-version: 1.8
 
+      - name: Set up Python 3.9
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.9
+
       - name: Prepare for execution of functionnal tests
         run: |
           git clone https://github.com/nuvla/example-ubuntu.git ${HOME}/example-ubuntu
