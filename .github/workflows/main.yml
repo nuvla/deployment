@@ -48,25 +48,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install nuvla-api
           python -c 'import nuvla.api;'
-          echo $(pwd)
-          exit 1
 
-      - name: This step is executed
+      - name: Deploy Docker swarm testing cluster
+        env:
+          TRAVIS_BUILD_DIR: .
+          SWARM_SIZE: 2
+          WAIT_AVAIL_MIN: 5
+          EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+          EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+        run: $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || { >&2 echo "failed to provision Nuvla."; $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate; exit 1; }
+
+      - name: Run Nuvla functional tests
+        run: cd functional-tests && export EXAMPLES_ROOT=${HOME} && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub && export mname=`cat $HOME/docker-machine-master` && eval $($HOME/docker-machine env $mname) && printenv && lein do clean, test
+
+      - name: Terminate Docker swarm testing cluster
         if: ${{ always() }}
-        run: echo 'hello'
-
-#      - name: Deploy Docker swarm test cluster
-#        env:
-#          TRAVIS_BUILD_DIR: .
-#          SWARM_SIZE: 2
-#          WAIT_AVAIL_MIN: 5
-#          EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
-#          EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
-#        run: $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE && ip=`cat $HOME/nuvla-test-host` && $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || { >&2 echo "failed to provision Nuvla."; $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate; exit 1; }
-#
-#      - name: Run Nuvla functional tests
-#        run: cd functional-tests && export EXAMPLES_ROOT=${HOME} && export NUVLA_INSECURE=TRUE && export NUVLA_HOST=`cat $HOME/nuvla-test-host` && export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub && export mname=`cat $HOME/docker-machine-master` && eval $($HOME/docker-machine env $mname) && printenv && lein do clean, test
-#
+        env:
+          TRAVIS_BUILD_DIR: .
+          EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+          EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+        run: $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
 
 #  slack-workflow-status:
 #    if: always()
