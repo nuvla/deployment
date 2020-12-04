@@ -7,6 +7,19 @@ ksql_file=./statements.sql
 
 yum install -yq jq
 
+./wait-for-it.sh -t 60 $ksql_host
+
+while :
+do
+    res=$(curl -sS http://$ksql_host/healthcheck | jq .isHealthy)
+    if [ "$res" == "true" ]
+    then
+        break
+    else
+        sleep 1
+    fi
+done
+
 grep -v -- '^--' $ksql_file | \
     tr '\n' ' ' | sed 's/;/;\'$'\n''/g' | \
     while read stmt; do
