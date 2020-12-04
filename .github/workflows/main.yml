@@ -52,6 +52,7 @@ jobs:
           exit 1
 
       - name: This step is executed
+        if: ${{ always() }}
         run: echo 'hello'
 
 #      - name: Deploy Docker swarm test cluster
