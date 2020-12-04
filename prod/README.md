@@ -21,3 +21,11 @@ Prerequisites:
         * `docker node update --label-add type=worker-job <node2>`
     * one node for running Nuvla DB layer:
         * `docker node update --label-add type=worker-db <node3>`
+* Run the following on the node(s) labeled `wokers-db`
+
+```
+sysctl -w vm.max_map_count=262144
+cat >> /etc/sysctl.conf<<EOF
+vm.max_map_count=262144
+EOF
+```
