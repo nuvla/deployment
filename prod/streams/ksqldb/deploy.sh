@@ -2,8 +2,10 @@
 
 set -e
 
+STREAMS_REPLICATION=$1
+
 STATEMENTS=./statements.sql
-if [ "$1" == "false" ]
+if [ "$STREAMS_REPLICATION" == "false" ]
 then
   STATEMENTS=./statements.replicas-1.sql
 fi

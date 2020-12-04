@@ -11,7 +11,7 @@ set -e
 # User by 'Deploy cluster and services monitoring.'.
 # NB! Example. Set strong password.
 # echo $(htpasswd -nb admin admin) | sed -e s/\\$/\\$\\$/g -e 's/^.*://'
-export ADMIN_HASHED_PASSWORD='$$apr1$$8Pq3X/GB$$dzKJt.YVgR./36IdL8l5s0'
+export ADMIN_HASHED_PASSWORD='$apr1$CssftMAJ$ohKj9Jk5JV9iMK07BEedX/'
 
 # SMTP configuration for user email notifications.
 # Used by 'Deploy Nuvla core services.'.
@@ -65,15 +65,8 @@ cd -
 #
 
 cd streams
-if [ "$STREAMS_REPLICATION" == "false" ]
-then
-    docker stack deploy -c docker-compose.single.yml streams
-else
-    docker stack deploy -c docker-compose.replicated.yml streams
-fi
-cd ksqldb
 ./deploy.sh $STREAMS_REPLICATION
-cd ../../
+cd -
 
 #
 # Deploy Nuvla core services.
