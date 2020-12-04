@@ -14,7 +14,7 @@ secrets:
 
 services:
   api:
-    image: nuvla/api:5.5.0
+    image: nuvladev/api:subscription
     environment:
       - ES_ENDPOINTS=es
       - ES_SNIFF_INTERVAL=5001
@@ -48,7 +48,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.10.1
+    image: nuvladev/ui:notif-subscription
     deploy:
       placement:
         constraints:

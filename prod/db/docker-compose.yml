@@ -3,11 +3,12 @@ version: '3.3'
 # Add these secrets to your deployment if you want to backup the
 # Elasticsearch database via S3. This is strongly recommended.
 
-secrets:
-  s3_access_key:
-    file: ./secrets/s3_access_key
-  s3_secret_key:
-    file: ./secrets/s3_secret_key
+# FIXME: uncomment
+#secrets:
+#  s3_access_key:
+#    file: ./secrets/s3_access_key
+#  s3_secret_key:
+#    file: ./secrets/s3_secret_key
 
 services:
 
@@ -39,9 +40,10 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s    
-    secrets:
-      - s3_access_key
-      - s3_secret_key
+    # FIXME: uncomment
+    #secrets:
+    #  - s3_access_key
+    #  - s3_secret_key
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
