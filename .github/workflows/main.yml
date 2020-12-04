@@ -69,12 +69,7 @@ jobs:
           export NUVLA_HOST=$(cat $HOME/nuvla-test-host)
           export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub
           export mname=$(cat $HOME/docker-machine-master)
-          echo $mname
-          echo $SHELL
-          ls -al $HOME/docker-machine
-          $HOME/docker-machine ls || true
-          $HOME/docker-machine env $mname --shell cmd || true
-          echo hello
+          eval $($HOME/docker-machine env $mname --shell bash)
           lein do clean, test
 
       - name: Terminate Docker swarm testing cluster
