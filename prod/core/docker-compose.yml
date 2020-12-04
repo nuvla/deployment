@@ -194,6 +194,13 @@ services:
 
   notify-slack:
     image: nuvladev/kafka-notify:master
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - nuvla-backend
     command:
@@ -201,6 +208,13 @@ services:
 
   notify-email:
     image: nuvladev/kafka-notify:master
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
+      restart_policy:
+        condition: on-failure
+        delay: 5s
     networks:
       - nuvla-backend
     command:
