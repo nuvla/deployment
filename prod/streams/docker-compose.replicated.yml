@@ -1,6 +1,26 @@
 ---
 version: '3.7'
 
+volumes:
+  streams-zk1-data:
+    driver: local
+  streams-zk1-datalog:
+    driver: local
+  streams-zk2-data:
+    driver: local
+  streams-zk2-datalog:
+    driver: local
+  streams-zk3-data:
+    driver: local
+  streams-zk3-datalog:
+    driver: local
+  streams-kafka1:
+    driver: local
+  streams-kafka2:
+    driver: local
+  streams-kafka3:
+    driver: local
+
 networks:
   nuvla-backend:
     external: true
@@ -11,6 +31,9 @@ services:
     image: confluentinc/cp-zookeeper:6.0.0
     networks:
       - nuvla-backend
+    volumes:
+      - streams-zk1-data:/data
+      - streams-zk1-datalog:/datalog
     deploy:
       placement:
         constraints:
@@ -25,6 +48,9 @@ services:
     image: confluentinc/cp-zookeeper:6.0.0
     networks:
       - nuvla-backend
+    volumes:
+      - streams-zk2-data:/data
+      - streams-zk2-datalog:/datalog
     deploy:
       placement:
         constraints:
@@ -39,6 +65,9 @@ services:
     image: confluentinc/cp-zookeeper:6.0.0
     networks:
       - nuvla-backend
+    volumes:
+      - streams-zk3-data:/data
+      - streams-zk3-datalog:/datalog
     deploy:
       placement:
         constraints:
@@ -56,6 +85,8 @@ services:
       - "9101:9101"
     networks:
       - nuvla-backend
+    volumes:
+      - streams-kafka1:/var/lib/kafka/data
     deploy:
       placement:
         constraints:
@@ -82,6 +113,8 @@ services:
       - "9102:9102"
     networks:
       - nuvla-backend
+    volumes:
+      - streams-kafka2:/var/lib/kafka/data
     deploy:
       placement:
         constraints:
@@ -108,6 +141,8 @@ services:
       - "9103:9103"
     networks:
       - nuvla-backend
+    volumes:
+      - streams-kafka3:/var/lib/kafka/data
     deploy:
       placement:
         constraints:
