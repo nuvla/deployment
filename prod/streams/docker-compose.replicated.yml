@@ -19,7 +19,7 @@ services:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_SERVERS: zookeeper1:2888:3888;zookeeper2:2888:3888;zookeeper3:2888:3888
+      ZOOKEEPER_SERVERS: 0.0.0.0:22888:23888;zookeeper2:32888:33888;zookeeper3:42888:43888
 
   zookeeper2:
     image: confluentinc/cp-zookeeper:6.0.0
@@ -33,7 +33,7 @@ services:
       ZOOKEEPER_SERVER_ID: 2
       ZOOKEEPER_CLIENT_PORT: 2182
       ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_SERVERS: zookeeper1:2888:3888;zookeeper2:2888:3888;zookeeper3:2888:3888
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;0.0.0.0:32888:33888;zookeeper3:42888:43888
 
   zookeeper3:
     image: confluentinc/cp-zookeeper:6.0.0
@@ -47,7 +47,7 @@ services:
       ZOOKEEPER_SERVER_ID: 3
       ZOOKEEPER_CLIENT_PORT: 2183
       ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_SERVERS: zookeeper1:2888:3888;zookeeper2:2888:3888;zookeeper3:2888:3888
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;zookeeper2:32888:33888;0.0.0.0:42888:43888
 
   kafka1:
     image: confluentinc/cp-kafka:6.0.0
