@@ -1,6 +1,14 @@
 ---
 version: '3.7'
 
+volumes:
+  streams-zkdata:
+    driver: local
+  streams-zkdatalog:
+    driver: local
+  streams-kafka:
+    driver: local
+
 networks:
   nuvla-backend:
     external: true
@@ -12,6 +20,9 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - streams-zkdata:/data
+      - streams-zkdatalog:/datalog
     networks:
       - nuvla-backend
     deploy:
@@ -24,6 +35,8 @@ services:
     ports:
       - "9092:9092"
       - "9101:9101"
+    volumes:
+      - streams-kafka:/var/lib/kafka/data
     networks:
       - nuvla-backend
     deploy:
