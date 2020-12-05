@@ -73,6 +73,5 @@ cd -
 #
 
 cd core
-./generate-certificates.sh
-docker stack deploy -c docker-compose.yml nuvla
+./deploy.sh
 cd -

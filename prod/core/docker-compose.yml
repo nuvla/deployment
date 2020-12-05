@@ -21,7 +21,7 @@ services:
       - ES_SNIFF_AFTER_FAILURE_DELAY=1001
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
-      - KAFKA_ENDPOINTS=kafka:9092
+      - KAFKA_ENDPOINTS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
     secrets:
       - source: session.crt
         target: /etc/nuvla/session/session.crt
