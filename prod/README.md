@@ -7,7 +7,7 @@ Deployment" section of the [Nuvla
 documentation](https://docs.nuvla.io/dave) for information on how
 to use these.
 
-See `deploy.sh` for an example of steps for deployment of fully  
+See [deploy.sh](deploy.sh) for an example of steps for deployment of fully  
 functional Nuvla server.
 
 Prerequisites:
@@ -21,7 +21,7 @@ Prerequisites:
         * `docker node update --label-add type=worker-job <node2>`
     * one node for running Nuvla DB layer:
         * `docker node update --label-add type=worker-db <node3>`
-* Run the following on the node(s) labeled `wokers-db`
+* Run the following on the node(s) labeled `workers-db`
 
 ```
 sysctl -w vm.max_map_count=262144
