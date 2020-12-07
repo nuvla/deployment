@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## [2.2.11] - 2020-12-07
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.6.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#560---2020-12-07)
+  - [nuvla/ui:2.11.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2110---2020-12-07)
+  - [nuvla/job-engine:2.9.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#290---2020-12-07)
+
+### Added
+
+ - BUILD - Support Github actions
+
 ## [2.2.10] - 2020-11-16
 
 This release update nuvla components to following versions:
