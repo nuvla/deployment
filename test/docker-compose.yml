@@ -54,7 +54,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:subscription
+    image: nuvladev/api:master
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -77,7 +77,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:notif-subscription
+    image: nuvladev/ui:master
     deploy:
       labels:
         - "traefik.enable=true"

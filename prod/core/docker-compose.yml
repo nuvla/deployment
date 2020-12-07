@@ -14,6 +14,7 @@ secrets:
 
 services:
   api:
+    # FIXME: change to the release version before merge
     image: nuvladev/api:subscription
     environment:
       - ES_ENDPOINTS=es
@@ -48,6 +49,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
+    # FIXME: change to the release version before merge
     image: nuvladev/ui:notif-subscription
     deploy:
       placement:
@@ -193,7 +195,7 @@ services:
       - nuvla-backend
 
   notify-slack:
-    image: nuvladev/kafka-notify:master
+    image: nuvladev/kafka-notify:0.3
     deploy:
       placement:
         constraints:
@@ -209,7 +211,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
 
   notify-email:
-    image: nuvladev/kafka-notify:master
+    image: nuvladev/kafka-notify:0.3
     deploy:
       placement:
         constraints:
