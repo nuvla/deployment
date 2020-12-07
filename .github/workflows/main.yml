@@ -43,7 +43,7 @@ jobs:
       - name: Deploy Docker swarm testing cluster
         env:
           TRAVIS_BUILD_DIR: .
-          SWARM_SIZE: 1
+          SWARM_SIZE: 2
           WAIT_AVAIL_MIN: 5
           EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
           EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
