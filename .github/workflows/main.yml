@@ -1,0 +1,84 @@
+name: BUILD
+
+on:
+  - workflow_dispatch
+
+jobs:
+
+  job-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+            - name: Cache local Maven repository
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Prepare for execution of functionnal tests
+        run: |
+          git clone https://github.com/nuvla/example-ubuntu.git ${HOME}/example-ubuntu
+          git clone https://github.com/nuvla/example-centos.git ${HOME}/example-centos
+          git clone https://github.com/nuvla/example-rstudio.git ${HOME}/example-rstudio
+          git clone https://github.com/nuvla/example-jupyter.git ${HOME}/example-jupyter
+          git clone https://github.com/nuvla/example-app.git ${HOME}/example-app
+          python -m pip install --upgrade pip
+          pip install nuvla-api
+          python -c 'import nuvla.api;'
+
+      - name: Deploy Docker swarm testing cluster
+        env:
+          TRAVIS_BUILD_DIR: .
+          SWARM_SIZE: 2
+          WAIT_AVAIL_MIN: 5
+          EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+          EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+        run: |
+          $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE
+          ip=`cat $HOME/nuvla-test-host`
+          $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || { >&2 echo "failed to provision Nuvla."; $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate; exit 1; }
+
+      - name: Run Nuvla functional tests
+        run: |
+          cd functional-tests
+          export EXAMPLES_ROOT=${HOME}
+          export NUVLA_INSECURE=TRUE
+          export NUVLA_HOST=$(cat $HOME/nuvla-test-host)
+          export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub
+          export mname=$(cat $HOME/docker-machine-master)
+          eval $($HOME/docker-machine env $mname --shell bash)
+          lein do clean, test
+
+      - name: Terminate Docker swarm testing cluster
+        if: ${{ always() }}
+        env:
+          TRAVIS_BUILD_DIR: .
+          EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
+          EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
+        run: $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
+
+  job-notify:
+    if: always()
+    name: Post Workflow Status To Slack
+    needs:
+      - job-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
