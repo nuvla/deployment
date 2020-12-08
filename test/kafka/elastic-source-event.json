@@ -1,0 +1,10 @@
+{   "name": "elastic-source-event",
+    "config": {"connector.class":"com.github.dariobalinzo.ElasticSourceConnector",
+                                "tasks.max": "1",
+                                "es.host" : "es",
+                                "es.port" : "9200",
+                                "index.prefix" : "nuvla-event",
+                                "topic.prefix" : "",
+                                "incrementing.field.name" : "timestamp"
+        }
+}
