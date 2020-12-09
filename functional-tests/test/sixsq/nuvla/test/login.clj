@@ -23,6 +23,7 @@
   (let [response (<!! (authn/login context/client {:href     "session-template/password"
                                                    :username context/nuvla-username
                                                    :password context/nuvla-password}))]
+    (println (str "response correct login:" response))
 
     (is (= 201 (:status response)))
     (is (re-matches #"session/.+" (:resource-id response)))
