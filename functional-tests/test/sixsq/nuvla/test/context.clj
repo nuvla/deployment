@@ -29,5 +29,10 @@
 
 (def options (when (= "TRUE" nuvla-insecure) {:insecure? true}))
 
+(println (str "nuvla-host: " nuvla-host))
+(println (str "server-endpoint: " server-endpoint))
+(println (str "nuvla-insecure: " nuvla-insecure))
+(println (str "options: " options))
+
 
 (def client (nuvla-client/instance server-endpoint options))
