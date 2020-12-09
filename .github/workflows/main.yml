@@ -55,12 +55,14 @@ jobs:
       - name: Run Nuvla functional tests
         run: |
           cd functional-tests
-          export EXAMPLES_ROOT=${HOME}
-          export NUVLA_INSECURE=TRUE
-          export NUVLA_HOST=$(cat $HOME/nuvla-test-host)
-          export SSH_PUBLIC_KEY=$HOME/.ssh/id_rsa.pub
-          export mname=$(cat $HOME/docker-machine-master)
-          eval $($HOME/docker-machine env $mname --shell bash)
+          export EXAMPLES_ROOT="$HOME"
+          export NUVLA_INSECURE="TRUE"
+          export NUVLA_HOST=$(cat "$HOME"/nuvla-test-host)
+          export SSH_PUBLIC_KEY="$HOME"/.ssh/id_rsa.pub
+          export mname=$(cat "$HOME"/docker-machine-master)
+          eval $("$HOME"/docker-machine env "$mname" --shell bash)
+          echo "$NUVLA_INSECURE"
+          echo "$NUVLA_HOST"
           lein do clean, test
 
       - name: Terminate Docker swarm testing cluster
