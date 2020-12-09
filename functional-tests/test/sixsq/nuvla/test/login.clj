@@ -18,7 +18,9 @@
     (is (instance? Exception response))
     (is (= 403 (:status (ex-data response))))
     (is (false? (<!! (authn/authenticated? context/client)))))
-
+  
+  (Thread/sleep 60000)
+  
   ;; log into the server with correct credentials
   (let [response (<!! (authn/login context/client {:href     "session-template/password"
                                                    :username context/nuvla-username
