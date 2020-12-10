@@ -11,10 +11,10 @@
   <fileSets>
 
     <fileSet>
-      <directory>${basedir}/test</directory>
+      <directory>${basedir}/prod</directory>
       <directoryMode>755</directoryMode>
       <fileMode>644</fileMode>
-      <outputDirectory>test</outputDirectory>
+      <outputDirectory>nuvla-prod</outputDirectory>
       <excludes>
         <exclude>**/*~</exclude>
         <exclude>**/.*</exclude>

@@ -24,6 +24,7 @@
                                                    :username context/nuvla-username
                                                    :password context/nuvla-password}))]
 
+    (Thread/sleep 30000)
     (is (= 201 (:status response)))
     (is (re-matches #"session/.+" (:resource-id response)))
     (is (= "group/nuvla-admin"

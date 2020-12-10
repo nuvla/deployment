@@ -57,6 +57,9 @@ services:
 
   api:
     image: nuvladev/api:master
+    configs:
+      - source: log4j.properties
+        target: /opt/nuvla/server/resources/log4j.properties
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -195,6 +198,8 @@ services:
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
+  log4j.properties:
+    file: ./log4j.properties
 
 networks:
   test-net:
