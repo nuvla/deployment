@@ -23,7 +23,7 @@ networks:
 services:
   data-gateway:
     <<: *common
-    image: traefik:2.1.1
+    image: traefik:2.3.5
     container_name: datagateway
     restart: always
     command:
@@ -59,7 +59,7 @@ services:
 
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:1.2.0
+    image: nuvlabox/system-manager:1.3.0
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=False
@@ -130,6 +130,7 @@ services:
       - 5000:5000
     depends_on:
       - system-manager
+      - management-api
     healthcheck:
       test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
       interval: 20s
