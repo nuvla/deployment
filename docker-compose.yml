@@ -25,7 +25,7 @@ services:
     <<: *common
     image: traefik:2.1.1
     container_name: datagateway
-    restart: on-failure
+    restart: always
     command:
       - --entrypoints.mqtt.address=:1883
       - --entrypoints.web.address=:80
@@ -117,7 +117,7 @@ services:
 
   compute-api:
     <<: *common
-    image: nuvlabox/compute-api:1.0.0
+    image: nuvlabox/compute-api:1.1.1
     container_name: compute-api
     restart: on-failure
     pid: "host"
@@ -130,6 +130,11 @@ services:
       - 5000:5000
     depends_on:
       - system-manager
+    healthcheck:
+      test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
+      interval: 20s
+      timeout: 10s
+      start_period: 30s
 
   network-manager:
     <<: *common
