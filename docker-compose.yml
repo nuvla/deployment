@@ -59,7 +59,7 @@ services:
 
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:1.3.0
+    image: nuvlabox/system-manager:1.3.1
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=False
