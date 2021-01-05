@@ -89,8 +89,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlabox/shared
       - /:/rootfs:ro
-    expose:
-      - 5000
+    ports:
+      - 127.0.0.1:5080:80
     depends_on:
       - system-manager
       - compute-api
