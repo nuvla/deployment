@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-bluetooth:
     <<: *common
-    image: nuvlabox/peripheral-manager-bluetooth:0.1.0
+    image: nuvlabox/peripheral-manager-bluetooth:1.0.0
     restart: on-failure
     network_mode: host
     volumes:
