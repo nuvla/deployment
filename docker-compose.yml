@@ -39,10 +39,11 @@ services:
 
   nb-mosquitto:
     <<: *common
-    image: eclipse-mosquitto:1.6.8
+    image: eclipse-mosquitto:1.6.12
     container_name: nbmosquitto
     restart: always
     init: true
+    command: sh -c 'sleep 10 && /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf'
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.routers.mytcprouter.rule=HostSNI(`*`)"
@@ -52,7 +53,7 @@ services:
       - "nuvlabox.component=True"
       - "nuvlabox.deployment=production"
     healthcheck:
-      test: ["CMD-SHELL", "timeout -t 5 mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1"]
+      test: ["CMD-SHELL", "timeout 5s mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1"]
       interval: 10s
       timeout: 10s
       start_period: 10s
