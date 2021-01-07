@@ -78,7 +78,7 @@ services:
   agent:
     <<: *common
     image: nuvlabox/agent:1.14.0
-    restart: on-failure
+    restart: unless-stopped
     privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
