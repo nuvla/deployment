@@ -104,8 +104,8 @@ services:
 
   management-api:
     <<: *common
-    image: nuvlabox/management-api:0.4.0
-    restart: on-failure
+    image: nuvlabox/management-api:1.0.0
+    restart: always
     environment:
       - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
       - HOST_USER=$USER
@@ -116,11 +116,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 5001:5001
-    healthcheck:
-      test: curl -k https://localhost:5001 2>&1 | grep SSL
-      interval: 20s
-      timeout: 10s
-      start_period: 30s
 
   compute-api:
     <<: *common
