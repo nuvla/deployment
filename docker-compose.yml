@@ -26,6 +26,7 @@ services:
     image: traefik:2.3.5
     container_name: datagateway
     restart: always
+    oom_score_adj: -900
     command:
       - --entrypoints.mqtt.address=:1883
       - --entrypoints.web.address=:80
@@ -80,6 +81,7 @@ services:
     <<: *common
     image: nuvlabox/agent:1.14.0
     restart: unless-stopped
+    oom_kill_disable: true
     privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
@@ -106,6 +108,7 @@ services:
     <<: *common
     image: nuvlabox/management-api:1.0.0
     restart: always
+    oom_score_adj: -900
     environment:
       - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
       - HOST_USER=$USER
@@ -122,6 +125,7 @@ services:
     image: nuvlabox/compute-api:1.1.1
     container_name: compute-api
     restart: on-failure
+    oom_score_adj: -900
     pid: "host"
     environment:
       - HOST=${HOSTNAME:-nuvlabox}
@@ -156,6 +160,7 @@ services:
     image: nuvlabox/vpn-client:0.0.4
     container_name: vpn-client
     restart: always
+    oom_kill_disable: true
     network_mode: host
     cap_add:
       - NET_ADMIN
