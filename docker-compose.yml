@@ -106,7 +106,7 @@ services:
 
   management-api:
     <<: *common
-    image: nuvlabox/management-api:1.0.0
+    image: nuvlabox/management-api:1.1.0
     restart: always
     oom_score_adj: -900
     environment:
