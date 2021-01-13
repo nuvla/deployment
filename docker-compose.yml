@@ -19,6 +19,8 @@ networks:
     driver: overlay
     name: nuvlabox-shared-network
     attachable: true
+    driver_opts:
+      encrypted: "true"
 
 services:
   data-gateway:
