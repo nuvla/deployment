@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+ - Job distributor for setting nuvlabox status to offline
+
 ## [2.2.12] - 2020-12-10
 
 This release update nuvla components to following versions:

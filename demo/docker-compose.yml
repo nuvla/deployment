@@ -35,7 +35,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
@@ -50,7 +50,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     volumes:
       - zkdata:/data
       - zkdatalog:/datalog
@@ -73,7 +73,7 @@ services:
         - "traefik.frontend.rule=PathPrefix:/api"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - backend
       - frontend
@@ -96,7 +96,7 @@ services:
         - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - frontend
 
@@ -107,7 +107,7 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - backend
 
@@ -118,7 +118,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - backend
 
@@ -191,6 +191,17 @@ services:
   jobd-vulnerabilities-database:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_vulnerabilities_database.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - backend
+
+  jobd-nuvlabox-status-offline:
+    image: nuvla/job:2.10.0
+    entrypoint: /app/job_distributor_nuvlabox_status_offline.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:

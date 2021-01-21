@@ -74,7 +74,7 @@ services:
         - "traefik.frontend.rule=PathPrefix:/api"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
@@ -92,7 +92,7 @@ services:
         - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
@@ -103,7 +103,7 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
@@ -187,6 +187,17 @@ services:
   jobd-vulnerabilities-database:
     image: nuvladev/job:master
     entrypoint: /app/job_distributor_vulnerabilities_database.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-nuvlabox-status-offline:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_nuvlabox_status_offline.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
