@@ -37,7 +37,7 @@ services:
         - "traefik.frontend.rule=PathPrefix:/api"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - nuvla-backend
       - traefik-public
@@ -59,7 +59,7 @@ services:
         - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - traefik-public
 
@@ -73,7 +73,7 @@ services:
           - node.hostname == worker-job
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - nuvla-backend
 
@@ -87,7 +87,7 @@ services:
           - node.hostname == worker-job
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - nuvla-backend
 
@@ -167,3 +167,14 @@ services:
         delay: 5s
     networks:
       - nuvla-backend
+
+    jobd-nuvlabox-status-offline:
+      image: nuvla/job:2.10.0
+      entrypoint: /app/job_distributor_nuvlabox_status_offline.py
+      command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+      deploy:
+        restart_policy:
+          condition: on-failure
+          delay: 5s
+      networks:
+        - nuvla-backend
