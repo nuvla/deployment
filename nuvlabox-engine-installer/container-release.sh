@@ -23,6 +23,7 @@ platforms=(amd64 arm64 arm)
 
 rm -Rf target/*.tar
 mkdir -p target
+cp ../docker-compose.* target/
 
 #
 # generate image for each platform

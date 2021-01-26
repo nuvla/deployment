@@ -78,6 +78,8 @@ services:
       timeout: 10s
       retries: 4
       start_period: 10s
+    depends_on:
+      - data-gateway
 
   agent:
     <<: *common
@@ -186,3 +188,12 @@ services:
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
+
+#  job-engine-lite:
+#    <<: *common
+#    image: nuvla/job-lite
+#    restart: always
+#    container_name: nuvlabox-job-engine-lite
+#    entrypoint: /app/pause.py
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
