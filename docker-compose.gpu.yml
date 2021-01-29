@@ -15,10 +15,10 @@ x-common: &common
 services:
   peripheral-manager-gpu:
     <<: *common
-    image: nuvlabox/peripheral-manager-gpu:0.1.1
+    image: nuvlabox/peripheral-manager-gpu:0.2.0
     restart: on-failure
     volumes:
-      - /etc/:/etc/:ro
+      - /etc/:/etcfs/:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/lib/:/usr/lib/:ro
       - /dev/:/dev/:ro
