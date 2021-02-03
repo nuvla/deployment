@@ -4,7 +4,7 @@ compose_files=${compose_files:-$1}
 target_version=${target_version:-${2:-"master"}}
 quiet=${quiet:-${3:-0}}
 environment=${environment:-$4}
-project=nuvlabox
+project=${project:-${5:-nuvlabox}}
 github_releases=${github_releases:-${6:-"https://github.com/nuvlabox/deployment/releases"}}
 save_dir=${save_dir:-${7:-$(pwd)}}
 

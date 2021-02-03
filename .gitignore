@@ -16,6 +16,8 @@ war/*
 logs/
 *.logs
 *.log
+test/.pytest_cache
+test/__pycache__
 docker-compose.test.yml
 .docker-compose.test.yml
 

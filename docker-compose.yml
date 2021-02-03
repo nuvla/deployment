@@ -83,7 +83,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvladev/agent:pull-mode #1.14.1
+    image: nuvlabox/agent:1.14.1
     restart: unless-stopped
     oom_kill_disable: true
     privileged: true
@@ -179,7 +179,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:1.0.0
+    image: nuvlabox/security:1.0.1
     restart: on-failure
     network_mode: host
     environment:
@@ -189,11 +189,11 @@ services:
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
 
-#  job-engine-lite:
-#    <<: *common
-#    image: nuvla/job-lite
-#    restart: always
-#    container_name: nuvlabox-job-engine-lite
-#    entrypoint: /app/pause.py
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
+  job-engine-lite:
+    <<: *common
+    image: nuvladev/job-lite:pull-mode
+    restart: always
+    container_name: nuvlabox-job-engine-lite
+    entrypoint: /app/pause.py
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
