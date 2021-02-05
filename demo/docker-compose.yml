@@ -102,7 +102,7 @@ services:
 
   job-executor:
     image: nuvla/job:2.10.0
-    command: -- /app/job_executor.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 2
       restart_policy:
@@ -114,7 +114,7 @@ services:
   jobd-jobs-cleanup:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_jobs_cleanup.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
@@ -125,7 +125,7 @@ services:
   jobd-deployment-state_10:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_deployment_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
       restart_policy:
         condition: on-failure
@@ -136,7 +136,7 @@ services:
   jobd-deployment-state_60:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_deployment_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
       restart_policy:
         condition: on-failure
@@ -147,7 +147,7 @@ services:
   jobd-comp-image-state:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_component_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
       restart_policy:
         condition: on-failure
@@ -158,7 +158,7 @@ services:
   jobd-srvc-image-state:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_service_image_state.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
       restart_policy:
         condition: on-failure
@@ -169,7 +169,7 @@ services:
   jobd-nuvlabox-releases:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_nuvlabox_releases.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
@@ -180,7 +180,7 @@ services:
   jobd-usage-report:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_usage_report.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
@@ -191,7 +191,7 @@ services:
   jobd-vulnerabilities-database:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_vulnerabilities_database.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
@@ -202,7 +202,7 @@ services:
   jobd-nuvlabox-status-offline:
     image: nuvla/job:2.10.0
     entrypoint: /app/job_distributor_nuvlabox_status_offline.py
-    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       restart_policy:
         condition: on-failure
