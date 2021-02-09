@@ -179,7 +179,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:1.0.1
+    image: nuvlabox/security:1.0.2
     restart: on-failure
     network_mode: host
     environment:
