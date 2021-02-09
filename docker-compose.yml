@@ -83,7 +83,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.14.1
+    image: nuvlabox/agent:1.15.0
     restart: unless-stopped
     oom_kill_disable: true
     privileged: true
@@ -161,7 +161,7 @@ services:
 
   vpn-client:
     <<: *common
-    image: nuvlabox/vpn-client:0.0.4
+    image: nuvlabox/vpn-client:1.0.0
     container_name: vpn-client
     restart: always
     oom_kill_disable: true
@@ -191,7 +191,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvladev/job-lite:pull-mode
+    image: nuvla/job-lite:2.11.0
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
