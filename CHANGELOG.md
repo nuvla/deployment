@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## [2.2.13] - 2021-02-09
+## [2.2.14] - 2021-02-09
 
 This release update nuvla components to following versions:
   - [nuvla/api-server:5.8.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#580---2021-02-09)
