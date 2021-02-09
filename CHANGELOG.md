@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+ - Job should use api-insecure because of http use for backend internal communication
+
 ## [2.2.14] - 2021-02-09
 
 This release update nuvla components to following versions:
