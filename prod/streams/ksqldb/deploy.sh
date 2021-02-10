@@ -1,14 +1,22 @@
 #!/bin/bash
 
+set -x
 set -e
 
 STREAMS_REPLICATION=$1
 
 STATEMENTS=./statements.sql
+
 if [ "$STREAMS_REPLICATION" == "false" ]
 then
-  STATEMENTS=./statements.replicas-1.sql
+  STATEMENTS_CHOICE=../../../streams/ksqldb/statements.replicas-1.sql
+else
+  STATEMENTS_CHOICE=../../../streams/ksqldb/statements.sql
 fi
+
+cp $STATEMENTS_CHOICE $STATEMENTS
+
+exit
 
 docker run --network nuvla-backend -v $(pwd):/nuvla -w /nuvla --rm -u root \
         --entrypoint ./ksqldb-create.sh confluentinc/cp-ksqldb-cli:6.0.0 \

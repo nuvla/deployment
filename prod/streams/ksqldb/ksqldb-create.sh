@@ -23,7 +23,8 @@ done
 grep -v -- '^--' $ksql_file | \
     tr '\n' ' ' | sed 's/;/;\'$'\n''/g' | \
     while read stmt; do
-    echo '{"ksql":"'"$stmt"'", "streamsProperties": {}}' | \
+    set noglob
+    echo '{"ksql":"'"$(set noglob; echo "$stmt" | sed -e 's/"/\\"/g' )"'", "streamsProperties": {}}' | \
         curl -sS -X "POST" "http://${ksql_host}/ksql" \
              -H "Content-Type: application/vnd.ksql.v1+json; charset=utf-8" \
              -d @- | \

@@ -71,7 +71,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.type == worker-job
+          - node.labels.type == worker-streams
     environment:
       ZOOKEEPER_SERVER_ID: 3
       ZOOKEEPER_CLIENT_PORT: 2183
@@ -90,7 +90,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.type == worker-job
+          - node.labels.type == worker-streams
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182,zookeeper3:2183'
@@ -118,7 +118,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.type == worker-job
+          - node.labels.type == worker-streams
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182,zookeeper3:2183'
@@ -171,7 +171,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.type == worker-job
+          - node.labels.type == worker-streams
     environment:
       KSQL_CONFIG_DIR: "/etc/ksql"
       KSQL_BOOTSTRAP_SERVERS: "kafka1:29092"
