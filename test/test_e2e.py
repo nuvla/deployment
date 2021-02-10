@@ -327,12 +327,13 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
         assert isinstance(nuvlabox_status.data.get('nuvlabox-api-endpoint'), str), \
             f'Missing management API endpoint attribute for NuvlaBox {nuvlabox_id}'
 
-        # check PULL capability
-        nuvlabox = api.get(nuvlabox_id)
-        assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
-            f'NuvlaBox {nuvlabox_id} is missing NUVLA_JOB_PULL capability'
-
         logging.info(f'Remote NuvlaBox {nuvlabox_id} has an healthy status')
+
+    nuvlabox_id = request.config.cache.get('nuvlabox_id_local', '')
+    # check PULL capability
+    nuvlabox = api.get(nuvlabox_id)
+    assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
+        f'NuvlaBox {nuvlabox_id} is missing NUVLA_JOB_PULL capability'
 
 
 def test_nuvlabox_engine_local_agent_api(request):
