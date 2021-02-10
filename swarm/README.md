@@ -144,6 +144,13 @@ To deploy Prometheus with the standard configuration, run the command:
 
 The service will be available at the URL `http://master-ip:3000/`. 
 
+To reset Grafana admin password use:
+
+```
+docker exec -it prometheus_grafana.1.<task ID> grafana-cli admin \ 
+   reset-admin-password --homepath /usr/share/grafana <new pass>
+```
+
 ## Minio (S3)
 
 The data management services rely on the availability of an
