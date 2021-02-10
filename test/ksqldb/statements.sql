@@ -43,19 +43,14 @@ WHERE s.kind = 'event' AND s.type = 'notification' AND s.category = 'state';
 CREATE STREAM EVENT_S
 (id VARCHAR,
   category VARCHAR,
-  content STRUCT<
-    resource STRUCT<
-      href VARCHAR
-      >,
-      state VARCHAR
-  >,
+  content STRUCT<resource STRUCT<href VARCHAR>,state VARCHAR>,
   severity VARCHAR,
   timestamp VARCHAR,
   acl STRUCT<
     owners ARRAY<VARCHAR>
   >
 )
-WITH (KAFKA_TOPIC='event', PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON');
+WITH (KAFKA_TOPIC='es_nuvla-event', PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON');
 
 --
 -- events for subscription on deployment state stream

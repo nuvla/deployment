@@ -54,7 +54,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:master
+    image: nuvladev/api:subscription-3.12
     environment:
       - ES_ENDPOINTS=es
       - ZK_ENDPOINTS=zk:2181
@@ -77,7 +77,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:master
+    image: nuvladev/ui:notif-subscription-2-1.2
     deploy:
       labels:
         - "traefik.enable=true"
@@ -88,18 +88,18 @@ services:
         - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
   job-executor:
-    image: nuvladev/job:master
+    image: nuvladev/job:subscriptions-0.2
     command: -- /app/job_executor.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     networks:
       - test-net
 
@@ -159,7 +159,7 @@ services:
       - test-net
 
   jobd-nuvlabox-releases:
-    image: nuvladev/job:master
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_nuvlabox_releases.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -191,6 +191,29 @@ services:
     networks:
       - test-net
 
+  jobd-nuvlabox-status-offline:
+    image: nuvladev/job:subscriptions-0.2
+    entrypoint: /app/job_distributor_nuvlabox_status_offline.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  jobd-subscriptions:
+    image: nuvladev/job:subscriptions-0.2
+    entrypoint: /app/job_distributor_subscriptions.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  # Zookeeper for Kafka
   kafka-zk:
     image: confluentinc/cp-zookeeper:6.0.0
     environment:
@@ -202,12 +225,18 @@ services:
     - kafka-zk-data:/data
     - kafka-zk-datalog:/datalog
 
+  # Kafka broker with Connect.
   kafka:
     image: confluentinc/cp-kafka:6.0.0
     ports:
       - "9092:9092"
     volumes:
       - kafka-data:/var/lib/kafka/data
+    configs:
+      - source: kafka-conf-distributed
+        target: /etc/kafka/connect-distributed.properties
+      - source: elastic-source-nuvlabox-all
+        target: /etc/kafka/elastic-source-nuvlabox-all.json
     networks:
       - test-net
     environment:
@@ -224,9 +253,51 @@ services:
       KAFKA_JMX_PORT: 9101
       KAFKA_JMX_HOSTNAME: localhost
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      ES_SOURCE_CONNECT_VER: "1.3"
+      FROM_SCRATCH: "true"
+    command:
+      - bash
+      - -xc
+      - |
+        ### Cleanup from previous launch
+        [ "$$FROM_SCRATCH" == "true" ] && rm -f /var/lib/kafka/data/meta.properties
 
+        ### Start Kafka
+        echo "Launching Kafka"
+        /etc/confluent/docker/run &
+
+        ### Install ES Connect source
+        mkdir -p /usr/share/java/elastic-source-connect
+        curl -L --output /usr/share/java/elastic-source-connect/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar \
+            https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/releases/download/v$${ES_SOURCE_CONNECT_VER}/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar
+
+        ### Start Kafka Connect worker
+        echo "Launching Kafka Connect worker"
+        connect-distributed -daemon /etc/kafka/connect-distributed.properties
+        echo "Waiting for Kafka Connect to start listening on localhost:8083"
+        kc_endpoint=http://localhost:8083
+        while : ; do
+          curl_status=$$(curl -s -o /dev/null -w %{http_code} $$kc_endpoint/connectors)
+          echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
+          if [ $$curl_status -eq 200 ] ; then
+            break
+          fi
+          sleep 5
+        done
+
+        ### Start Elasticsearch Connect
+        echo "Start ES source connector"
+        curl -X POST -H "Content-Type: application/json" --data @/etc/kafka/elastic-source-nuvlabox-all.json $$kc_endpoint/connectors
+        sleep 1
+        curl $$kc_endpoint/connectors/elastic-source-nuvlabox-status/status
+
+        sleep infinity
+
+  # ksqlDB stream processor
   ksqldb-server:
     image: confluentinc/cp-ksqldb-server:6.0.0
+    ports:
+      - "8088:8088"
     configs:
       - source: ksql.queries.file
         target: /etc/ksqldb/nuvla-statements.sql
@@ -241,35 +312,45 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
       KSQL_KSQL_QUERIES_FILE: /etc/ksqldb/nuvla-statements.sql
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
     networks:
       - test-net
 
+  # Notification service to Slack
   notify-slack:
-    image: nuvladev/kafka-notify:master
+    image: nuvladev/kafka-notify:message-0.8
     networks:
       - test-net
     command:
       - slack
+    environment:
+      NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
 
+  # Notification service to Email
   notify-email:
-    image: nuvladev/kafka-notify:master
+    image: nuvladev/kafka-notify:message-0.8
     networks:
       - test-net
     command:
       - email
     environment:
-     # If not provided, will be taken from configuration/nuvla resource if defined there.
-     SMTP_HOST: "${SMTP_HOST}"
-     SMTP_PORT: "${SMTP_PORT}"
-     SMTP_SSL: "${SMTP_SSL}"
-     SMTP_USER: "${SMTP_USER}"
-     SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
+      # If not provided, will be taken from configuration/nuvla resource if defined there.
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_SSL: "${SMTP_SSL}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
 
 configs:
   traefik.toml:
     file: ./traefik/traefik.toml
   ksql.queries.file:
-    file: ./ksqldb/statements.sql
+    file: ../streams/ksqldb/statements.replicas-1.sql
+  kafka-conf-distributed:
+    file: ../streams/kafka/connect-distributed.properties
+  elastic-source-nuvlabox-all:
+    file: ../streams/kafka/elastic-source-nuvlabox-all.json
 
 networks:
   test-net:
