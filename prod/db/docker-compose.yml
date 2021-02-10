@@ -3,7 +3,6 @@ version: '3.3'
 # Add these secrets to your deployment if you want to backup the
 # Elasticsearch database via S3. This is strongly recommended.
 
- FIXME: uncomment
 secrets:
   s3_access_key:
     file: ./secrets/s3_access_key
@@ -40,7 +39,6 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s    
-     FIXME: uncomment
     secrets:
       - s3_access_key
       - s3_secret_key

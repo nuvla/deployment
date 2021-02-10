@@ -15,7 +15,7 @@ secrets:
 services:
   api:
     # FIXME: change to the release version before merge
-    image: nuvladev/api:subscription
+    image: nuvladev/api:subscription-3.12
     environment:
       - ES_ENDPOINTS=es
       - ES_SNIFF_INTERVAL=5001
@@ -50,7 +50,7 @@ services:
   # is routed elsewhere.
   ui:
     # FIXME: change to the release version before merge
-    image: nuvladev/ui:notif-subscription
+    image: nuvladev/ui:notif-subscription-2-1.2
     deploy:
       placement:
         constraints:
@@ -69,7 +69,8 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     command: -- /app/job_executor.py --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -83,7 +84,8 @@ services:
       - nuvla-backend
 
   jobd-jobs-cleanup:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -97,7 +99,8 @@ services:
       - nuvla-backend
 
   jobd-deployment-state_10:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
@@ -111,7 +114,8 @@ services:
       - nuvla-backend
 
   jobd-deployment-state_60:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
@@ -125,7 +129,8 @@ services:
       - nuvla-backend
 
   jobd-comp-image-state:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_component_image_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -139,7 +144,8 @@ services:
       - nuvla-backend
 
   jobd-srvc-image-state:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_service_image_state.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -153,7 +159,8 @@ services:
       - nuvla-backend
 
   jobd-nuvlabox-releases:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_nuvlabox_releases.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -167,7 +174,8 @@ services:
       - nuvla-backend
 
   jobd-usage-report:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_usage_report.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -181,7 +189,8 @@ services:
       - nuvla-backend
 
   jobd-vulnerabilities-database:
-    image: nuvla/job:2.9.0
+    # FIXME: change to the release version before merge
+    image: nuvladev/job:subscriptions-0.2
     entrypoint: /app/job_distributor_vulnerabilities_database.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -195,7 +204,7 @@ services:
       - nuvla-backend
 
   notify-slack:
-    image: nuvladev/kafka-notify:0.3
+    image: nuvladev/kafka-notify:message-0.8
     deploy:
       placement:
         constraints:
@@ -211,7 +220,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
 
   notify-email:
-    image: nuvladev/kafka-notify:0.3
+    image: nuvladev/kafka-notify:message-0.8
     deploy:
       placement:
         constraints:
@@ -225,6 +234,7 @@ services:
       - email
     environment:
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
+      # If not provided, will be taken from configuration/nuvla resource if defined there.
       SMTP_HOST: "${SMTP_HOST}"
       SMTP_PORT: "${SMTP_PORT}"
       SMTP_SSL: "${SMTP_SSL}"
