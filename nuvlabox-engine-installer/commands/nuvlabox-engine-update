@@ -17,7 +17,7 @@ then
   exit 1
 fi
 
-if [[ ! -z ${environment} ]]
+if [[ ! -z "${environment}" ]]
 then
   env_file="${save_dir}/.env"
   nuvlabox-engine-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"

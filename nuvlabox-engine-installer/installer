@@ -71,14 +71,14 @@ check_args_install()
 check_args_update()
 {
   if [[ -z $compose_files ]] || [[ -z $target_version ]] || [[ -z $quiet ]] || [[ -z $on_update_failure ]] || \
-      [[ -z $project ]] || [[ -z $working_dir ]]
+      [[ -z $project ]] || [[ -z "$working_dir" ]]
   then
     echo -e "update ERROR: missing mandatory args"
     usage
     exit 1
   fi
 
-  if [[ -z $old_environment ]]
+  if [[ -z "$old_environment" ]]
   then
     export old_environment=$(nuvlabox-engine-current-env ${project} 2>&1)
     if [[ $? -ne 0 ]]
@@ -88,7 +88,7 @@ check_args_update()
     fi
   fi
 
-  if [[ -z $environment ]]
+  if [[ -z "$environment" ]]
   then
     # assume no changes to the new env
     export environment="${old_environment}"

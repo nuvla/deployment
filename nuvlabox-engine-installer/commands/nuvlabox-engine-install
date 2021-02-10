@@ -10,7 +10,7 @@ save_dir=${save_dir:-${7:-$(pwd)}}
 
 nuvlabox-engine-printer "Installing NuvlaBox Engine to version: ${target_version}" ${quiet} "NONE" yes
 
-if [[ ! -z ${environment} ]]
+if [[ ! -z "${environment}" ]]
 then
   env_file="${save_dir}/.env"
   nuvlabox-engine-printer "Setting environment for install, at ${env_file}" ${quiet} "INFO" "no"
