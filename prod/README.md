@@ -10,7 +10,7 @@ to use these.
 See [deploy.sh](deploy.sh) for an example of steps for deployment of a
 fully functional Nuvla server.
 
-Prerequisites:
+## Prerequisites
 
 * Docker Swarm cluster of 4 nodes.
     * Minimal settings per node: 4 CPU / 8 GB RAM / 50 GB Disk
@@ -42,3 +42,9 @@ export DOCKER_TLS_VERIFY=1
 export DOCKER_CERT_PATH=~/.docker/<TLS-CERTS>
 export DOCKER_HOST=<HOST>:2376
 ```
+
+## Elasticsearch backup to S3
+
+If you want to backup Elasticsearch to S3, you can make S3 key and
+secret available for the installation. For details see
+[db/README.md](db/README.md).

@@ -56,6 +56,12 @@ cd -
 #
 
 cd db
+if [ ! -d ./secrets ]
+then
+  mkdir -p secrets
+  echo S3 FAKE KEY > secrets/s3_access_key
+  echo S3 FAKE SECRET > secrets/s3_secret_key
+fi
 docker stack deploy -c docker-compose.yml db
 cd -
 
