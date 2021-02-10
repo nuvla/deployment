@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -x
 set -e
 
 STREAMS_REPLICATION=$1
