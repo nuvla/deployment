@@ -16,8 +16,6 @@ fi
 
 cp $STATEMENTS_CHOICE $STATEMENTS
 
-exit
-
 docker run --network nuvla-backend -v $(pwd):/nuvla -w /nuvla --rm -u root \
         --entrypoint ./ksqldb-create.sh confluentinc/cp-ksqldb-cli:6.0.0 \
         ksqldb-server:8088 $STATEMENTS
