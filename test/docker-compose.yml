@@ -54,7 +54,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:subscription-4.0
+    image: nuvladev/api:subscription-4.1
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
