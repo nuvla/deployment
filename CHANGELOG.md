@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Changed
+
+ - Job should use api-insecure because of http use for backend internal communication
+
+## [2.2.14] - 2021-02-09
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.8.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#580---2021-02-09)
+  - [nuvla/ui:2.13.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2130---2021-02-09)
+  - [nuvla/job-engine:2.11.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2110---2021-02-09)
+
+### Added
+
+ - Job distributor for setting nuvlabox status to offline
+
+## [2.2.12] - 2020-12-10
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.7.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#570---2020-12-10)
+  - [nuvla/ui:2.12.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2120---2020-12-10)
+  - [nuvla/job-engine:2.10.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2100---2020-12-10)
+
+### Changed
+
+  - Release tarball content fix
+
 ## [2.2.11] - 2020-12-07
 
 This release update nuvla components to following versions:
