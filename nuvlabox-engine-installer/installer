@@ -68,6 +68,26 @@ check_args_install()
   fi
 }
 
+reset_host_environment(){
+  # since this installer runs inside a container, the reserved HOST env variables are replaced by the container
+  # The NB needs the HOST env, not the container's
+  # so let's try to replicate the necessary HOST environment, inside this container
+
+  # env setup for setting HOME folder (for mgmt-api)
+  for env_var in $(echo ${environment} | tr ',' ' ')
+  do
+    if [[ $(echo ${env_var} | grep "HOME=") ]]
+    then
+      export ${env_var}
+    fi
+
+    if [[ $(echo ${env_var} | grep "HOST=") ]]
+    then
+      export HOSTNAME=$(echo ${env_var} | cut -d= -f 2)
+    fi
+  done
+}
+
 check_args_update()
 {
   if [[ -z $compose_files ]] || [[ -z $target_version ]] || [[ -z $quiet ]] || [[ -z $on_update_failure ]] || \
@@ -93,7 +113,10 @@ check_args_update()
     # assume no changes to the new env
     export environment="${old_environment}"
   fi
+
+  reset_host_environment
 }
+
 
 case ${command} in
   -h | --help)
@@ -274,6 +297,7 @@ case ${command} in
     done
     banner_intro ${quiet}
     check_args_install
+    reset_host_environment
     output=$(nuvlabox-engine-install 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]

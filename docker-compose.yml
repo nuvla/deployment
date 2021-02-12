@@ -110,12 +110,12 @@ services:
 
   management-api:
     <<: *common
-    image: nuvlabox/management-api:1.1.1
+    image: nuvlabox/management-api:1.2.0
     restart: always
     oom_score_adj: -900
     environment:
       - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
-      - HOST_USER=$USER
+      - HOME=${HOME}
     volumes:
       - /proc/sysrq-trigger:/sysrq
       - ${HOME}/.ssh/:/hostfs/.ssh/
@@ -153,7 +153,7 @@ services:
     restart: on-failure
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - VPN_INTERFACE_NAME=${NUVLABOX_VPN_IFACE:-vpn}
+      - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
     depends_on:
@@ -183,7 +183,7 @@ services:
     restart: on-failure
     network_mode: host
     environment:
-      - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CSV_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
+      - EXTERNAL_CSV_VULNERABILITY_DB=${EXTERNAL_CSV_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
       - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
