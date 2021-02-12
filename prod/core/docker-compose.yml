@@ -221,6 +221,17 @@ services:
     networks:
       - nuvla-backend
 
+  jobd-subscriptions:
+    image: nuvladev/job:subscriptions-1.0
+    entrypoint: /app/job_distributor_subscriptions.py
+    command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - nuvla-backend
+
   notify-slack:
     image: nuvladev/kafka-notify:message-0.8
     deploy:
