@@ -80,7 +80,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:notif-subscription-2-1.3
+    image: nuvladev/ui:notif-subscription-2-1.6
     deploy:
       labels:
         - "traefik.enable=true"
