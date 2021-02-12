@@ -183,7 +183,7 @@ services:
     restart: on-failure
     network_mode: host
     environment:
-      - EXTERNAL_CSV_VULNERABILITY_DB=${EXTERNAL_CSV_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
+      - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CVE_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
       - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
