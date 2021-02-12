@@ -467,6 +467,7 @@ def test_nuvlabox_engine_local_management_api(request, remote):
 
     # won't do the test on add/revoke-ssh-key because it is a sensitive action
     # let's not compromise the test environment
+    # let's not compromise the test environment
 
     peripheral_id = request.config.cache.get('peripheral_id', '')
     assert peripheral_id != '', 'PyTest cache is not working'
@@ -475,14 +476,14 @@ def test_nuvlabox_engine_local_management_api(request, remote):
                       verify=False,
                       cert=(cert.name, key.name),
                       json={'id': peripheral_id, 'video-device': '/dev/null'})
-    assert r.status_code == 200, f'NuvlaBox management API {management_api} failed to start mjgp streamer'
+    assert r.status_code == 200, f'NuvlaBox management API {management_api} failed to start mjgp streamer: {r.text}'
 
     r = requests.post(management_api + '/data-source-mjpg/disable',
                       verify=False,
                       cert=(cert.name, key.name),
                       json={'id': peripheral_id})
     atexit.register(cleaner.delete_zombie_mjpg_streamer, peripheral_id)
-    assert r.status_code == 200, f'NuvlaBox management API {management_api} failed to stop mjgp streamer'
+    assert r.status_code == 200, f'NuvlaBox management API {management_api} failed to stop mjgp streamer: {r.text}'
     atexit.unregister(cleaner.delete_zombie_mjpg_streamer)
 
     logging.info(f'Management API ({management_api}) succeeded at handling Data Gateway video streaming requests')
