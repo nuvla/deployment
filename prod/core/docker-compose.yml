@@ -19,7 +19,7 @@ configs:
 services:
   api:
     # FIXME: change to the release version before merge
-    image: nuvladev/api:subscription-4.1
+    image: nuvladev/api:subscription-4.4
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
