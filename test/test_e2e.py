@@ -204,7 +204,7 @@ def test_deploy_nuvlaboxes(request, remote):
         logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
 
     atexit.register(cleaner.remove_local_nuvlabox, local_project_name, nbe_installer_image)
-    atexit.register(cleaner.delete_nuvlabox, nuvlabox_id_local)
+    # atexit.register(cleaner.delete_nuvlabox, nuvlabox_id_local)
     installer_container = docker_client.containers.get("nuvlabox-engine-installer")
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
     logging.info(f'NuvlaBox ({nuvlabox_id_local}) Engine successfully installed with project name {local_project_name}')
@@ -331,7 +331,14 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
 
     nuvlabox_id = request.config.cache.get('nuvlabox_id_local', '')
     # check PULL capability
-    nuvlabox = api.get(nuvlabox_id)
+    with timeout(60):
+        while True:
+            nuvlabox = api.get(nuvlabox_id)
+            if 'capabilities' in nuvlabox.data:
+                break
+
+            time.sleep(3)
+
     assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
         f'NuvlaBox {nuvlabox_id} is missing NUVLA_JOB_PULL capability'
 

@@ -83,7 +83,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:1.15.0
+    image: nuvlabox/agent:1.15.1
     restart: unless-stopped
     oom_kill_disable: true
     privileged: true
