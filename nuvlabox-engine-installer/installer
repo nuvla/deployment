@@ -76,7 +76,7 @@ reset_host_environment(){
   # env setup for setting HOME folder (for mgmt-api)
   for env_var in $(echo ${environment} | tr ',' ' ')
   do
-    if [[ $(echo ${env_var} | grep "HOME=") ]]
+    if [[ $(echo ${env_var} | grep "HOST_HOME=") ]]
     then
       export ${env_var}
     fi

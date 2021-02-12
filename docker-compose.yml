@@ -115,7 +115,7 @@ services:
     oom_score_adj: -900
     environment:
       - NUVLABOX_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
-      - HOME=${HOME}
+      - HOST_HOME=${HOME}
     volumes:
       - /proc/sysrq-trigger:/sysrq
       - ${HOME}/.ssh/:/hostfs/.ssh/
