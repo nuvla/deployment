@@ -5,6 +5,8 @@ set -ex
 ksql_host=${1:-localhost:8088}
 sql=${2}
 
+yum install -y jq
+
 if [ ! -z "$sql" ]; then
     ./run-ksql-script.sh $ksql_host $sql
 else
