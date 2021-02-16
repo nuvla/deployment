@@ -118,8 +118,8 @@ CREATE TABLE SUBS_NB_STATE_T AS
     EMIT CHANGES;
 
 --
--- NB numeric above metrics (expanded)
-CREATE TABLE SUBS_NB_LOAD_ABOVE_T AS
+-- NB numeric load metric (expanded)
+CREATE TABLE SUBS_NB_LOAD_T AS
     SELECT "resource-id",
            LATEST_BY_OFFSET(AS_VALUE(id)) AS subs_id,
            LATEST_BY_OFFSET(enabled) AS enabled,
@@ -136,8 +136,53 @@ CREATE TABLE SUBS_NB_LOAD_ABOVE_T AS
     FROM SUBSCRIPTION_S
     WHERE "resource-kind" = 'nuvlabox'
           and criteria->kind = 'numeric'
-          and criteria->condition = '>'
           and criteria->metric = 'load'
+    GROUP BY "resource-id"
+    EMIT CHANGES;
+
+--
+-- NB numeric ram metrics (expanded)
+CREATE TABLE SUBS_NB_RAM_T AS
+    SELECT "resource-id",
+           LATEST_BY_OFFSET(AS_VALUE(id)) AS subs_id,
+           LATEST_BY_OFFSET(enabled) AS enabled,
+           LATEST_BY_OFFSET(name) AS name,
+           LATEST_BY_OFFSET(description) AS description,
+           LATEST_BY_OFFSET(acl->owners[1]) AS owner,
+           LATEST_BY_OFFSET(category) AS category,
+           LATEST_BY_OFFSET("method-id") AS "method-id",
+           LATEST_BY_OFFSET("resource-kind") AS "resource-kind",
+           LATEST_BY_OFFSET(criteria->metric) AS metric,
+           LATEST_BY_OFFSET(criteria->condition) AS condition,
+           LATEST_BY_OFFSET(CAST(criteria->"value" as DOUBLE)) AS "value",
+           LATEST_BY_OFFSET(criteria->"window") AS "window"
+    FROM SUBSCRIPTION_S
+    WHERE "resource-kind" = 'nuvlabox'
+          and criteria->kind = 'numeric'
+          and criteria->metric = 'ram'
+    GROUP BY "resource-id"
+    EMIT CHANGES;
+
+--
+-- NB numeric disk metrics (expanded)
+CREATE TABLE SUBS_NB_DISK_T AS
+    SELECT "resource-id",
+           LATEST_BY_OFFSET(AS_VALUE(id)) AS subs_id,
+           LATEST_BY_OFFSET(enabled) AS enabled,
+           LATEST_BY_OFFSET(name) AS name,
+           LATEST_BY_OFFSET(description) AS description,
+           LATEST_BY_OFFSET(acl->owners[1]) AS owner,
+           LATEST_BY_OFFSET(category) AS category,
+           LATEST_BY_OFFSET("method-id") AS "method-id",
+           LATEST_BY_OFFSET("resource-kind") AS "resource-kind",
+           LATEST_BY_OFFSET(criteria->metric) AS metric,
+           LATEST_BY_OFFSET(criteria->condition) AS condition,
+           LATEST_BY_OFFSET(CAST(criteria->"value" as DOUBLE)) AS "value",
+           LATEST_BY_OFFSET(criteria->"window") AS "window"
+    FROM SUBSCRIPTION_S
+    WHERE "resource-kind" = 'nuvlabox'
+          and criteria->kind = 'numeric'
+          and criteria->metric = 'disk'
     GROUP BY "resource-id"
     EMIT CHANGES;
 
@@ -194,7 +239,8 @@ CREATE STREAM NB_TELEM_RESOURCES_S (
    parent VARCHAR,
    online BOOLEAN,
    resources STRUCT<cpu STRUCT<"load" DOUBLE, "capacity" BIGINT, "topic" VARCHAR>,
-                    ram STRUCT<"used" BIGINT, "capacity" BIGINT, "topic" VARCHAR>>,
+                    ram STRUCT<"used" BIGINT, "capacity" BIGINT, "topic" VARCHAR>,
+                    disks ARRAY<STRUCT<"used" BIGINT, "capacity" BIGINT, "device" VARCHAR>>>,
    "current-time" VARCHAR,
    acl STRUCT<"owners" ARRAY<VARCHAR>,
               "view-data" ARRAY<VARCHAR>
@@ -346,4 +392,217 @@ SELECT id,
        CAST("VALUE" as VARCHAR) AS "VALUE",
        timestamp
 FROM NB_LOAD_ABOVE_NOTIF_S
+WHERE LCASE(method) = 'slack';
+
+----------------------------------------------------------------
+-- Notifications trigger on NB CPU load % against all thresholds
+CREATE STREAM NB_LOAD_NOTIF_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT
+       subs."method-id" as id,
+       notif.method as method,
+       notif.destination as destination,
+       subs.subs_id as subs_id,
+       subs.name as subs_name,
+       subs.description as subs_description,
+       CONCAT('edge/', SPLIT(AS_VALUE(nb_tlm.id), '/')[2]) as nb_uri,
+       nb_tlm.name as nb_name,
+       nb_tlm.description as nb_description,
+       CONCAT('NB load %', '') as metric,
+       subs.condition as condition,
+       subs."value" as condition_value,
+       ((nb_tlm.resources->cpu->"load" * 100) / nb_tlm.resources->cpu->"capacity") as "value",
+       nb_tlm.timestamp as timestamp
+FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
+JOIN SUBS_NB_LOAD_T AS subs ON subs."resource-id" = nb_tlm.id
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
+WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
+      AND subs.enabled = true
+      AND (
+              (subs.condition = '>' AND ((nb_tlm.resources->cpu->"load" * 100) / nb_tlm.resources->cpu->"capacity") > CAST(subs."value" AS INTEGER))
+              OR
+              (subs.condition = '<' AND ((nb_tlm.resources->cpu->"load" * 100) / nb_tlm.resources->cpu->"capacity") < CAST(subs."value" AS INTEGER))
+              OR
+              (subs.condition = '=' AND ((nb_tlm.resources->cpu->"load" * 100) / nb_tlm.resources->cpu->"capacity") = CAST(subs."value" AS INTEGER))
+              OR
+              (subs.condition = '!=' AND ((nb_tlm.resources->cpu->"load" * 100) / nb_tlm.resources->cpu->"capacity") != CAST(subs."value" AS INTEGER))
+              )
+        EMIT CHANGES;
+
+INSERT INTO NOTIFICATIONS_EMAIL_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       CAST(condition_value AS VARCHAR) AS condition_value,
+       CAST("value" AS VARCHAR) AS "VALUE",
+       timestamp
+FROM NB_LOAD_NOTIF_S
+WHERE LCASE(method) = 'email';
+
+INSERT INTO NOTIFICATIONS_SLACK_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       CAST(condition_value AS VARCHAR) AS condition_value,
+       CAST("value" as VARCHAR) AS "VALUE",
+       timestamp
+FROM NB_LOAD_NOTIF_S
+WHERE LCASE(method) = 'slack';
+
+----------------------------------------------------------------
+-- Notifications trigger on NB RAM used % against all thresholds
+CREATE STREAM NB_RAM_NOTIF_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT
+       subs."method-id" as id,
+       notif.method as method,
+       notif.destination as destination,
+       subs.subs_id as subs_id,
+       subs.name as subs_name,
+       subs.description as subs_description,
+       CONCAT('edge/', SPLIT(AS_VALUE(nb_tlm.id), '/')[2]) as nb_uri,
+       nb_tlm.name as nb_name,
+       nb_tlm.description as nb_description,
+       CONCAT('NB ram %', '') as metric,
+       subs.condition as condition,
+       subs."value" as condition_value,
+       ((nb_tlm.resources->ram->"used" * 100) / nb_tlm.resources->ram->"capacity") as "value",
+       nb_tlm.timestamp as timestamp
+FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
+JOIN SUBS_NB_RAM_T AS subs ON subs."resource-id" = nb_tlm.id
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
+WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
+      AND subs.enabled = true
+      AND (
+              (subs.condition = '>' AND ((nb_tlm.resources->ram->"used" * 100) / nb_tlm.resources->ram->"capacity") > CAST(subs."value" AS INTEGER))
+              OR
+              (subs.condition = '<' AND ((nb_tlm.resources->ram->"used" * 100) / nb_tlm.resources->ram->"capacity") < CAST(subs."value" AS INTEGER))
+              OR
+              (subs.condition = '=' AND ((nb_tlm.resources->ram->"used" * 100) / nb_tlm.resources->ram->"capacity") = CAST(subs."value" AS INTEGER))
+              OR
+              (subs.condition = '!=' AND ((nb_tlm.resources->ram->"used" * 100) / nb_tlm.resources->ram->"capacity") != CAST(subs."value" AS INTEGER))
+              )
+        EMIT CHANGES;
+
+INSERT INTO NOTIFICATIONS_EMAIL_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       CAST(condition_value AS VARCHAR) AS condition_value,
+       CAST("value" AS VARCHAR) AS "VALUE",
+       timestamp
+FROM NB_RAM_NOTIF_S
+WHERE LCASE(method) = 'email';
+
+INSERT INTO NOTIFICATIONS_SLACK_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       CAST(condition_value AS VARCHAR) AS condition_value,
+       CAST("value" as VARCHAR) AS "VALUE",
+       timestamp
+FROM NB_RAM_NOTIF_S
+WHERE LCASE(method) = 'slack';
+
+-----------------------------------------------------------------
+-- Notifications trigger on NB disk used % against all thresholds
+CREATE STREAM NB_DISK_NOTIF_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT
+       subs."method-id" as id,
+       notif.method as method,
+       notif.destination as destination,
+       subs.subs_id as subs_id,
+       subs.name as subs_name,
+       subs.description as subs_description,
+       CONCAT('edge/', SPLIT(AS_VALUE(nb_tlm.id), '/')[2]) as nb_uri,
+       nb_tlm.name as nb_name,
+       nb_tlm.description as nb_description,
+       CONCAT('NB disk %', '') as metric,
+       subs.condition as condition,
+       subs."value" as condition_value,
+       ((nb_tlm.resources->disks[1]->"used" * 100) / nb_tlm.resources->disks[1]->"capacity") as "value",
+       nb_tlm.timestamp as timestamp
+FROM NB_TELEM_RESOURCES_REKYED_S_1 AS nb_tlm
+JOIN SUBS_NB_DISK_T AS subs ON subs."resource-id" = nb_tlm.id
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
+WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
+      AND subs.enabled = true
+      AND (
+              (subs.condition = '>' AND (((nb_tlm.resources->disks[1]->"used" * 100) / nb_tlm.resources->disks[1]->"capacity") > CAST(subs."value" AS INTEGER)))
+              OR
+              (subs.condition = '<' AND (((nb_tlm.resources->disks[1]->"used" * 100) / nb_tlm.resources->disks[1]->"capacity") < CAST(subs."value" AS INTEGER)))
+              OR
+              (subs.condition = '=' AND (((nb_tlm.resources->disks[1]->"used" * 100) / nb_tlm.resources->disks[1]->"capacity") = CAST(subs."value" AS INTEGER)))
+              OR
+              (subs.condition = '!=' AND (((nb_tlm.resources->disks[1]->"used" * 100) / nb_tlm.resources->disks[1]->"capacity") != CAST(subs."value" AS INTEGER)))
+              )
+        EMIT CHANGES;
+
+INSERT INTO NOTIFICATIONS_EMAIL_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       CAST(condition_value AS VARCHAR) AS condition_value,
+       CAST("value" AS VARCHAR) AS "VALUE",
+       timestamp
+FROM NB_DISK_NOTIF_S
+WHERE LCASE(method) = 'email';
+
+INSERT INTO NOTIFICATIONS_SLACK_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       CAST(condition_value AS VARCHAR) AS condition_value,
+       CAST("value" as VARCHAR) AS "VALUE",
+       timestamp
+FROM NB_DISK_NOTIF_S
 WHERE LCASE(method) = 'slack';

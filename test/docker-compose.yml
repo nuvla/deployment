@@ -54,7 +54,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:subscription-4.4
+    image: nuvladev/api:subscription-4.5
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -321,7 +321,7 @@ services:
 
   # Notification service to Slack
   notify-slack:
-    image: nuvladev/kafka-notify:message-0.8
+    image: nuvladev/kafka-notify:message-1.1
     networks:
       - test-net
     command:
@@ -331,7 +331,7 @@ services:
 
   # Notification service to Email
   notify-email:
-    image: nuvladev/kafka-notify:message-0.8
+    image: nuvladev/kafka-notify:message-1.1
     networks:
       - test-net
     command:
