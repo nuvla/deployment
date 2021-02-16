@@ -57,7 +57,7 @@ services:
   # is routed elsewhere.
   ui:
     # FIXME: change to the release version before merge
-    image: nuvladev/ui:notif-subscription-2-1.6
+    image: nuvladev/ui:notif-subscription-2-1.7
     deploy:
       placement:
         constraints:
