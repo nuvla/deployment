@@ -211,7 +211,7 @@ services:
         condition: on-failure
         delay: 5s
     networks:
-      - test-net
+      - backend
 
   jobd-subscriptions:
     image: nuvla/job:2.12.0
