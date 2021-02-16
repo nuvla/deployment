@@ -18,8 +18,7 @@ configs:
 
 services:
   api:
-    # FIXME: change to the release version before merge
-    image: nuvladev/api:subscription-4.5
+    image: nuvla/api:5.9.0
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -56,8 +55,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    # FIXME: change to the release version before merge
-    image: nuvladev/ui:notif-subscription-2-1.7
+    image: nuvla/ui:2.10.0
     deploy:
       placement:
         constraints:
@@ -76,8 +74,7 @@ services:
       - traefik-public
 
   job-executor:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -91,8 +88,7 @@ services:
       - nuvla-backend
 
   jobd-jobs-cleanup:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -106,8 +102,7 @@ services:
       - nuvla-backend
 
   jobd-deployment-state_10:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
@@ -121,8 +116,7 @@ services:
       - nuvla-backend
 
   jobd-deployment-state_60:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
@@ -136,8 +130,7 @@ services:
       - nuvla-backend
 
   jobd-comp-image-state:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_component_image_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -151,8 +144,7 @@ services:
       - nuvla-backend
 
   jobd-srvc-image-state:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_service_image_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -166,8 +158,7 @@ services:
       - nuvla-backend
 
   jobd-nuvlabox-releases:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_nuvlabox_releases.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -181,8 +172,7 @@ services:
       - nuvla-backend
 
   jobd-usage-report:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_usage_report.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -196,8 +186,7 @@ services:
       - nuvla-backend
 
   jobd-vulnerabilities-database:
-    # FIXME: change to the release version before merge
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_vulnerabilities_database.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -211,7 +200,7 @@ services:
       - nuvla-backend
 
   jobd-nuvlabox-status-offline:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_nuvlabox_status_offline.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -222,7 +211,7 @@ services:
       - nuvla-backend
 
   jobd-subscriptions:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvla/job:2.12.0
     entrypoint: /app/job_distributor_subscriptions.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -233,7 +222,7 @@ services:
       - nuvla-backend
 
   notify-slack:
-    image: nuvladev/kafka-notify:message-0.8
+    image: nuvla/kafka-notify:0.4.0
     deploy:
       placement:
         constraints:
@@ -249,7 +238,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
 
   notify-email:
-    image: nuvladev/kafka-notify:message-0.8
+    image: nuvla/kafka-notify:0.4.0
     deploy:
       placement:
         constraints:
