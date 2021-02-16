@@ -54,7 +54,7 @@ services:
       - test-net
 
   api:
-    image: nuvladev/api:subscription-4.5
+    image: nuvladev/api:master
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -80,7 +80,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvladev/ui:notif-subscription-2-1.7
+    image: nuvladev/ui:master
     deploy:
       labels:
         - "traefik.enable=true"
@@ -96,7 +96,7 @@ services:
       - test-net
 
   job-executor:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 1
@@ -107,7 +107,7 @@ services:
       - test-net
 
   jobd-jobs-cleanup:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_jobs_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -118,7 +118,7 @@ services:
       - test-net
 
   jobd-deployment-state_10:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 10
     deploy:
@@ -129,7 +129,7 @@ services:
       - test-net
 
   jobd-deployment-state_60:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_deployment_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 60
     deploy:
@@ -140,7 +140,7 @@ services:
       - test-net
 
   jobd-comp-image-state:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_component_image_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -151,7 +151,7 @@ services:
       - test-net
 
   jobd-srvc-image-state:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_service_image_state.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181 --interval 3600
     deploy:
@@ -162,7 +162,7 @@ services:
       - test-net
 
   jobd-nuvlabox-releases:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_nuvlabox_releases.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -173,7 +173,7 @@ services:
       - test-net
 
   jobd-usage-report:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_usage_report.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -184,7 +184,7 @@ services:
       - test-net
 
   jobd-vulnerabilities-database:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_vulnerabilities_database.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -195,7 +195,7 @@ services:
       - test-net
 
   jobd-nuvlabox-status-offline:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_nuvlabox_status_offline.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -206,7 +206,7 @@ services:
       - test-net
 
   jobd-subscriptions:
-    image: nuvladev/job:subscriptions-1.0
+    image: nuvladev/job:master
     entrypoint: /app/job_distributor_subscriptions.py
     command: --api-url http://api:8200 --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
