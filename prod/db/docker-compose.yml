@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 
 # Add these secrets to your deployment if you want to backup the
 # Elasticsearch database via S3. This is strongly recommended.
@@ -38,7 +38,7 @@ services:
           - node.labels.type == worker-db
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     secrets:
       - s3_access_key
       - s3_secret_key
@@ -55,13 +55,14 @@ services:
     image: zookeeper:3.4
     environment:
       - ZOO_MY_ID=3
+      - ZOO_AUTOPURGE_PURGEINTERVAL=4
     deploy:
       placement:
         constraints:
           - node.labels.type == worker-db
       restart_policy:
         condition: on-failure
-        delay: 5s    
+        delay: 5s
     volumes:
       - zkdata:/data
       - zkdatalog:/datalog

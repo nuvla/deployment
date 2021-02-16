@@ -204,6 +204,9 @@ services:
     entrypoint: /app/job_distributor_nuvlabox_status_offline.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-job
       restart_policy:
         condition: on-failure
         delay: 5s
