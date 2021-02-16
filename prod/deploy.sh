@@ -34,7 +34,10 @@ export STREAMS_REPLICATION=false
 docker network create --driver=overlay traefik-public
 
 cd ../swarm/traefik
-./generate-certificates.sh
+if [ ! -d ./secrets ]
+then
+  ./generate-certificates.sh
+fi
 docker stack deploy -c docker-compose.yml traefik
 cd -
 
