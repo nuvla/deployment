@@ -1,0 +1,187 @@
+---
+version: '3.7'
+
+volumes:
+  streams-zk1-data:
+    driver: local
+  streams-zk1-datalog:
+    driver: local
+  streams-zk2-data:
+    driver: local
+  streams-zk2-datalog:
+    driver: local
+  streams-zk3-data:
+    driver: local
+  streams-zk3-datalog:
+    driver: local
+  streams-kafka1:
+    driver: local
+  streams-kafka2:
+    driver: local
+  streams-kafka3:
+    driver: local
+
+networks:
+  nuvla-backend:
+    external: true
+
+services:
+
+  zookeeper1:
+    image: confluentinc/cp-zookeeper:6.0.0
+    networks:
+      - nuvla-backend
+    volumes:
+      - streams-zk1-data:/data
+      - streams-zk1-datalog:/datalog
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == frontend
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: 0.0.0.0:22888:23888;zookeeper2:32888:33888;zookeeper3:42888:43888
+
+  zookeeper2:
+    image: confluentinc/cp-zookeeper:6.0.0
+    networks:
+      - nuvla-backend
+    volumes:
+      - streams-zk2-data:/data
+      - streams-zk2-datalog:/datalog
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == frontend
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;0.0.0.0:32888:33888;zookeeper3:42888:43888
+
+  zookeeper3:
+    image: confluentinc/cp-zookeeper:6.0.0
+    networks:
+      - nuvla-backend
+    volumes:
+      - streams-zk3-data:/data
+      - streams-zk3-datalog:/datalog
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-streams
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2183
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper1:22888:23888;zookeeper2:32888:33888;0.0.0.0:42888:43888
+
+  kafka1:
+    image: confluentinc/cp-kafka:6.0.0
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    networks:
+      - nuvla-backend
+    volumes:
+      - streams-kafka1:/var/lib/kafka/data
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-streams
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182,zookeeper3:2183'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://kafka1:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: kafka1
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+
+  kafka2:
+    image: confluentinc/cp-kafka:6.0.0
+    ports:
+      - "9093:9093"
+      - "9102:9102"
+    networks:
+      - nuvla-backend
+    volumes:
+      - streams-kafka2:/var/lib/kafka/data
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-streams
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182,zookeeper3:2183'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:29093,PLAINTEXT_HOST://kafka2:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9102
+      KAFKA_JMX_HOSTNAME: kafka2
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+
+  kafka3:
+    image: confluentinc/cp-kafka:6.0.0
+    ports:
+      - "9094:9094"
+      - "9103:9103"
+    networks:
+      - nuvla-backend
+    volumes:
+      - streams-kafka3:/var/lib/kafka/data
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == frontend
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2182,zookeeper3:2183'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:29094,PLAINTEXT_HOST://kafka3:9094
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9103
+      KAFKA_JMX_HOSTNAME: kafka3
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:6.0.0
+    ports:
+      - "8088:8088"
+    networks:
+      - nuvla-backend
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == worker-streams
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: "kafka1:29092"
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      KSQL_KSQL_CONNECT_URL: "http://connect:8083"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'

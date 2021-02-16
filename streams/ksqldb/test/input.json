@@ -1,0 +1,42 @@
+{
+  "inputs": [
+    {
+      "topic": "notification-method",
+      "key": "notification-method/01",
+      "value": {
+        "id": "notification-method/01",
+        "method": "slack",
+        "address": "https://slack.com/url?token=abc"
+      }
+    },
+    {
+      "topic": "subscription",
+      "key": "deployment/01",
+      "value": {
+        "id": "subscription/01",
+        "type": "notification",
+        "kind": "event",
+        "category": "state",
+        "state": "enabled",
+        "resource": "deployment/01",
+        "notification": "notification-method/01",
+        "acl": {
+          "owners": ["user/01"]
+        }
+      }
+    },
+    {
+      "topic": "event",
+      "key": "event/01",
+      "value": {
+        "id": "event/01",
+        "category": "state",
+        "content": {
+          "resource": {"href": "deployment/01"},
+          "state": "created"},
+        "acl": {"owners": ["user/01"]
+        }
+      }
+    }
+  ]
+}

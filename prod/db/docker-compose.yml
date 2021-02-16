@@ -24,8 +24,6 @@ services:
 
   es:
     image: nuvla/es:7.7.0.0
-    ports:
-      - "9200:9200"
     environment:
       - xpack.security.enabled=false
       - node.name=es
@@ -33,11 +31,11 @@ services:
       - cluster.initial_master_nodes=es
       - cluster.name=elasticsearch
       - bootstrap.memory_lock_true
-      - "ES_JAVA_OPTS=-Xms16g -Xmx16g"
+      - "ES_JAVA_OPTS=-Xms6g -Xmx6g"
     deploy:
       placement:
         constraints:
-          - node.hostname == worker-db
+          - node.labels.type == worker-db
       restart_policy:
         condition: on-failure
         delay: 5s    
@@ -55,14 +53,12 @@ services:
 
   zk:
     image: zookeeper:3.4
-    ports:
-      - "2181:2181"
     environment:
       - ZOO_MY_ID=3
     deploy:
       placement:
         constraints:
-          - node.hostname == worker-db
+          - node.labels.type == worker-db
       restart_policy:
         condition: on-failure
         delay: 5s    

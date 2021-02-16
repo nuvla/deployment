@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+ - Deployment of streaming platform based on Kafka and used for notifications.
+
 ### Changed
 
  - Job should use api-insecure because of http use for backend internal communication
