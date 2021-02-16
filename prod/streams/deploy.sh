@@ -17,7 +17,7 @@ fi
 # All Kafka brokers must be running before creation of streams.
 #
 
-WAIT_SEC=30
+WAIT_SEC=60
 WAITFORIT_end_ts=$(($(date +%s) + $WAIT_SEC))
 while :
 do
