@@ -321,7 +321,7 @@ services:
 
   # Notification service to Slack
   notify-slack:
-    image: nuvladev/kafka-notify:message-1.1
+    image: nuvladev/kafka-notify:master
     networks:
       - test-net
     command:
@@ -331,7 +331,7 @@ services:
 
   # Notification service to Email
   notify-email:
-    image: nuvladev/kafka-notify:message-1.1
+    image: nuvladev/kafka-notify:master
     networks:
       - test-net
     command:

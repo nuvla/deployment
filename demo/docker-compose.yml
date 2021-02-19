@@ -329,7 +329,7 @@ services:
 
   # Notification service to Slack
   notify-slack:
-    image: nuvla/kafka-notify:0.4.0
+    image: nuvla/kafka-notify:0.4.2
     networks:
       - test-net
     command:
@@ -339,7 +339,7 @@ services:
 
   # Notification service to Email
   notify-email:
-    image: nuvla/kafka-notify:0.4.0
+    image: nuvla/kafka-notify:0.4.2
     networks:
       - backend
     command:
