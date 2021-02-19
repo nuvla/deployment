@@ -68,29 +68,6 @@ CREATE STREAM NOTIFICATIONS_SLACK_S (
 
 --
 -- stream with all individual subscriptions
-CREATE TABLE SUBSCRIPTION_T
-(id VARCHAR PRIMARY KEY,
-  name VARCHAR,
-  description VARCHAR,
-  enabled BOOLEAN,
-  acl STRUCT<
-    owners ARRAY<VARCHAR>
-  >,
-  category VARCHAR,
-  "method-id" VARCHAR,
-  "resource-id" VARCHAR,
-  "resource-kind" VARCHAR,
-  criteria STRUCT<kind VARCHAR,
-                  metric VARCHAR,
-                  condition VARCHAR,
-                  "value" VARCHAR,
-                  "window" BIGINT>
-)
-WITH (KAFKA_TOPIC='subscription',
-      PARTITIONS=1,
-      REPLICAS=1,
-      VALUE_FORMAT='JSON');
-
 CREATE STREAM SUBSCRIPTION_S
 (id VARCHAR KEY,
   name VARCHAR,
