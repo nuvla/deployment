@@ -68,6 +68,29 @@ CREATE STREAM NOTIFICATIONS_SLACK_S (
 
 --
 -- stream with all individual subscriptions
+CREATE TABLE SUBSCRIPTION_T
+(id VARCHAR PRIMARY KEY,
+  name VARCHAR,
+  description VARCHAR,
+  enabled BOOLEAN,
+  acl STRUCT<
+    owners ARRAY<VARCHAR>
+  >,
+  category VARCHAR,
+  "method-id" VARCHAR,
+  "resource-id" VARCHAR,
+  "resource-kind" VARCHAR,
+  criteria STRUCT<kind VARCHAR,
+                  metric VARCHAR,
+                  condition VARCHAR,
+                  "value" VARCHAR,
+                  "window" BIGINT>
+)
+WITH (KAFKA_TOPIC='subscription',
+      PARTITIONS=1,
+      REPLICAS=1,
+      VALUE_FORMAT='JSON');
+
 CREATE STREAM SUBSCRIPTION_S
 (id VARCHAR KEY,
   name VARCHAR,
@@ -95,8 +118,8 @@ WITH (KAFKA_TOPIC='subscription',
 -- NB subscription criteria
 
 --
--- NB state metrics (expanded)
-CREATE TABLE SUBS_NB_STATE_T AS
+-- Subscription to NB offline state (expanded)
+CREATE TABLE SUBS_NB_STATE_OFF_T AS
     SELECT "resource-id",
            LATEST_BY_OFFSET(AS_VALUE(id)) AS subs_id,
            LATEST_BY_OFFSET(enabled) AS enabled,
@@ -114,6 +137,31 @@ CREATE TABLE SUBS_NB_STATE_T AS
     WHERE "resource-kind" = 'nuvlabox'
           and criteria->kind = 'boolean'
           and criteria->metric = 'state'
+          and LCASE(criteria->condition) = 'no'
+    GROUP BY "resource-id"
+    EMIT CHANGES;
+
+--
+-- Subscription to NB online state (expanded)
+CREATE TABLE SUBS_NB_STATE_ON_T AS
+    SELECT "resource-id",
+           LATEST_BY_OFFSET(AS_VALUE(id)) AS subs_id,
+           LATEST_BY_OFFSET(enabled) AS enabled,
+           LATEST_BY_OFFSET(name) AS name,
+           LATEST_BY_OFFSET(description) AS description,
+           LATEST_BY_OFFSET(acl->owners[1]) AS owner,
+           LATEST_BY_OFFSET(category) AS category,
+           LATEST_BY_OFFSET("method-id") AS "method-id",
+           LATEST_BY_OFFSET("resource-kind") AS "resource-kind",
+           LATEST_BY_OFFSET(criteria->metric) AS metric,
+           LATEST_BY_OFFSET(criteria->condition) AS condition,
+           LATEST_BY_OFFSET(criteria->"value") AS "value",
+           LATEST_BY_OFFSET(criteria->"window") AS "window"
+    FROM SUBSCRIPTION_S
+    WHERE "resource-kind" = 'nuvlabox'
+          and criteria->kind = 'boolean'
+          and criteria->metric = 'state'
+          and LCASE(criteria->condition) = 'yes'
     GROUP BY "resource-id"
     EMIT CHANGES;
 
@@ -286,7 +334,7 @@ AS SELECT
        CONCAT('') as "VALUE",
        nb_tlm.timestamp as timestamp
 FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
-JOIN SUBS_NB_STATE_T AS subs ON subs."resource-id" = nb_tlm.id
+JOIN SUBS_NB_STATE_OFF_T AS subs ON subs."resource-id" = nb_tlm.id
 JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
 WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
       AND subs.enabled = true
@@ -327,6 +375,70 @@ SELECT id,
        "VALUE",
        timestamp
 FROM NB_OFFLINE_NOTIF_S
+WHERE LCASE(method) = 'slack';
+
+---------------------------------------
+-- Notifications trigger on NB on-line
+--
+CREATE STREAM NB_ONLINE_NOTIF_S
+WITH (PARTITIONS=1, REPLICAS=1, VALUE_FORMAT='JSON')
+AS SELECT
+       subs."method-id" as id,
+       notif.method as method,
+       notif.destination as destination,
+       subs.subs_id as subs_id,
+       subs.name as subs_name,
+       subs.description as subs_description,
+       CONCAT('edge/', SPLIT(AS_VALUE(nb_tlm.id), '/')[2]) as nb_uri,
+       nb_tlm.name as nb_name,
+       nb_tlm.description as nb_description,
+       CONCAT('NB online', '') as metric,
+       subs.condition as condition,
+       CONCAT('') as condition_value,
+       CONCAT('') as "VALUE",
+       nb_tlm.timestamp as timestamp
+FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
+JOIN SUBS_NB_STATE_ON_T AS subs ON subs."resource-id" = nb_tlm.id
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
+WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
+      AND subs.enabled = true
+      AND nb_tlm.online = true
+      EMIT CHANGES;
+
+INSERT INTO NOTIFICATIONS_EMAIL_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       condition_value,
+       "VALUE",
+       timestamp
+FROM NB_ONLINE_NOTIF_S
+WHERE LCASE(method) = 'email';
+
+INSERT INTO NOTIFICATIONS_SLACK_S
+SELECT id,
+       method,
+       destination,
+       subs_id,
+       subs_name,
+       subs_description,
+       nb_uri as resource_uri,
+       nb_name as resource_name,
+       nb_description as resource_description,
+       metric,
+       condition,
+       condition_value,
+       "VALUE",
+       timestamp
+FROM NB_ONLINE_NOTIF_S
 WHERE LCASE(method) = 'slack';
 
 ----------------------------------------------------------------
