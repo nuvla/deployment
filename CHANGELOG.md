@@ -11,6 +11,7 @@
  - Job should use api-insecure because of http use for backend internal communication
  - Fix: make streams treat NB on/off-line configs separately.
  - Bump up kafka-notify versions (patch).
+ - ksqlDB queries using online-prev on NB telem for conditional alerting.
 
 ## [2.2.14] - 2021-02-09
 
