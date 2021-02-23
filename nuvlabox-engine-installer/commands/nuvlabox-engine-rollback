@@ -7,6 +7,7 @@ old_environment=${old_environment:-$2}
 compose_files=${compose_files:-$3}
 project=${project:-$4}
 quiet=${quiet:-${5:-0}}
+force_restart=${force_restart:-${6:-0}}
 
 if [[ -z ${project} ]]
 then
@@ -56,6 +57,41 @@ then
 fi
 
 docker_compose_command="docker-compose -p ${project}${docker_compose_args} up -d"
+
+
+if [[ ${force_restart} -eq 1 ]]
+then
+  nuvlabox-engine-printer "Forcing the restart of the NuvlaBox Engine components before rolling back" ${quiet} "WARNING" "no"
+  docker_compose_down_command="docker-compose --no-ansi --log-level ERROR -p ${project}${docker_compose_args} down --remove-orphans"
+
+  nuvlabox-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
+
+  if [[ ${quiet} -eq 1 ]]
+  then
+    out=$($docker_compose_down_command 2>&1)
+  else
+    out="\n$($docker_compose_down_command)"
+  fi
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlabox-engine-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
+    if [[ ${quiet} -eq 1 ]]
+    then
+      out=$($docker_compose_down_command 2>&1)
+    else
+      out="\n$($docker_compose_down_command)"
+    fi
+
+    if [[ $? -ne 0 ]]
+    then
+      nuvlabox-engine-printer "Unable to force restart during rollback. Continue anyway - ${out}" ${quiet} "ERROR" "no"
+    fi
+  fi
+fi
+
+
+
 nuvlabox-engine-printer "Executing command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
 if [[ ${quiet} -eq 1 ]]

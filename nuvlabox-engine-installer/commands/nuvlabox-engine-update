@@ -8,6 +8,7 @@ environment=${environment:-$5}
 project=${project:-$6}
 github_releases=${github_releases:-${7:-"https://github.com/nuvlabox/deployment/releases"}}
 save_dir=${save_dir:-${8:-$(pwd)}}
+force_restart=${force_restart:-${9:-0}}
 
 nuvlabox-engine-printer "Updating NuvlaBox Engine to version ${target_version}" ${quiet} "NONE" yes
 
@@ -50,6 +51,37 @@ nuvlabox-engine-printer "Preparing to update NuvlaBox Engine running as project 
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
 docker_compose_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
+
+if [[ ${force_restart} -eq 1 ]]
+then
+  nuvlabox-engine-printer "Forcing the restart of the NuvlaBox Engine components before updating" ${quiet} "WARNING" "no"
+  docker_compose_down_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
+
+  nuvlabox-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
+
+  if [[ ${quiet} -eq 1 ]]
+  then
+    out=$($docker_compose_down_command 2>&1)
+  else
+    out="\n$($docker_compose_down_command)"
+  fi
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlabox-engine-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
+    if [[ ${quiet} -eq 1 ]]
+    then
+      out=$($docker_compose_down_command 2>&1)
+    else
+      out="\n$($docker_compose_down_command)"
+    fi
+
+    if [[ $? -ne 0 ]]
+    then
+      nuvlabox-engine-printer "Unable to force restart during update. Continue anyway - ${out}" ${quiet} "ERROR" "no"
+    fi
+  fi
+fi
 
 nuvlabox-engine-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
