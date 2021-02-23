@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## [2.2.16] - 2021-02-23
+
+This release update nuvla components to following versions:
+  - [nuvla/kafka-notify:0.4.3](https://github.com/nuvla/kafka-notify/blob/main/CHANGELOG.md#043---2021-02-22)
+
 ### Changed
 
- - ksqlDB queries using online-prev on NB telem for conditional alerting.
+ - ksqlDB queries using online-prev on NB telemetry for conditional alerting.
+ - Slack alert color and email image are green for NB online.
 
 ## [2.2.15] - 2021-02-22
 
