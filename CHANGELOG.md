@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [2.2.15] - 2021-02-22
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.10.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5100---2021-02-22)
+  - [nuvla/ui:2.15.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2150---2021-02-22)
+  - [nuvla/job-engine:2.13.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2130---2021-02-22)
+
+
 ### Added
 
  - Deployment of streaming platform based on Kafka and used for notifications.
