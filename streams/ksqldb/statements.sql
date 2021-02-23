@@ -260,6 +260,7 @@ CREATE STREAM NB_TELEM_RESOURCES_S (
    id VARCHAR,
    parent VARCHAR,
    online BOOLEAN,
+   "online-prev" BOOLEAN,
    resources STRUCT<cpu STRUCT<"load" DOUBLE, "capacity" BIGINT, "topic" VARCHAR>,
                     ram STRUCT<"used" BIGINT, "capacity" BIGINT, "topic" VARCHAR>,
                     disks ARRAY<STRUCT<"used" BIGINT, "capacity" BIGINT, "device" VARCHAR>>>,
@@ -280,6 +281,7 @@ CREATE STREAM NB_TELEM_RESOURCES_REKYED_S AS
        nb.name as name,
        nb.description as description,
        online,
+       "online-prev" as online_prev,
        resources,
        "current-time" as timestamp,
        tlm.acl as acl
@@ -302,17 +304,17 @@ AS SELECT
        CONCAT('edge/', SPLIT(AS_VALUE(nb_tlm.id), '/')[2]) as nb_uri,
        nb_tlm.name as nb_name,
        nb_tlm.description as nb_description,
-       CONCAT('NB online', '') as metric,
+       'NB online' as metric,
        subs.condition as condition,
-       CONCAT('') as condition_value,
-       CONCAT('') as "VALUE",
+       '' as condition_value,
+       '' as "VALUE",
        nb_tlm.timestamp as timestamp
 FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
 JOIN SUBS_NB_STATE_OFF_T AS subs ON subs."resource-id" = nb_tlm.id
 JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
 WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
       AND subs.enabled = true
-      AND nb_tlm.online = false
+      AND (nb_tlm.online = false AND nb_tlm.online_prev = true)
       EMIT CHANGES;
 
 INSERT INTO NOTIFICATIONS_EMAIL_S
@@ -366,17 +368,17 @@ AS SELECT
        CONCAT('edge/', SPLIT(AS_VALUE(nb_tlm.id), '/')[2]) as nb_uri,
        nb_tlm.name as nb_name,
        nb_tlm.description as nb_description,
-       CONCAT('NB online', '') as metric,
+       'NB online' as metric,
        subs.condition as condition,
-       CONCAT('') as condition_value,
-       CONCAT('') as "VALUE",
+       '' as condition_value,
+       '' as "VALUE",
        nb_tlm.timestamp as timestamp
 FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
 JOIN SUBS_NB_STATE_ON_T AS subs ON subs."resource-id" = nb_tlm.id
 JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = subs."method-id"
 WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
       AND subs.enabled = true
-      AND nb_tlm.online = true
+      AND (nb_tlm.online = true AND nb_tlm.online_prev = false)
       EMIT CHANGES;
 
 INSERT INTO NOTIFICATIONS_EMAIL_S

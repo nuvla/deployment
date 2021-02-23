@@ -2,13 +2,16 @@
 
 ## Unreleased
 
+### Changed
+
+ - ksqlDB queries using online-prev on NB telem for conditional alerting.
+
 ## [2.2.15] - 2021-02-22
 
 This release update nuvla components to following versions:
   - [nuvla/api-server:5.10.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5100---2021-02-22)
   - [nuvla/ui:2.15.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2150---2021-02-22)
   - [nuvla/job-engine:2.13.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2130---2021-02-22)
-
 
 ### Added
 
@@ -19,6 +22,7 @@ This release update nuvla components to following versions:
  - Job should use api-insecure because of http use for backend internal communication
  - Fix: make streams treat NB on/off-line configs separately.
  - Bump up kafka-notify versions (patch).
+ - online-prev attribute on NB status to support conditional alerting.
 
 ## [2.2.14] - 2021-02-09
 
