@@ -633,7 +633,7 @@ def test_snyk_score(request):
     total_high_vulnerabilities = 0
 
     # count of current high vulnerabilities
-    reference_vulnerabilities = 63
+    reference_vulnerabilities = 66
     log_file = 'log.json'
     for img in images:
         os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')

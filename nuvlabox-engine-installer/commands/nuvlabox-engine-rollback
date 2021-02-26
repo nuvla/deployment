@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # the host / must be mounted into this container's $rootfs directory
-rootfs=${ROOTFS:-/rootfs}
+rootfs=${ROOTFS:-${rootfs:-/rootfs}}
 working_dir=${working_dir:-$1}
 old_environment=${old_environment:-$2}
 compose_files=${compose_files:-$3}
