@@ -6,6 +6,7 @@
                "index.prefix" : "nuvla-nuvlabox",
                "topic.prefix" : "es_",
                "incrementing.field.name" : "updated",
-               "fieldname_converter": "nop"
+               "fieldname_converter": "nop",
+               "filters.json_cast": "resources.net-stats"
     }
 }
