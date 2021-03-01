@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+ - Streams: Temporary workaround for ES to Kafka connector - do not
+   transform "resources.net-stats" due to [connector issue](https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/issues/38).
+
 ## [2.2.16] - 2021-02-23
 
 This release update nuvla components to following versions:
