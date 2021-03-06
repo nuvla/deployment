@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 ksql_host=${1:-ksqldb-server:8088}
 ksql_file=${2:-./statements.sql}
