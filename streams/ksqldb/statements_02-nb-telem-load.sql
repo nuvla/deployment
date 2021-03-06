@@ -73,7 +73,7 @@ SELECT
     nb_tlm.timestamp as timestamp,
     (nb_tlm.resources_prev->cpu->"load" > nb_tlm.resources->cpu->"load") as recovery
 FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
-JOIN SUBS_NB_LOAD_ABOVE_SLACK_T AS subs ON nb_tlm.id = subs."resource-id"
+JOIN SUBS_NB_LOAD_ABOVE_T AS subs ON nb_tlm.id = subs."resource-id"
 WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
     AND subs.method = 'slack'
     AND subs.enabled = true
