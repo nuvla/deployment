@@ -1,7 +1,7 @@
 ----------------------------------------------------------
 --
 -- Subscription to NB state change with email notification
-CREATE TABLE SUBS_NB_STATE_EMAIL_T AS
+CREATE TABLE SUBS_NB_STATE_T AS
 SELECT "resource-id",
     LATEST_BY_OFFSET(notif.method) as method,
     LATEST_BY_OFFSET(notif.destination) as destination,
@@ -20,7 +20,6 @@ SELECT "resource-id",
 FROM SUBSCRIPTION_S AS subs
 JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = "method-id"
 WHERE "resource-kind" = 'nuvlabox'
-    AND notif.method = 'email'
     AND subs.criteria->kind = 'boolean'
     AND subs.criteria->metric = 'state'
 GROUP BY "resource-id"
@@ -43,42 +42,15 @@ SELECT
     '' as "VALUE",
     nb_tlm.timestamp as timestamp,
     (nb_tlm.online = true AND nb_tlm.online_prev = false) as recovery
-FROM NB_TELEM_RESOURCES_REKYED_S_1 AS nb_tlm
-JOIN SUBS_NB_STATE_EMAIL_T AS subs ON subs."resource-id" = nb_tlm.id
+FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
+JOIN SUBS_NB_STATE_T AS subs ON subs."resource-id" = nb_tlm.id
 WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
+    AND subs.method = 'email'
     AND subs.enabled = true
     AND ((nb_tlm.online = true AND nb_tlm.online_prev = false)
           OR (nb_tlm.online = false AND nb_tlm.online_prev = true))
 EMIT CHANGES;
 
-
-----------------------------------------------------------
---
--- Subscription to NB state change with slack notification
-CREATE TABLE SUBS_NB_STATE_SLACK_T AS
-SELECT "resource-id",
-    LATEST_BY_OFFSET(notif.method) as method,
-    LATEST_BY_OFFSET(notif.destination) as destination,
-    LATEST_BY_OFFSET(subs.enabled) AS enabled,
-    LATEST_BY_OFFSET(AS_VALUE(subs.id)) AS subs_id,
-    LATEST_BY_OFFSET(subs.name) AS name,
-    LATEST_BY_OFFSET(subs.description) AS description,
-    LATEST_BY_OFFSET(subs.acl->owners[1]) AS owner,
-    LATEST_BY_OFFSET(subs.category) AS category,
-    LATEST_BY_OFFSET(subs."method-id") AS "method-id",
-    LATEST_BY_OFFSET(subs."resource-kind") AS "resource-kind",
-    LATEST_BY_OFFSET(subs.criteria->metric) AS metric,
-    LATEST_BY_OFFSET(subs.criteria->condition) AS condition,
-    LATEST_BY_OFFSET(subs.criteria->"value") AS "value",
-    LATEST_BY_OFFSET(subs.criteria->"window") AS "window"
-FROM SUBSCRIPTION_S AS subs
-JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = "method-id"
-WHERE "resource-kind" = 'nuvlabox'
-    AND notif.method = 'slack'
-    AND subs.criteria->kind = 'boolean'
-    AND subs.criteria->metric = 'state'
-GROUP BY "resource-id"
-EMIT CHANGES;
 
 INSERT INTO NOTIFICATIONS_SLACK_S
 SELECT
@@ -97,9 +69,10 @@ SELECT
     '' as "VALUE",
     nb_tlm.timestamp as timestamp,
     (nb_tlm.online = true AND nb_tlm.online_prev = false) as recovery
-FROM NB_TELEM_RESOURCES_REKYED_S_1 AS nb_tlm
-JOIN SUBS_NB_STATE_SLACK_T AS subs ON subs."resource-id" = nb_tlm.id
+FROM NB_TELEM_RESOURCES_REKYED_S AS nb_tlm
+JOIN SUBS_NB_STATE_T AS subs ON subs."resource-id" = nb_tlm.id
 WHERE (ARRAY_CONTAINS(nb_tlm.acl->"owners", subs.owner) OR ARRAY_CONTAINS(nb_tlm.acl->"view-data", subs.owner))
+    AND subs.method = 'slack'
     AND subs.enabled = true
     AND ((nb_tlm.online = true AND nb_tlm.online_prev = false)
           OR (nb_tlm.online = false AND nb_tlm.online_prev = true))
