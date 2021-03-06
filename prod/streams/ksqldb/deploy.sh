@@ -20,6 +20,6 @@ cp $STATEMENTS_DIR/statements_*.sql .
 
 for sf in $STATEMENTS statements_*.sql; do
     docker run --network nuvla-backend -v $(pwd):/nuvla -w /nuvla --rm -u root \
-            --entrypoint ./ksqldb-create.sh confluentinc/cp-ksqldb-cli:6.0.0 \
+            --entrypoint ./ksqldb-create.sh confluentinc/cp-ksqldb-cli:6.1.0 \
             ksqldb-server:8088 $sf
 done
