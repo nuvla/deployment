@@ -121,7 +121,7 @@ services:
         constraints:
           - node.labels.type == worker-streams
     environment:
-      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
       KSQL_BOOTSTRAP_SERVERS: "kafka:9092"
       KSQL_HOST_NAME: ksqldb-server
       KSQL_LISTENERS: "http://0.0.0.0:8088"

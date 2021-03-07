@@ -28,7 +28,7 @@ networks:
 services:
 
   zookeeper1:
-    image: confluentinc/cp-zookeeper:6.0.0
+    image: confluentinc/cp-zookeeper:6.1.0
     networks:
       - nuvla-backend
     volumes:
@@ -45,7 +45,7 @@ services:
       ZOOKEEPER_SERVERS: 0.0.0.0:22888:23888;zookeeper2:32888:33888;zookeeper3:42888:43888
 
   zookeeper2:
-    image: confluentinc/cp-zookeeper:6.0.0
+    image: confluentinc/cp-zookeeper:6.1.0
     networks:
       - nuvla-backend
     volumes:
@@ -62,7 +62,7 @@ services:
       ZOOKEEPER_SERVERS: zookeeper1:22888:23888;0.0.0.0:32888:33888;zookeeper3:42888:43888
 
   zookeeper3:
-    image: confluentinc/cp-zookeeper:6.0.0
+    image: confluentinc/cp-zookeeper:6.1.0
     networks:
       - nuvla-backend
     volumes:
@@ -79,7 +79,7 @@ services:
       ZOOKEEPER_SERVERS: zookeeper1:22888:23888;zookeeper2:32888:33888;0.0.0.0:42888:43888
 
   kafka1:
-    image: confluentinc/cp-kafka:6.0.0
+    image: confluentinc/cp-kafka:6.1.0
     ports:
       - "9092:9092"
       - "9101:9101"
@@ -107,7 +107,7 @@ services:
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
 
   kafka2:
-    image: confluentinc/cp-kafka:6.0.0
+    image: confluentinc/cp-kafka:6.1.0
     ports:
       - "9093:9093"
       - "9102:9102"
@@ -135,7 +135,7 @@ services:
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
 
   kafka3:
-    image: confluentinc/cp-kafka:6.0.0
+    image: confluentinc/cp-kafka:6.1.0
     ports:
       - "9094:9094"
       - "9103:9103"
@@ -163,7 +163,7 @@ services:
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
 
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.0.0
+    image: confluentinc/ksqldb-server:0.15.0
     ports:
       - "8088:8088"
     networks:
@@ -173,15 +173,14 @@ services:
         constraints:
           - node.labels.type == worker-streams
     environment:
-      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
       KSQL_BOOTSTRAP_SERVERS: "kafka1:29092"
       KSQL_HOST_NAME: ksqldb-server
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
       KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
-      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
-      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       KSQL_KSQL_CONNECT_URL: "http://connect:8083"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
