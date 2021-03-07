@@ -4,6 +4,9 @@
 
  - Streams: Temporary workaround for ES to Kafka connector - do not
    transform "resources.net-stats" due to [connector issue](https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/issues/38).
+ - Streams: ksql statements explode notification methods list per notification
+   configuration at a later stage of the streaming pipeline; using the latest
+   Confluent images including ksqlDB server 0.15.0.
 
 ## [2.2.16] - 2021-02-23
 
