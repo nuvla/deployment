@@ -1,6 +1,3 @@
---
--- NB! Force PARTITIONS=3 due to https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/issues/33
-
 ----------------------------------------------------
 --
 -- notifications configuration table
@@ -17,6 +14,46 @@ WITH (KAFKA_TOPIC='notification-method',
       PARTITIONS=3,
       REPLICAS=3,
       VALUE_FORMAT='JSON');
+
+CREATE STREAM NOTIFICATIONS_S (
+    id VARCHAR KEY,
+    subs_id VARCHAR,
+    subs_name VARCHAR,
+    method_ids ARRAY<VARCHAR>,
+    subs_description VARCHAR,
+    resource_uri VARCHAR,
+    resource_name VARCHAR,
+    resource_description VARCHAR,
+    metric VARCHAR,
+    condition VARCHAR,
+    condition_value VARCHAR,
+    "VALUE" VARCHAR,
+    timestamp VARCHAR,
+    recovery BOOLEAN
+) WITH (
+    KAFKA_TOPIC='NOTIFICATIONS_S',
+    PARTITIONS=3,
+    REPLICAS=3,
+    VALUE_FORMAT = 'JSON');
+
+CREATE STREAM NOTIFICATIONS_INDIVIDUAL_S AS
+SELECT
+    id,
+    subs_id,
+    subs_name,
+    EXPLODE(method_ids) as method_id,
+    subs_description,
+    resource_uri,
+    resource_name,
+    resource_description,
+    metric,
+    condition,
+    condition_value,
+    "VALUE",
+    timestamp,
+    recovery
+FROM NOTIFICATIONS_S
+EMIT CHANGES;
 
 --
 -- email notifications stream
@@ -43,6 +80,28 @@ CREATE STREAM NOTIFICATIONS_EMAIL_S (
     REPLICAS=3,
     VALUE_FORMAT = 'JSON');
 
+INSERT INTO NOTIFICATIONS_EMAIL_S
+SELECT
+     notif.id as id,
+     notif.method as method,
+     notif.destination as destination,
+     ni.subs_id,
+     ni.subs_name,
+     ni.subs_description,
+     ni.resource_uri,
+     ni.resource_name,
+     ni.resource_description,
+     ni.metric,
+     ni.condition,
+     ni.condition_value,
+     ni."VALUE",
+     ni.timestamp,
+     ni.recovery
+FROM NOTIFICATIONS_INDIVIDUAL_S AS ni
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = ni.method_id
+WHERE LCASE(notif.method) = 'email'
+EMIT CHANGES;
+
 --
 -- slack notifications stream
 -- keyed by subscription ID
@@ -68,6 +127,29 @@ CREATE STREAM NOTIFICATIONS_SLACK_S (
     REPLICAS=3,
     VALUE_FORMAT = 'JSON');
 
+
+INSERT INTO NOTIFICATIONS_SLACK_S
+SELECT
+     notif.id as id,
+     notif.method as method,
+     notif.destination as destination,
+     ni.subs_id,
+     ni.subs_name,
+     ni.subs_description,
+     ni.resource_uri,
+     ni.resource_name,
+     ni.resource_description,
+     ni.metric,
+     ni.condition,
+     ni.condition_value,
+     ni."VALUE",
+     ni.timestamp,
+     ni.recovery
+FROM NOTIFICATIONS_INDIVIDUAL_S AS ni
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = ni.method_id
+WHERE LCASE(notif.method) = 'slack'
+EMIT CHANGES;
+
 --
 -- stream with all individual subscriptions
 CREATE STREAM SUBSCRIPTION_S
@@ -79,7 +161,30 @@ CREATE STREAM SUBSCRIPTION_S
     owners ARRAY<VARCHAR>
   >,
   category VARCHAR,
-  "method-id" VARCHAR,
+  "method-ids" ARRAY<VARCHAR>,
+  "resource-id" VARCHAR,
+  "resource-kind" VARCHAR,
+  criteria STRUCT<kind VARCHAR,
+                  metric VARCHAR,
+                  condition VARCHAR,
+                  "value" VARCHAR,
+                  "window" BIGINT>
+)
+WITH (KAFKA_TOPIC='subscription',
+      PARTITIONS=3,
+      REPLICAS=3,
+      VALUE_FORMAT='JSON');
+
+CREATE TABLE SUBSCRIPTION_T
+(id VARCHAR PRIMARY KEY,
+  name VARCHAR,
+  description VARCHAR,
+  enabled BOOLEAN,
+  acl STRUCT<
+    owners ARRAY<VARCHAR>
+  >,
+  category VARCHAR,
+  "method-ids" ARRAY<VARCHAR>,
   "resource-id" VARCHAR,
   "resource-kind" VARCHAR,
   criteria STRUCT<kind VARCHAR,
