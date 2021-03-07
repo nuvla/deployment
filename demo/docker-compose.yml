@@ -329,7 +329,7 @@ services:
   notify-slack:
     image: nuvla/kafka-notify:0.4.3
     networks:
-      - test-net
+      - backend
     command:
       - slack
     environment:
