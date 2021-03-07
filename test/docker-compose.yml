@@ -218,19 +218,19 @@ services:
 
   # Zookeeper for Kafka
   kafka-zk:
-    image: confluentinc/cp-zookeeper:6.0.0
+    image: confluentinc/cp-zookeeper:6.1.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
       - test-net
     volumes:
-    - kafka-zk-data:/data
-    - kafka-zk-datalog:/datalog
+    - kafka-zk-data:/var/lib/zookeeper/data
+    - kafka-zk-datalog:/var/lib/zookeeper/log
 
   # Kafka broker with Connect.
   kafka:
-    image: confluentinc/cp-kafka:6.0.0
+    image: confluentinc/cp-kafka:6.1.0
     ports:
       - "9092:9092"
     volumes:
@@ -257,7 +257,7 @@ services:
       KAFKA_JMX_HOSTNAME: localhost
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
       ES_SOURCE_CONNECT_VER: "1.3"
-      FROM_SCRATCH: "true"
+      FROM_SCRATCH: "false"
     command:
       - bash
       - -xc
@@ -298,14 +298,14 @@ services:
 
   # ksqlDB stream processor
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.0.0
+    image: confluentinc/ksqldb-server:0.15.0
     ports:
       - "8088:8088"
     configs:
       - source: ksql.queries.file
         target: /etc/ksqldb/nuvla-statements.sql
     environment:
-      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
       KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
       KSQL_HOST_NAME: ksqldb-server
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
