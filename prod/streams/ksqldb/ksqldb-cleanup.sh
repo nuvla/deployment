@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 ksql_host=${1:-localhost:8088}
 sql=${2}

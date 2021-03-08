@@ -226,7 +226,7 @@ services:
 
   # Zookeeper for Kafka
   kafka-zk:
-    image: confluentinc/cp-zookeeper:6.0.0
+    image: confluentinc/cp-zookeeper:6.1.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -238,7 +238,7 @@ services:
 
   # Kafka broker with Connect.
   kafka:
-    image: confluentinc/cp-kafka:6.0.0
+    image: confluentinc/cp-kafka:6.1.0
     ports:
       - "9092:9092"
     volumes:
@@ -306,19 +306,17 @@ services:
 
   # ksqlDB stream processor
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:6.0.0
+    image: confluentinc/ksqldb-server:0.15.0
     ports:
       - "8088:8088"
     configs:
       - source: ksql.queries.file
         target: /etc/ksqldb/nuvla-statements.sql
     environment:
-      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_CONFIG_DIR: "/etc/ksqldb"
       KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
       KSQL_HOST_NAME: ksqldb-server
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
-      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
-      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
@@ -331,7 +329,7 @@ services:
   notify-slack:
     image: nuvla/kafka-notify:0.4.3
     networks:
-      - test-net
+      - backend
     command:
       - slack
     environment:
