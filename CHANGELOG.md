@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## [2.2.17] - 2021-03-08
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.11.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5110---2021-03-08)
+  - [nuvla/ui:2.16.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2160---2021-03-08)
+  - [nuvla/kafka-notify:0.5.0](https://github.com/nuvla/kafka-notify/blob/main/CHANGELOG.md#050---2021-03-07)
+
+### Changed
+
  - Upgrade nuvla/es:7.7.1.0
  - Streams: Temporary workaround for ES to Kafka connector - do not
    transform "resources.net-stats" due to [connector issue](https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/issues/38).
