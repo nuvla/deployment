@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+ - Upgrade nuvla/es:7.7.1.0
  - Streams: Temporary workaround for ES to Kafka connector - do not
    transform "resources.net-stats" due to [connector issue](https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/issues/38).
  - Streams: ksql statements explode notification methods list per notification

@@ -24,7 +24,7 @@ services:
       - frontend
 
   es:
-    image: nuvla/es:7.7.0.0
+    image: nuvla/es:7.7.1.0
     environment:
       - cluster.name=elasticsearch
       - xpack.security.enabled=false
