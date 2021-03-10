@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+ - Upgrade nuvla/es:7.11.1.0
+ 
 ## [2.2.17] - 2021-03-08
 
 This release update nuvla components to following versions:
