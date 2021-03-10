@@ -23,7 +23,7 @@ services:
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
 
   es:
-    image: nuvla/es:7.7.1.0
+    image: nuvla/es:7.11.1.0
     environment:
       - xpack.security.enabled=false
       - node.name=es
