@@ -270,7 +270,6 @@ WITH (KAFKA_TOPIC='es_nuvla-nuvlabox-status',
    VALUE_FORMAT='JSON');
 
 -- re-key by parent which is NB ID
--- due to: only T-to-T join on foreign key is supported.
 CREATE STREAM NB_TELEM_RESOURCES_REKYED_S AS
 SELECT
     parent as id,
