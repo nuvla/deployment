@@ -4,6 +4,9 @@
 
 ### Changed
 
+ - Monitoring disable alertmanager in the configuration
+ - Monitoring update Prometheus image to official repo
+ - Monitoring update Graphana image to official repo
  - Upgrade nuvla/es:7.11.1.0
  
 ## [2.2.17] - 2021-03-08

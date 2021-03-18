@@ -45,7 +45,7 @@ services:
           memory: 64M
 
   grafana:
-    image: stefanprodan/swarmprom-grafana:5.3.4
+    image: grafana/grafana:7.4.3
     environment:
       - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin_admin}
@@ -172,21 +172,22 @@ services:
       - nuvla-backend
 
   prometheus:
-    image: stefanprodan/swarmprom-prometheus:v2.5.0
+    image: prom/prometheus:v2.25.2
     command:
       # see https://github.com/stefanprodan/swarmprom/issues/25#issuecomment-539104269
       - '--config.file=/etc/prometheus/prometheus_custom.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=24h'
+      - '--storage.tsdb.retention.size=5GB'
       - '--web.external-url=https://ignored.example.com/prometheus'
       - '--web.route-prefix=/prometheus'
     volumes:
       - prometheus:/prometheus
     configs:
-      - source: node_rules
-        target: /etc/prometheus/swarm_node.rules.yml
-      - source: task_rules
-        target: /etc/prometheus/swarm_task.rules.yml
+#      - source: node_rules
+#        target: /etc/prometheus/swarm_node.rules.yml
+#      - source: task_rules
+#        target: /etc/prometheus/swarm_task.rules.yml
       - source: prometheus_config
         target: /etc/prometheus/prometheus_custom.yml
     deploy:
