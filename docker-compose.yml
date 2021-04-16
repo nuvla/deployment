@@ -191,7 +191,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:2.12.2
+    image: nuvla/job-lite:2.14.2
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
