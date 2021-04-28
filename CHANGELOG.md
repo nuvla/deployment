@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [2.2.18] - 2021-04-28
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.12.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5120---2021-04-09)
+  - [nuvla/ui:2.17.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2170---2021-04-09)
+  - [nuvla/job-engine:2.14.1](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2141---2021-04-09)
+
 ### Changed
 
  - Monitoring disable alertmanager in the configuration
