@@ -191,6 +191,17 @@ services:
     networks:
       - backend
 
+  jobd-nuvlabox-cluster-cleanup:
+    image: nuvla/job:2.14.1
+    entrypoint: /app/job_distributor_nuvlabox_cluster_cleanup.py
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - backend
+
   jobd-vulnerabilities-database:
     image: nuvla/job:2.14.1
     entrypoint: /app/job_distributor_vulnerabilities_database.py
