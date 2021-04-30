@@ -58,7 +58,7 @@ services:
       - backend
 
   api:
-    image: nuvla/api:5.12.1
+    image: nuvla/api:5.12.2
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
