@@ -81,7 +81,7 @@ def test_zero_nuvlaboxes():
 
 
 def get_nuvlabox_version():
-    major = 1
+    major = 2
     for tag in repo.tags:
         major = int(tag.name.split('.')[0]) if int(tag.name.split('.')[0]) > major else major
 
@@ -288,7 +288,7 @@ def test_nuvlabox_engine_local_agent_api(request):
     logging.info(f'Agent API ({agent_api}) for peripheral management is up and running')
 
 
-def test_nuvlabox_engine_local_management_api(request):
+def test_nuvlabox_engine_local_compute_api(request):
     isg_id = request.config.cache.get('nuvlabox_id_local_isg', '')
 
     infra_service_group = api.get(isg_id)
@@ -311,38 +311,6 @@ def test_nuvlabox_engine_local_management_api(request):
     key.write(local_nb_credential.data['resources'][0]['key'].encode())
     key.flush()
 
-    management_api = 'https://localhost:5001/api'
-    r = requests.get(management_api, verify=False, cert=(cert.name, key.name))
-
-    assert r.status_code == 200, f'NuvlaBox management API {management_api} is not working'
-    assert 'nuvlabox-api-endpoints' in r.json(), f'NuvlaBox management API {management_api} did not return JSON'
-    logging.info(f'Management API ({management_api}) is up, running and secured')
-
-    # won't do the test on add/revoke-ssh-key because it is a sensitive action
-    # let's not compromise the test environment
-    # let's not compromise the test environment
-
-    peripheral_id = request.config.cache.get('peripheral_id', '')
-    assert peripheral_id != '', 'PyTest cache is not working'
-
-    r = requests.post(management_api + '/data-source-mjpg/enable',
-                      verify=False,
-                      cert=(cert.name, key.name),
-                      json={'id': peripheral_id, 'video-device': '/dev/null'})
-    assert r.status_code == 200, f'NuvlaBox management API {management_api} failed to start mjgp streamer: {r.text}'
-
-    r = requests.post(management_api + '/data-source-mjpg/disable',
-                      verify=False,
-                      cert=(cert.name, key.name),
-                      json={'id': peripheral_id})
-    atexit.register(cleaner.delete_zombie_mjpg_streamer, peripheral_id)
-    assert r.status_code == 200, f'NuvlaBox management API {management_api} failed to stop mjgp streamer: {r.text}'
-    atexit.unregister(cleaner.delete_zombie_mjpg_streamer)
-
-    logging.info(f'Management API ({management_api}) succeeded at handling Data Gateway video streaming requests')
-
-
-def test_nuvlabox_engine_local_compute_api(request):
     compute_api = 'https://localhost:5000/'
 
     r = requests.get(compute_api + 'containers/json', verify=False, cert=(cert.name, key.name))
@@ -354,9 +322,15 @@ def test_nuvlabox_engine_local_compute_api(request):
 
 
 def test_nuvlabox_engine_local_datagateway():
-    # TODO: first, check if shared network exists
-
     nuvlabox_network = 'nuvlabox-shared-network'
+
+    docker_net = None
+    try:
+        docker_net = docker_client.networks.get(nuvlabox_network)
+    except docker.errors.NotFound:
+        logging.warning(f'NuvlaBox network {nuvlabox_network} not found')
+
+    assert nuvlabox_network == docker_net.name, f'Network {nuvlabox_network} does not exist'
 
     check_dg = docker_client.containers.run('alpine',
                                             command='sh -c "ping -c 1 data-gateway 2>&1 >/dev/null && echo OK"',
@@ -367,7 +341,7 @@ def test_nuvlabox_engine_local_datagateway():
 
     logging.info(f'NuvlaBox shared network ({nuvlabox_network}) is functional')
 
-    cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h datagateway -t nuvlabox-status -C 1"'
+    cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlabox-status -C 1"'
     check_mqtt = docker_client.containers.run('alpine',
                                               command=cmd,
                                               network=nuvlabox_network,
@@ -465,7 +439,7 @@ def test_snyk_score(request):
     total_high_vulnerabilities = 0
 
     # count of current high vulnerabilities
-    reference_vulnerabilities = 66
+    reference_vulnerabilities = 58
     log_file = 'log.json'
     for img in images:
         os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')
@@ -477,5 +451,5 @@ def test_snyk_score(request):
     assert total_high_vulnerabilities <= reference_vulnerabilities, \
         f'Snyk scan detected more high vulnerabilities ({total_high_vulnerabilities}) ' \
             f'than expected ({reference_vulnerabilities})'
-    logging.info(f'Snyk: number of high vulnerabilities found ({total_high_vulnerabilities}) is not higher'
+    logging.info(f'Snyk: number of high vulnerabilities found ({total_high_vulnerabilities}) is not higher '
                  f'than previous tests ({reference_vulnerabilities})')
