@@ -6,11 +6,11 @@ DOCKER_IMAGE=installer
 # default env vars in GH actions
 GIT_BRANCH=$(echo ${GITHUB_REF} | awk -F'/' '{print $(NF)}' | sed -e 's/[^a-z0-9\._-]/-/g')
 
-if [[ "${GIT_BRANCH}" != "master" ]] || [[ "${GIT_BRANCH}" != *"."*"."* ]]
+if [[ "${GIT_BRANCH}" == "master" ]] || [[ "${GIT_BRANCH}" == *"."*"."* ]]
 then
-  DOCKER_ORG=nuvladev
-else
   DOCKER_ORG=nuvlabox
+else
+  DOCKER_ORG=nuvladev
 fi
 
 MANIFEST=${DOCKER_ORG}/${DOCKER_IMAGE}:${GIT_BRANCH}
