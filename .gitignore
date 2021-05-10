@@ -19,7 +19,6 @@ logs/
 test/.pytest_cache
 test/__pycache__
 docker-compose.test.yml
-.docker-compose.test.yml
 
 pom.xml.next
 pom.xml.releaseBackup

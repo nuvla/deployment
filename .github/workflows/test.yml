@@ -36,7 +36,7 @@ jobs:
           cd test
           pip install -r requirements.txt
           docker swarm init
-          python -m pytest --remote --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
+          python -m pytest --cis -vv -x --html=nuvlabox.e2e_pytest.output.html --self-contained-html
 
       - if: always()
         name: Keep test results

@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+import docker
+import argparse
+import sys
+import socket
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--force-new-cluster", action="store_true")
+parser.add_argument("--leave", action="store_true")
+parser.add_argument("--join-address", action="store", dest="join_address")
+parser.add_argument("--join-worker", action="store", dest="join_worker")
+parser.add_argument("--join-manager", action="store", dest="join_manager")
+
+args = parser.parse_args()
+
+docker_client = docker.from_env()
+
+node_mode = None
+if not docker_client.info()['Swarm'].get('NodeID') and docker_client.info()['Swarm'].get('LocalNodeState') == 'inactive':
+  # then this is not running in swarm mode
+  node_mode = 'standalone'
+else:
+  # in a swarm, but as a worker or a manager?
+  if docker_client.info()['Swarm'].get('ControlAvailable'):
+    node_mode = 'manager'
+  else:
+    node_mode = 'worker'
+
+
+def leave():
+  if node_mode in ['worker', 'manager']:
+    docker_client.swarm.leave(force=True)
+  else:
+    return
+
+
+def force_new_cluster():
+  if node_mode == 'standalone':
+    # just need to start the cluster
+    docker_client.swarm.init()
+  elif node_mode == 'worker':
+    # leave and start new cluster
+    leave()
+    docker_client.swarm.init()
+  else:
+    docker_client.swarm.init(force_new_cluster=True)
+
+
+def join(token: str, addr: str):
+  if node_mode in ['worker', 'manager']:
+    leave()
+
+  try:
+    docker_client.swarm.join([addr], token)
+  except Exception as e:
+    sys.exit(f'Unable to join new cluster: {str(e)}')
+
+
+if args.force_new_cluster:
+  force_new_cluster()
+else:
+  if args.leave:
+    leave()
+  else:
+    if args.join_address:
+      if not args.join_worker and not args.join_manager:
+        raise Exception('Join token is missing!')
+      else:
+        try:
+          addr = args.join_address.split(':')
+          ip_addr = addr[0] if len(addr) == 1 else ':'.join(addr[:-1])
+          reach_check = socket.gethostbyaddr(ip_addr)
+        except socket.herror:
+          raise Exception(f'Join address {args.join_address} is not reachable. Ensure this NuvlaBox can reach the appointed manager')
+
+        token = args.join_worker if args.join_worker else args.join_manager
+        join(token, args.join_address)
+    else:
+      raise Exception('Join operations need an address!')

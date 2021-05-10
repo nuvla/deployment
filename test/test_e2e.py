@@ -72,21 +72,12 @@ def test_nuvla_login():
     assert api.is_authenticated(), "The provided Nuvla API key credential is not valid"
 
 
-def test_zero_nuvlaboxes(remote):
+def test_zero_nuvlaboxes():
     logging.info('We shall not run this test if there are leftover NuvlaBox resources in Nuvla...')
     existing_nuvlaboxes = api.get('nuvlabox',
                                   filter='description^="NuvlaBox for E2E testing - commit" and state="COMMISSIONED"')
     # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
     assert existing_nuvlaboxes.data.get('count', 0) == 0, 'There are leftovers from previous tests'
-
-    if remote:
-        dep_filter = f'module/id="{install_module_id}" and state!="STOPPED"'
-        existing_nuvlabox_deployments = api.get('deployment', filter=dep_filter)
-
-        # if there are active NB deployments then it means a previous test run left uncleaned resources
-        # This must be fixed manually
-        assert existing_nuvlabox_deployments.data.get('count', 0) == 0, \
-            f'There are {existing_nuvlabox_deployments.data.get("count")} leftover deployments from previous tests'
 
 
 def get_nuvlabox_version():
@@ -113,19 +104,7 @@ def create_nuvlabox_body(vpn_server_id, local_nuvlabox, body=None):
     return body
 
 
-def test_create_new_nuvlaboxes(request, remote, vpnserver):
-    if remote:
-        new_nb = api.add('nuvlabox', data=create_nuvlabox_body(vpnserver, False))
-        nuvlabox_id = new_nb.data.get('resource-id')
-
-        assert nuvlabox_id is not None, f'Failed to create NuvlaBox resource in {api.endpoint}'
-        assert new_nb.data.get('status', -1) == 201, f'Failed to create NuvlaBox resource in {api.endpoint}'
-
-        logging.info(f'Created new NuvlaBox (remote) with UUID {nuvlabox_id}')
-        request.config.cache.set('nuvlabox_id_remote', nuvlabox_id)
-
-        atexit.register(cleaner.delete_nuvlabox, nuvlabox_id)
-
+def test_create_new_nuvlaboxes(request, vpnserver):
     new_nb = api.add('nuvlabox', data=create_nuvlabox_body(vpnserver, True))
     nuvlabox_id = new_nb.data.get('resource-id')
 
@@ -138,51 +117,7 @@ def test_create_new_nuvlaboxes(request, remote, vpnserver):
     atexit.register(cleaner.delete_nuvlabox, nuvlabox_id)
 
 
-def test_deploy_nuvlaboxes(request, remote):
-    # This app is in Nuvla.io and has been created by dev@sixsq.com, as group/sixsq-devs
-    if remote:
-        # deploy NB via Nuvla.io
-        logging.info(f'Deploying NuvlaBox Engine remotely via {api.endpoint}')
-        # find module
-        nuvlabox_id_remote = request.config.cache.get('nuvlabox_id_remote', '')
-        assert nuvlabox_id_remote != '', 'PyTest cache is not working'
-        nuvlabox_engine_app = api.get(install_module_id)
-
-        assert nuvlabox_engine_app.id == install_module_id, f'Sanity check for Nuvla app ID {install_module_id} failed'
-
-        create_deployment_body = {
-            "module": {
-                "href": install_module_id
-            }
-        }
-
-        # create app deployment
-        create_deployment = api.add('deployment', data=create_deployment_body)
-        assert create_deployment.data.get('status', -1) == 201, f'NuvlaBox deployment failed: {create_deployment.data}'
-
-        deployment_id = create_deployment.data.get('resource-id')
-        request.config.cache.set('deployment_id', deployment_id)
-        atexit.register(cleaner.delete_install_deployment, deployment_id)
-
-        deployment = api.get(deployment_id)
-        deployment.data['module']['content']['environmental-variables'][0].update({"value": nuvlabox_id_remote})
-
-        deployment.data['parent'] = credential_id
-
-        # add credential to deployment
-        install_deployment_edited = api.edit(deployment_id, data=deployment.data)
-        assert install_deployment_edited.data.get('parent') == credential_id, \
-            f'Failed to add {credential_id} to {deployment_id}'
-        nb_uuid_env_var = install_deployment_edited.data['module']['content']['environmental-variables'][0]
-        assert nb_uuid_env_var['value'] == nuvlabox_id_remote, f'Failed to add env vars to {deployment_id}'
-
-        # start deployment
-        api.get(deployment_id + "/start")
-        # atexit.unregister(cleaner.delete_install_deployment)
-        atexit.register(cleaner.stop_install_deployment, deployment_id)
-
-        logging.info(f'Started remote NuvlaBox Engine from Nuvla deployment {deployment_id}')
-
+def test_deploy_nuvlaboxes(request):
     nuvlabox_id_local = request.config.cache.get('nuvlabox_id_local', '')
     assert nuvlabox_id_local != '', 'PyTest cache is not working'
 
@@ -211,7 +146,7 @@ def test_deploy_nuvlaboxes(request, remote):
     atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id_local)
 
 
-def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinux):
+def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
     nb_containers = docker_client.containers.list(filters={'label': 'nuvlabox.component=True'}, all=True)
 
     container_names = []
@@ -246,88 +181,6 @@ def test_nuvlabox_engine_containers_stability(request, remote, vpnserver, nolinu
     logging.info('All NuvlaBox containers from local installation are stable')
     request.config.cache.set('containers', container_names)
     request.config.cache.set('images', image_names)
-
-    if remote:
-        deployment_id = request.config.cache.get('deployment_id', '')
-        nuvlabox_id = request.config.cache.get('nuvlabox_id_remote', '')
-
-        wait_for_start_job = 0
-        while True:
-            # deployment is not moving away from created...might be stuck. Gave it 2 attempts already. Aborting
-            assert wait_for_start_job < 2, f'Deployment {deployment_id} still in "created" state...might be stuck'
-
-            deployment = api.get(deployment_id)
-            current_state = deployment.data['state'].lower()
-            if current_state == "starting":
-                time.sleep(5)
-                continue
-            elif current_state == "created":
-                logging.warning(f'Remote NuvlaBox deployment {deployment_id} is still in "created" state...')
-                wait_for_start_job += 1
-                time.sleep(2)
-                continue
-            elif current_state == "started":
-                break
-            else:
-                assert current_state in ['starting', 'created', 'started'], f'Deployment {deployment_id} failed'
-
-        logging.info(f'Remote NuvlaBox started from deployment {deployment_id} is now up and running')
-
-        # wait 60 seconds for activation
-        decommission_registered = 0
-        with timeout(60):
-            while True:
-                # now check for the NuvlaBox
-                nuvlabox = api.get(nuvlabox_id)
-
-                nb_state = nuvlabox.data['state'].lower()
-                if nb_state == "commissioned":
-                    # just to be sure, give time for a 2nd telemetry cycle to arrive
-                    time.sleep(30)
-                    break
-                elif nb_state == "activated" and decommission_registered == 0:
-                    # in case the commissioning never comes
-                    logging.warning(f'NuvlaBox {nuvlabox_id} activated but still not commissioned...')
-                    atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id)
-                    decommission_registered = 1
-                else:
-                    time.sleep(3)
-
-        # In case the activation went too fast
-        if decommission_registered == 0:
-            atexit.register(cleaner.decommission_nuvlabox, nuvlabox_id)
-
-        # atexit.unregister(cleaner.delete_nuvlabox)
-
-        assert nb_state == "commissioned", f'NuvlaBox {nuvlabox_id} failed to commission'
-        logging.info(f'Remote NuvlaBox {nuvlabox_id} is now commissioned')
-
-        # check for an hearbeat
-        nuvlabox = api.get(nuvlabox_id)
-        nuvlabox_status_id = nuvlabox.data.get('nuvlabox-status')
-        assert nuvlabox_status_id is not None, f'NuvlaBox {nuvlabox_id} is commissioned but not operational'
-        request.config.cache.set('nuvlabox_status_id_remote', nuvlabox_status_id)
-
-        nuvlabox_status = api.get(nuvlabox_status_id)
-        assert nuvlabox_status.data.get('next-heartbeat') is not None, \
-            f'NuvlaBox telemetry not working for {nuvlabox_id}'
-
-        # check operational status
-        assert nuvlabox_status.data.get('status', 'OFF').lower() == "operational", \
-            f'NuvlaBox {nuvlabox_id} not operational'
-
-        # check that resource consumption is being sent
-        assert isinstance(nuvlabox_status.data.get('resources'), dict), \
-            f'NuvlaBox {nuvlabox_id} is missing the information about resource consumption'
-        assert "cpu" in nuvlabox_status.data.get('resources', {}).keys(), \
-            f'NuvlaBox {nuvlabox_id} is missing the information about CPU consumption'
-
-        # check NB API endpoint
-        nuvlabox_status = api.get(nuvlabox_status_id)
-        assert isinstance(nuvlabox_status.data.get('nuvlabox-api-endpoint'), str), \
-            f'Missing management API endpoint attribute for NuvlaBox {nuvlabox_id}'
-
-        logging.info(f'Remote NuvlaBox {nuvlabox_id} has an healthy status')
 
     nuvlabox_id = request.config.cache.get('nuvlabox_id_local', '')
     # check PULL capability
@@ -435,7 +288,7 @@ def test_nuvlabox_engine_local_agent_api(request):
     logging.info(f'Agent API ({agent_api}) for peripheral management is up and running')
 
 
-def test_nuvlabox_engine_local_management_api(request, remote):
+def test_nuvlabox_engine_local_management_api(request):
     isg_id = request.config.cache.get('nuvlabox_id_local_isg', '')
 
     infra_service_group = api.get(isg_id)
@@ -488,26 +341,6 @@ def test_nuvlabox_engine_local_management_api(request, remote):
 
     logging.info(f'Management API ({management_api}) succeeded at handling Data Gateway video streaming requests')
 
-    if remote:
-        nuvlabox_id = request.config.cache.get('nuvlabox_id_remote', '')
-
-        # check-api
-        check_api = api.get(nuvlabox_id + "/check-api")
-        assert check_api.data.get('status') == 202, f'Failed to launch NuvlaBox API check via {api.endpoint}'
-
-        job_id = check_api.data['location']
-
-        with timeout(60):
-            while True:
-                job = api.get(job_id)
-                assert job.data.get('state', '').lower() != "failed", f'Failed to check NuvlaBox API via {api.endpoint}'
-                if job.data.get('state', '') == 'SUCCESS':
-                    break
-
-                time.sleep(5)
-
-        logging.info(f'Management API ({management_api}) is up, running and secured - remote check from {api.endpoint}')
-
 
 def test_nuvlabox_engine_local_compute_api(request):
     compute_api = 'https://localhost:5000/'
@@ -521,6 +354,8 @@ def test_nuvlabox_engine_local_compute_api(request):
 
 
 def test_nuvlabox_engine_local_datagateway():
+    # TODO: first, check if shared network exists
+
     nuvlabox_network = 'nuvlabox-shared-network'
 
     check_dg = docker_client.containers.run('alpine',
@@ -565,16 +400,13 @@ def test_nuvlabox_engine_local_system_manager():
     logging.info(f'NuvlaBox internal dashboard ({system_manager_dashboard}) is up and running')
 
 
-def test_nuvlabox_engine_remote_system_manager(remote):
-    if not remote:
-        logging.info('Remote testing disabled')
-    else:
-        system_manager_dashboard = 'http://swarm.nuvla.io:3636/dashboard'
+def test_nuvlabox_engine_remote_system_manager():
+    system_manager_dashboard = 'http://swarm.nuvla.io:3636/dashboard'
 
-        with pytest.raises(requests.exceptions.ConnectionError):
-            requests.get(system_manager_dashboard)
+    with pytest.raises(requests.exceptions.ConnectionError):
+        requests.get(system_manager_dashboard)
 
-        logging.info(f'NuvlaBox internal dashboard {system_manager_dashboard} inaccessible from outside, as expected')
+    logging.info(f'NuvlaBox internal dashboard {system_manager_dashboard} inaccessible from outside, as expected')
 
 
 def test_cis_benchmark(request, cis, nolinux):

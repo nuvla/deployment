@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:2.0.0
+    image: nuvladev/system-manager:master
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
@@ -41,18 +41,18 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:2.0.0
+    image: nuvladev/agent:master
     restart: unless-stopped
     oom_kill_disable: true
     privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLABOX_ENGINE_VERSION=1.16.2
+      - NUVLABOX_ENGINE_VERSION=1.16.1
       - NUVLABOX_IMMUTABLE_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
-      - HOST_HOME=${HOME}
-      - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+      - HOST_HOME=${HOME}
+      - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlabox/shared
@@ -111,7 +111,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:1.0.3
+    image: nuvlabox/security:1.0.2
     restart: on-failure
     network_mode: host
     environment:
@@ -123,7 +123,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:2.15.0
+    image: nuvladev/job-lite:master
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
@@ -132,7 +132,7 @@ services:
 
   on-stop:
     <<: *common
-    image: nuvlabox/on-stop:1.0.0
+    image: nuvladev/on-stop:clustering
     restart: always
     container_name: nuvlabox-on-stop
     command: pause

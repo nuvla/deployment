@@ -9,6 +9,7 @@ export rootfs=${ROOTFS:-/rootfs}
 export quiet=0
 export force_restart=1
 export github_releases="https://github.com/nuvlabox/deployment/releases"
+export cluster_args=""
 
 set -o pipefail
 
@@ -25,6 +26,7 @@ usage()
   echo -e " install\t\t\t\tInstall the NuvlaBox Engine"
   echo -e " update\t\t\t\t\tUpdate an existing NuvlaBox Engine installation"
   echo -e " uninstall\t\t\t\tShutdown (and optionally delete) an existing NuvlaBox Engine installation"
+  echo -e " cluster\t\t\t\tJoin/Leave the NuvlaBox device to/from a cluster"
   echo -e ""
   echo -e "INSTALL args:"
   echo -e " --compose-files=<list>\t\t\t(optional) Comma-separated list of compose files to deploy. If not passed, it uses all"
@@ -46,6 +48,14 @@ usage()
   echo -e ""
   echo -e "UNINSTALL args:"
   echo -e " --project=<string>\t\t\t(optional) Project name used during the first installation. Default is 'nuvlabox'"
+  echo -e " --quiet\t\t\t\t(optional) Only print final status message"
+  echo -e ""
+  echo -e "CLUSTER args:"
+  echo -e " --join-worker=<string>\t\t\tToken used to join this device as a worker. Takes precedence over --token-manager"
+  echo -e " --join-manager=<string>\t\tToken used to join this device as a manager"
+  echo -e " --join-address=<string>\t\tAdvertised manager address to join to"
+  echo -e " --leave\t\t\t\tLeave the cluster. Precedes all join- options"
+  echo -e " --force-new-cluster\t\t\tLeave the cluster and force the creation of a new one, where it shall become manager. Ignore all other options"
   echo -e " --quiet\t\t\t\t(optional) Only print final status message"
 }
 
@@ -89,6 +99,43 @@ reset_host_environment(){
       export HOSTNAME=$(echo ${env_var} | cut -d= -f 2)
     fi
   done
+}
+
+check_args_cluster()
+{
+  if [[ ! -z $cluster_force_new ]]
+  then
+    # nothing to do
+    export cluster_args="${cluster_args} --force-new-cluster"
+    continue
+  else
+    if [[ ! -z $cluster_leave ]]
+    then
+      # nothing to do
+      export cluster_args="${cluster_args} --leave"
+      continue
+    else
+      if [[ -z $join_address ]]
+      then
+        echo -e "cluster ERROR: need join address to be able to join a cluster"
+        usage
+        exit 1
+      else
+        export cluster_args="${cluster_args} --join-address ${join_address}"
+        if [[ ! -z $join_worker ]]
+        then
+          export cluster_args="${cluster_args} --join-worker ${join_worker}"
+        elif [[ ! -z $join_manager ]]
+        then
+          export cluster_args="${cluster_args} --join-worker ${join_manager}"
+        else
+          echo -e "cluster ERROR: need to have either a worker or manager token to be able to join the cluster"
+          usage
+          exit 1
+        fi
+      fi
+    fi
+  fi
 }
 
 check_args_update()
@@ -203,7 +250,7 @@ case ${command} in
       # update failed, so check the fail policy
       case $on_update_failure in
         rollback)
-          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback too previous version" 0 "WARNING" "no"
+          nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlabox-engine-printer "ROLLBACK" ${quiet} "NONE" "yes"
           output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
@@ -270,6 +317,60 @@ case ${command} in
     then
       # uninstall failed
       nuvlabox-engine-printer "NuvlaBox Engine uninstall failed" ${quiet} "ERROR" "no"
+      exit 1
+    else
+      # uninstall successful
+      # print final message and finish
+      exit 0
+    fi
+    ;;
+  cluster)
+    #------------------------------------------------------------------------#
+    # CLUSTER
+    #------------------------------------------------------------------------#
+    shift
+    while [ "$1" != "" ]; do
+      PARAM=`echo -e $1 | awk -F= '{print $1}'`
+      VALUE=`echo -e $1 | cut -d "=" -f 2-`
+      case $PARAM in
+        -h | --help)
+          usage
+          exit
+          ;;
+        --join-worker)
+          export join_worker=${VALUE}
+          ;;
+        --join-manager)
+          export join_manager=${VALUE}
+          ;;
+        --join-address)
+          export join_address=${VALUE}
+          ;;
+        --leave)
+          export cluster_leave=1
+          ;;
+        --force-new-cluster)
+          export cluster_force_new=1
+          ;;
+        --quiet)
+          export quiet=1
+          ;;
+        *)
+          echo -e "${command} ERROR: unknown option $PARAM"
+          usage
+          exit 1
+          ;;
+      esac
+      shift
+    done
+    banner_intro ${quiet}
+    check_args_cluster
+    output=$(nuvlabox-engine-cluster ${cluster_args} 2>&1 | tee /dev/fd/2)
+
+    if [[ $? -ne 0 ]]
+    then
+      # uninstall failed
+      nuvlabox-engine-printer "Clustering operation failed" ${quiet} "ERROR" "no"
       exit 1
     else
       # uninstall successful
