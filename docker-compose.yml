@@ -47,7 +47,7 @@ services:
     privileged: true
     environment:
       - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLABOX_ENGINE_VERSION=1.16.2
+      - NUVLABOX_ENGINE_VERSION=2.0.0
       - NUVLABOX_IMMUTABLE_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}

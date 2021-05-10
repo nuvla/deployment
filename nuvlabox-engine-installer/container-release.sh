@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 
-DOCKER_IMAGE=installer
+DOCKER_IMAGE=2.0.0
 
 # default env vars in GH actions
 GIT_BRANCH=$(echo ${GITHUB_REF} | awk -F'/' '{print $(NF)}' | sed -e 's/[^a-z0-9\._-]/-/g')
