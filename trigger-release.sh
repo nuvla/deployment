@@ -35,10 +35,10 @@ fi
 sed -i.old "s/NUVLABOX_ENGINE_VERSION.*/NUVLABOX_ENGINE_VERSION=$tag/g" docker-compose.yml
 rm docker-compose.yml.old
 
-sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlabox-engine-installer/container-release.sh
-rm nuvlabox-engine-installer/container-release.sh.old
+#sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlabox-engine-installer/container-release.sh
+#rm nuvlabox-engine-installer/container-release.sh.old
 
-git add docker-compose.yml nuvlabox-engine-installer/container-release.sh.old
+git add docker-compose.yml #nuvlabox-engine-installer/container-release.sh
 git commit -m "Update NuvlaBox Engine version to $tag"
 git push
 
