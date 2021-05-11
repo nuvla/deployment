@@ -51,7 +51,7 @@ jobs:
         with:
           token: ${{ secrets.SLACK_TOKEN }}
           path: test/nuvlabox.e2e_pytest.output.html
-          channel: travis-ci
+          channel: nuvla-ci
           filetype: html
           filename: nuvlabox.e2e_pytest.output.html
           title: "NuvlaBox E2E PyTest report"
