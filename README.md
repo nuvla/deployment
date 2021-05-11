@@ -1,12 +1,13 @@
 # NuvlaBox Engine
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/nuvlabox/deployment/graphs/commit-activity)
-
-
-[![CI](https://img.shields.io/travis/com/nuvlabox/deployment?style=for-the-badge&logo=travis-ci&logoColor=white)](https://travis-ci.com/nuvlabox/deployment)
 [![GitHub issues](https://img.shields.io/github/issues/nuvlabox/deployment?style=for-the-badge&logo=github&logoColor=white)](https://GitHub.com/nuvlabox/deployment/issues/)
 [![GitHub release](https://img.shields.io/github/release/nuvlabox/deployment?style=for-the-badge&logo=github&logoColor=white)](https://github.com/nuvlabox/deployment/releases/tag/1.1.0)
 [![GitHub release](https://img.shields.io/github/release-date/nuvlabox/deployment?logo=github&logoColor=white&style=for-the-badge)](https://github.com/nuvlabox/deployment/releases)
+
+![CI Build](https://github.com/nuvlabox/deployment/actions/workflows/main.yml/badge.svg)
+![CI Release](https://github.com/nuvlabox/deployment/actions/workflows/release.yml/badge.svg)
+![CI Test](https://github.com/nuvlabox/deployment/actions/workflows/test.yml/badge.svg)
 
 
 This repository container the definitions for the installation of the NuvlaBox Engine.
