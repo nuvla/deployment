@@ -216,6 +216,17 @@ services:
     networks:
       - test-net
 
+  jobd-nuvlabox-cluster-cleanup:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor_nuvlabox_cluster_cleanup.py
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
   # Zookeeper for Kafka
   kafka-zk:
     image: confluentinc/cp-zookeeper:6.1.0

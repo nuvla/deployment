@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+ - jobd-nuvlabox-cluster-cleanup
+
 ## [2.2.19] - 2021-05-06
 
 This release update nuvla components to following versions:
