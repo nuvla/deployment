@@ -225,7 +225,7 @@ services:
       - nuvla-backend
 
   jobd-nuvlabox-cluster-cleanup:
-    image: nuvla/job:2.14.1
+    image: nuvla/job:2.15.0
     entrypoint: /app/job_distributor_nuvlabox_cluster_cleanup.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
