@@ -41,7 +41,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvladev/agent:master
+    image: aaa # nuvladev/agent:master
     restart: unless-stopped
     oom_kill_disable: true
     privileged: true
