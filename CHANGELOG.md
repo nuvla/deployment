@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [2.2.20] - 2021-06-04
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.14.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5140---2021-06-04)
+  - [nuvla/ui:2.19.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2190---2021-06-04)
+  - [nuvla/job-engine:2.15.2](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2152---2021-06-01)
+
+
 ### Added
 
  - jobd-nuvlabox-cluster-cleanup
