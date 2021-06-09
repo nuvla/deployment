@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+ - Job distributor multi-threaded
+
 ## [2.2.20] - 2021-06-04
 
 This release update nuvla components to following versions:
