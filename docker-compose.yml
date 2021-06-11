@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:2.0.0
+    image: nuvlabox/system-manager:2.0.1
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
@@ -41,8 +41,8 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:2.0.1
-    restart: unless-stopped
+    image: nuvlabox/agent:2.1.0
+    restart: always
     oom_kill_disable: true
     privileged: true
     environment:
