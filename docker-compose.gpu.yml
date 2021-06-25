@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-gpu:
     <<: *common
-    image: nuvlabox/peripheral-manager-gpu:0.2.0
+    image: nuvlabox/peripheral-manager-gpu:0.2.1
     restart: on-failure
     volumes:
       - /etc/:/etcfs/:ro
