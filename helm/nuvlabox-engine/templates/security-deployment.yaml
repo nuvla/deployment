@@ -1,0 +1,45 @@
+{{- if .Values.security }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-deployment
+  namespace: {{ include "nuvlabox-engine.namespace" . }}
+  labels:
+    {{- include "nuvlabox-engine.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      component: security
+  template:
+    metadata:
+      labels:
+        component: security
+        {{- include "nuvlabox-engine.labels" . | nindent 8 }}
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
+      containers:
+        - name: security
+          image: "{{ .Values.images.security.repository }}:{{ .Values.images.security.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.security.pullPolicy }}
+          env:
+            - name: EXTERNAL_CVE_VULNERABILITY_DB
+              value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB | default (printf "https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true" | quote) }}
+            - name: EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL
+              value: {{ .Values.EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL | default 86400 | quote }}
+            - name: SECURITY_SCAN_INTERVAL
+              value: {{ .Values.SECURITY_SCAN_INTERVAL | default 1800 | quote }}
+            - name: MY_NAMESPACE
+              value: {{ include "nuvlabox-engine.namespace" . }}
+          volumeMounts:
+            - mountPath: /srv/nuvlabox/shared
+              name: nuvlabox-db
+
+      volumes:
+        - name: nuvlabox-db
+          hostPath:
+            path: /var/lib/{{ include "nuvlabox-engine.namespace" . }}
+{{- end }}

@@ -1,0 +1,9 @@
+The NuvlaBox Engine has just been installed on your Kubernetes node {{ .Values.kubernetesNode }}, on namespace {{ .Release.Namespace }}.
+
+
+1. To get the internal NuvlaBox dashboard URL, you can run:
+
+  echo $(kubectl get svc -n {{ include "nuvlabox-engine.namespace" . }} system-manager -o jsonpath="{.spec.clusterIP}")":3636"
+
+
+You can now find your NuvlaBox at {{ .Values.NUVLA_ENDPOINT | default "https://nuvla.io" }}/ui/edge/{{ .Values.NUVLABOX_UUID | replace "nuvlabox/" "" }}
