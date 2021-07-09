@@ -432,14 +432,14 @@ def test_cis_benchmark(request, cis, nolinux):
 def test_snyk_score(request):
     logging.info('Running Snyk scan with the API token provided from the environment')
     snyktoken = os.getenv('SNYK_SIXSQCI_API_TOKEN')
-    assert snyktoken is not None, f'Invalid Snyk token provided'
+    assert snyktoken is not None, 'Invalid Snyk token provided'
 
     images = request.config.cache.get('images', [])
 
     total_high_vulnerabilities = 0
 
     # count of current high vulnerabilities
-    reference_vulnerabilities = 70
+    reference_vulnerabilities = 74
     log_file = 'log.json'
     for img in images:
         os.system(f'SNYK_TOKEN={snyktoken} snyk test --docker {img} --json --severity-threshold=high > {log_file}')
