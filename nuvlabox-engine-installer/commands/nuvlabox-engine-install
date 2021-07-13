@@ -78,4 +78,4 @@ then
 fi
 
 # if we got here, then install was successful
-nuvlabox-engine-printer "NuvlaBox Engine installed to version: ${target_version}!" 0 "NONE" "no"
+nuvlabox-engine-printer "NuvlaBox Engine installed to version: ${target_version}!" 0 "" "no"

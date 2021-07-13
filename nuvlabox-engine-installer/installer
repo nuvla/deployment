@@ -6,6 +6,7 @@ on_update_failure_options="('rollback' 'ignore' 'retry')"
 
 export save_dir=$(pwd)
 export rootfs=${ROOTFS:-/rootfs}
+export rootfs_working_dir=${ROOTFS_WORKING_DIR:-/rootfs-working-dir}
 export quiet=0
 export force_restart=1
 export github_releases="https://github.com/nuvlabox/deployment/releases"
@@ -87,11 +88,19 @@ reset_host_environment(){
   # so let's try to replicate the necessary HOST environment, inside this container
 
   # env setup for setting HOME folder (for mgmt-api)
+  home_set=0
   for env_var in $(echo ${environment} | tr ',' ' ')
   do
     if [[ $(echo ${env_var} | grep "HOST_HOME=") ]]
     then
       export ${env_var}
+      export HOME=$(echo ${env_var} | cut -d= -f 2)
+      home_set=1
+    fi
+
+    if [[ $(echo ${env_var} | grep "HOST_USER=") ]]
+    then
+      export USER=$(echo ${env_var} | cut -d= -f 2)
     fi
 
     if [[ $(echo ${env_var} | grep "HOST=") ]]
@@ -99,6 +108,16 @@ reset_host_environment(){
       export HOSTNAME=$(echo ${env_var} | cut -d= -f 2)
     fi
   done
+
+  # If HOME isn't yet defined, we need to reverse engineer it (this is needed for the legacy mgmt-api)
+  if [[ $home_set -eq 0 ]]
+  then
+    infer_home=$(nuvlabox-engine-get-host-home)
+    if [[ ! -z $infer_home ]]
+    then
+      export HOME=$infer_home
+    fi
+  fi
 }
 
 check_args_cluster()
@@ -150,14 +169,22 @@ check_args_update()
 
   if [[ "${on_update_failure}" == "rollback" ]]
   then
-    old_nb_dir="${rootfs}${working_dir}"
+    export old_nb_dir="${rootfs}${working_dir}"
     ls ${old_nb_dir}/*yml 2&>1 > /dev/null
 
     if [[ $? -ne 0 ]]
     then
-      echo -e "update ERROR: cannot proceed: original compose files are not available for rollback at ${working_dir}"
-      exit 1
+      # try to find them in 2nd bind mount, if available
+      export old_nb_dir="${rootfs_working_dir}"
+      ls ${old_nb_dir}/*yml 2&>1 > /dev/null
+      if [[ $? -ne 0 ]]
+      then
+        echo -e "update ERROR: installer cannot find original compose files for rollback at ${working_dir}"
+        exit 1
+      fi
     fi
+
+    mkdir -p ${working_dir} || (echo -e "update ERROR: cannot reproduce installation dir at ${working_dir}" && exit 1)
   fi
 
   if [[ -z "$old_environment" ]]
@@ -175,6 +202,9 @@ check_args_update()
     # assume no changes to the new env
     export environment="${old_environment}"
   fi
+
+  # cleanup list of compose files to avoid duplicates and full paths
+  export compose_files=$(python -c 'import os;print(",".join(set([c.split("/")[-1] for c in os.getenv("compose_files").split(",")])))')
 
   reset_host_environment
 }
@@ -251,7 +281,7 @@ case ${command} in
       case $on_update_failure in
         rollback)
           nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback to previous version" 0 "WARNING" "no"
-          nuvlabox-engine-printer "ROLLBACK" ${quiet} "NONE" "yes"
+          nuvlabox-engine-printer "ROLLBACK" ${quiet} "" "yes"
           output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
@@ -264,7 +294,7 @@ case ${command} in
           ;;
         retry)
           nuvlabox-engine-printer "NuvlaBox Engine update failed once. Trying a second time..." ${quiet} "WARNING" "no"
-          nuvlabox-engine-printer "RETRY" ${quiet} "NONE" "yes"
+          nuvlabox-engine-printer "RETRY" ${quiet} "" "yes"
           output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then

@@ -34,4 +34,4 @@ then
 fi
 
 # if we got here, then install was successful
-nuvlabox-engine-printer "NuvlaBox Engine uninstalled successfully!" 0 "NONE" "no"
+nuvlabox-engine-printer "NuvlaBox Engine uninstalled successfully!" 0 "" "no"

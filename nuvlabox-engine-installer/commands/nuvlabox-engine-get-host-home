@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import docker
+
+dc = docker.from_env()
+
+try:
+    mgmt_api = dc.containers.list(filters={'label': 'com.docker.compose.service=management-api'})[0]
+
+    binds = mgmt_api.attrs['HostConfig']['Binds']
+    for bind in binds:
+        if "/.ssh" in bind:
+            print(bind.split('.ssh')[0])
+            break
+except:
+    print('')

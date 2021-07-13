@@ -15,27 +15,32 @@ then
   message=" == ${message} == "
 fi
 
-default_color=$'\e[1;39m'
-case ${level} in
-    INFO)
-      color=$'\e[1;36m';
-      ;;
-    WARNING)
-      color=$'\e[1;33m';
-      ;;
-    DEBUG)
-      color=$'\e[1;37m';
-      ;;
-    ERROR)
-      color=$'\e[1;31m';
-      ;;
-    *)
-      color=${default_color};
-      unset level
-      ;;
-esac
+#default_color=$'\e[1;39m'
+#case ${level} in
+#    INFO)
+#      color=$'\e[1;36m';
+#      ;;
+#    WARNING)
+#      color=$'\e[1;33m';
+#      ;;
+#    DEBUG)
+#      color=$'\e[1;37m';
+#      ;;
+#    ERROR)
+#      color=$'\e[1;31m';
+#      ;;
+#    *)
+#      color=${default_color};
+#      unset level
+#      ;;
+#esac
 
-color_end=$'\e[0m'
+#color_end=$'\e[0m'
+
+#if [[ "${level}" == "NONE" ]]
+#then
+#  unset level
+#fi
 
 if [[ ! -z ${level} ]]
 then
@@ -46,5 +51,5 @@ if [[ ${to_file} -eq 1 ]]
 then
   echo -e "${level}${message}" >> "${WORKDIR}/output.log"
 else
-  echo -e "${color}${level}${default_color}${message}${color_end}"
+  echo -e "${level}${message}"
 fi

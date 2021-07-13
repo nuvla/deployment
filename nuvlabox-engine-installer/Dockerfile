@@ -8,8 +8,11 @@ COPY . .
 
 COPY target/ .
 
+RUN apk add jq
+
 ENV PATH="$PATH:${workdir}/common:${workdir}/commands" \
     WORKDIR="${workdir}" \
-    ROOTFS="/rootfs"
+    ROOTFS="/rootfs"  \
+    ROOTFS_WORKING_DIR="/rootfs-working-dir"
 
 ENTRYPOINT ["./installer"]

@@ -7,8 +7,8 @@ on_update_failure=${on_update_failure:-$4}
 environment=${environment:-$5}
 project=${project:-$6}
 github_releases=${github_releases:-${7:-"https://github.com/nuvlabox/deployment/releases"}}
-save_dir=${save_dir:-${8:-$(pwd)}}
-force_restart=${force_restart:-${9:-0}}
+force_restart=${force_restart:-${8:-0}}
+working_dir=${working_dir:-$9}
 
 nuvlabox-engine-printer "Updating NuvlaBox Engine to version ${target_version}" ${quiet} "NONE" yes
 
@@ -20,7 +20,7 @@ fi
 
 if [[ ! -z "${environment}" ]]
 then
-  env_file="${save_dir}/.env"
+  env_file="${working_dir}/.env"
   nuvlabox-engine-printer "Setting environment for update, at ${env_file}" ${quiet} "INFO" "no"
 
   env_lines=$(echo ${environment} | sed 's/,/\\n/g')
@@ -39,7 +39,7 @@ source_code_url="${github_releases}/download/${target_version}"
 
 nuvlabox-engine-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
 
-download=$(nuvlabox-engine-download-configs "${compose_files}" "${save_dir}" "${source_code_url}" 2>&1)
+download=$(nuvlabox-engine-download-configs "${compose_files}" "${working_dir}" "${source_code_url}" 2>&1)
 
 if [[ $? -ne 0 ]]
 then
@@ -51,6 +51,8 @@ nuvlabox-engine-printer "Preparing to update NuvlaBox Engine running as project 
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
 docker_compose_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
+
+cd ${working_dir}
 
 if [[ ${force_restart} -eq 1 ]]
 then
@@ -114,4 +116,4 @@ then
 fi
 
 # if we got here, then update was successful
-nuvlabox-engine-printer "NuvlaBox Engine update to version ${target_version} was successful!" 0 "NONE" "no"
+nuvlabox-engine-printer "NuvlaBox Engine update to version ${target_version} was successful!" 0 "" "no"

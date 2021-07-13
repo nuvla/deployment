@@ -1,13 +1,14 @@
 #!/bin/sh
 
 # the host / must be mounted into this container's $rootfs directory
-rootfs=${ROOTFS:-${rootfs:-/rootfs}}
+rootfs=${rootfs:-/rootfs}
 working_dir=${working_dir:-$1}
 old_environment=${old_environment:-$2}
 compose_files=${compose_files:-$3}
 project=${project:-$4}
 quiet=${quiet:-${5:-0}}
 force_restart=${force_restart:-${6:-0}}
+old_nb_dir=${old_nb_dir:-$7}
 
 if [[ -z ${project} ]]
 then
@@ -17,12 +18,9 @@ fi
 
 nuvlabox-engine-printer "Initiating NuvlaBox Engine rollback to previous version" ${quiet} "NONE" yes
 
-rollback_dir="$(pwd)/rollback"
-mkdir -p "${rollback_dir}"
-cd "${rollback_dir}"
+cd "${working_dir}"
 
-old_nb_dir="${rootfs}${working_dir}"
-cp ${old_nb_dir}/*yml .
+cp -f ${old_nb_dir}/*yml .
 
 if [[ $? -ne 0 ]]
 then
@@ -90,8 +88,6 @@ then
   fi
 fi
 
-
-
 nuvlabox-engine-printer "Executing command: ${docker_compose_command}" ${quiet} "INFO" "no"
 
 if [[ ${quiet} -eq 1 ]]
@@ -123,4 +119,4 @@ then
 fi
 
 # if we got here, then update was successful
-nuvlabox-engine-printer "NuvlaBox Engine was rolled back successfully after a failed update" 0 "NONE" "no"
+nuvlabox-engine-printer "NuvlaBox Engine was rolled back successfully after a failed update" 0 "" "no"
