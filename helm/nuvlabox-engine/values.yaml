@@ -10,7 +10,7 @@ images:
   agent:
     repository: nuvlabox/agent
     pullPolicy: Always
-    tag: "2.1.0"
+    tag: "2.2.0"
   dataGateway:
     repository: eclipse-mosquitto
     pullPolicy: Always
@@ -22,11 +22,11 @@ images:
   kubernetesCredentialsManager:
     repository: nuvlabox/kubernetes-credentials-manager
     pullPolicy: Always
-    tag: "0.0.1"
+    tag: "1.0.0"
   security:
     repository: nuvlabox/security
     pullPolicy: Always
-    tag: "1.0.3"
+    tag: "1.1.0"
   systemManager:
     repository: nuvlabox/system-manager
     pullPolicy: Always
@@ -38,23 +38,23 @@ images:
   peripheralManagerUSB:
     repository: nuvlabox/peripheral-manager-usb
     pullPolicy: Always
-    tag: "1.4.1"
+    tag: "2.0.0"
   peripheralManagerNetwork:
     repository: nuvlabox/peripheral-manager-network
     pullPolicy: Always
-    tag: "1.0.1"
+    tag: "1.1.0"
   peripheralManagerModbus:
     repository: nuvlabox/peripheral-manager-modbus
     pullPolicy: Always
-    tag: "1.1.0"
+    tag: "1.2.0"
   peripheralManagerBluetooth:
     repository: nuvlabox/peripheral-manager-bluetooth
     pullPolicy: Always
-    tag: "1.0.0"
+    tag: "1.1.0"
   peripheralManagerGPU:
     repository: nuvlabox/peripheral-manager-gpu
     pullPolicy: Always
-    tag: "0.2.0"
+    tag: "1.0.0"
 
 nameOverride: ""
 fullnameOverride: ""
