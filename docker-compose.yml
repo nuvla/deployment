@@ -123,7 +123,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvladev/job-lite:master # nuvla/job-lite:2.15.2 -> backfix once released new version
+    image: nuvladev/job-lite:command_empty_output_fix # nuvla/job-lite:2.15.2 -> backfix once released new version
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
