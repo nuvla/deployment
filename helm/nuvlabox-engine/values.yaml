@@ -10,7 +10,7 @@ images:
   agent:
     repository: nuvlabox/agent
     pullPolicy: Always
-    tag: "2.2.0"
+    tag: "2.2.1"
   dataGateway:
     repository: eclipse-mosquitto
     pullPolicy: Always
