@@ -38,7 +38,7 @@ images:
   peripheralManagerUSB:
     repository: nuvlabox/peripheral-manager-usb
     pullPolicy: Always
-    tag: "2.0.0"
+    tag: "2.0.1"
   peripheralManagerNetwork:
     repository: nuvlabox/peripheral-manager-network
     pullPolicy: Always
