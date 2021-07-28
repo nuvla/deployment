@@ -163,8 +163,9 @@ def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
                                 f'and container state ({container.status}) for {container.name}')
                 continue
 
-        assert (container.attrs['RestartCount'] == 0 or container.attrs.get('State', {}).get('ExitCode', 0)) == 0, \
-            f'Local NuvlaBox container {container.name} is unstable: {json.dumps(container.attrs, indent=2)}'
+        assert (container.attrs['RestartCount'] == 0 or container.attrs.get('State', {}).get('ExitCode', 0) == 0), \
+            f'Local NuvlaBox container {container.name} is unstable: {json.dumps(container.attrs, indent=2)}\n\n' \
+                f'Logs: {container.logs()}'
 
         # we allow for containers to have exited, provided they have exited without an error
         # like this we cover scenarios where, for example, a peripheral manager is not supported by the testing env
