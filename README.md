@@ -62,4 +62,4 @@ In this scenario, we assume you are using Nuvla at https://nuvla.io.
 
 ## Copyright
 
-Copyright &copy; 2019, SixSq Sàrl
+Copyright &copy; 2021, SixSq SA
