@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [2.2.21] - 2021-08-04
+
+This release update nuvla components to following versions:
+  - [nuvla/api-server:5.15.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5150---2021-08-04)
+  - [nuvla/ui:2.20.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2200---2021-08-04)
+  - [nuvla/job-engine:2.16.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2160---2021-08-04)
+
+
 ### Changed
 
  - Job distributor multi-threaded
