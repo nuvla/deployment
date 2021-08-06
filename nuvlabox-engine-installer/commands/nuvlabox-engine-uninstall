@@ -5,7 +5,7 @@ project=${project:-${2:-"nuvlabox"}}
 
 nuvlabox-engine-printer "Uninstalling NuvlaBox Engine - ${project} - (permanently)" ${quiet} "NONE" yes
 
-docker_compose_command="docker-compose --no-ansi --log-level ERROR -p ${project} down -v --remove-orphans"
+docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} down -v --remove-orphans"
 
 nuvlabox-engine-printer "Executing uninstall command: ${docker_compose_command}" ${quiet} "INFO" "no"
 

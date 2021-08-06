@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  stop_grace_period: 4s
+  stop_grace_period: 5s
   logging:
     options:
       max-size: "250k"
@@ -17,4 +17,5 @@ services:
     <<: *common
     image: nuvlabox/peripheral-manager-modbus:1.2.0
     restart: on-failure
-
+    depends_on:
+      - agent

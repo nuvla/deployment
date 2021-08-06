@@ -1,9 +1,11 @@
 name: "E2E NuvlaBox Testing"
 
 on:
-  push:
-    branches:
-      - master
+  workflow_run:
+    workflows: ["NuvlaBox Installer Build"]
+    branches: [master]
+    types:
+      - completed
 
 jobs:
   tester:

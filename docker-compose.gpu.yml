@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  stop_grace_period: 4s
+  stop_grace_period: 5s
   logging:
     options:
       max-size: "250k"
@@ -22,3 +22,5 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/lib/:/usr/lib/:ro
       - /dev/:/dev/:ro
+    depends_on:
+      - agent

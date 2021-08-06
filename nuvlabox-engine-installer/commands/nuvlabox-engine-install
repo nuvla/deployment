@@ -45,7 +45,7 @@ fi
 nuvlabox-engine-printer "Preparing to install NuvlaBox Engine running as project ${project}" ${quiet} "NONE" "yes"
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
-docker_compose_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} up -d"
+docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} up -d"
 
 nuvlabox-engine-printer "Executing install command: ${docker_compose_command}" ${quiet} "INFO" "no"
 

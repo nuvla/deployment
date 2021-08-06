@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  stop_grace_period: 4s
+  stop_grace_period: 5s
   logging:
     options:
       max-size: "250k"
@@ -22,3 +22,5 @@ services:
       - /dev:/dev:ro
       - /run/udev/control:/run/udev/control:ro
       - nuvlabox-db:/srv/nuvlabox/shared
+    depends_on:
+      - agent

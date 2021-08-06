@@ -11,6 +11,7 @@ export quiet=0
 export force_restart=1
 export github_releases="https://github.com/nuvlabox/deployment/releases"
 export cluster_args=""
+export hard_reset=0
 
 set -o pipefail
 
@@ -44,6 +45,7 @@ usage()
   echo -e " --on-update-failure=<string>\t\tAction be take in case the update fails ${on_update_failure_options}. Default: ${on_update_failure}"
   echo -e " --project=<string>\t\t\tProject name used during the first installation"
   echo -e " --quiet\t\t\t\t(optional) Only print final status message"
+  echo -e " --current-version=<string>\t\t(optional) NuvlaBox Engine version currently installed. Must match a release from ${github_releases}"
   echo -e " --target-version=<string>\t\tNuvlaBox Engine version to be installed. Must match a release from ${github_releases}"
   echo -e " --working-dir=<string>\t\t\tDirectory, on the host, from where the NuvlaBox Engine was installed the first time, and where the corresponding config files can be found"
   echo -e ""
@@ -93,8 +95,8 @@ reset_host_environment(){
   do
     if [[ $(echo ${env_var} | grep "HOST_HOME=") ]]
     then
-      export ${env_var}
-      export HOME=$(echo ${env_var} | cut -d= -f 2)
+      export HOST_HOME=$(echo ${env_var} | cut -d= -f 2)
+      export HOME=$HOST_HOME
       home_set=1
     fi
 
@@ -197,6 +199,18 @@ check_args_update()
     fi
   fi
 
+  if [[ -z "$current_version" ]]
+  then
+    for old_env_var in $(echo ${old_environment} | tr ',' ' ')
+    do
+      if [[ $(echo ${old_env_var} | grep "NUVLABOX_ENGINE_VERSION=") ]]
+      then
+        export current_version=$(echo ${old_env_var} | cut -d= -f 2)
+        break
+      fi
+    done
+  fi
+
   if [[ -z "$environment" ]]
   then
     # assume no changes to the new env
@@ -231,6 +245,9 @@ case ${command} in
         --compose-files)
           export compose_files=${VALUE}
           ;;
+        --current-version)
+          export current_version=${VALUE}
+          ;;
         --target-version)
           export target_version=${VALUE}
           ;;
@@ -252,10 +269,16 @@ case ${command} in
           esac
           ;;
         --new-environment)
-          export environment=${VALUE}
+          case "${VALUE}" in
+            "'"*) eval environment="${VALUE}" && export environment;;
+            *) export environment=${VALUE};;
+          esac
           ;;
         --current-environment)
-          export old_environment=${VALUE}
+          case "${VALUE}" in
+            "'"*) eval old_environment="${VALUE}" && export old_environment;;
+            *) export old_environment=${VALUE};;
+          esac
           ;;
         --project)
           export project=${VALUE}
@@ -273,7 +296,7 @@ case ${command} in
     done
     check_args_update
     banner_intro ${quiet}
-    output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
+    output=`asdqw` #$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]
     then
@@ -282,15 +305,25 @@ case ${command} in
         rollback)
           nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlabox-engine-printer "ROLLBACK" ${quiet} "" "yes"
-          output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
+          output=`qewqwe` #$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
-            exit 1
-          else
-            # rollback successful
-            nuvlabox-engine-printer "NuvlaBox Engine update failed. But was able to rollback to previous version" ${quiet} "WARNING" "no"
-            exit 0
+            if [[ ! -z "${NUVLABOX_API_KEY}" ]] && [[ ! -z "${NUVLABOX_API_SECRET}" ]]
+            then
+              nuvlabox-engine-printer "NuvlaBox Engine rollback was unsuccessful. Forcing recovery and update through full re-installation" 0 "WARNING" "no"
+              export hard_reset=1
+              output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
+              if [[ $? -ne 0 ]]
+              then
+                exit 1
+              fi
+            else
+              exit 1
+            fi
           fi
+          # rollback successful
+          nuvlabox-engine-printer "NuvlaBox Engine update failed. But was able to rollback to previous version" ${quiet} "WARNING" "no"
+          exit 0
           ;;
         retry)
           nuvlabox-engine-printer "NuvlaBox Engine update failed once. Trying a second time..." ${quiet} "WARNING" "no"
@@ -425,7 +458,10 @@ case ${command} in
           export compose_files=${VALUE}
           ;;
         --environment)
-          export environment=${VALUE}
+          case "${VALUE}" in
+            "'"*) eval environment="${VALUE}" && export environment;;
+            *) export environment=${VALUE};;
+          esac
           ;;
         --quiet)
           export quiet=1

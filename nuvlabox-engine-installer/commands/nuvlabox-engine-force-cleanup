@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+
+import docker
+import sys
+import time
+import inspect
+
+
+func = inspect.currentframe().f_code
+project_name = sys.argv[1]
+working_dir = sys.argv[2]
+delete_volume = int(sys.argv[3])
+
+
+print(f"Args: "
+      f"ProjectName={project_name}, WorkingDir={working_dir}, DeleteVolume={True if delete_volume == 1 else False}")
+try:
+    dc = docker.from_env()
+
+    # Start by shutting down the System Manager cause it may revive others by itself
+    sm = dc.containers.list(all=True,
+                            filters={'label': ['com.docker.compose.project=nuvlabox',
+                                               f'com.docker.compose.project.working_dir={working_dir}',
+                                               'nuvlabox.component=True',
+                                               'nuvlabox.deployment=production',
+                                               'com.docker.compose.service=system-manager']})
+
+    for container in sm:
+        try:
+            container.remove(force=True)
+        except docker.errors.NotFound:
+            # good, it has already been removed
+            pass
+
+    # Then start by the core containers
+    all = dc.containers.list(all=True,
+                             filters={'label': ['com.docker.compose.project=nuvlabox',
+                                                f'com.docker.compose.project.working_dir={working_dir}',
+                                                'nuvlabox.component=True',
+                                                'nuvlabox.deployment=production']})
+
+    peripheral_managers = dc.containers.list(all=True,
+                                             filters={'label': ['com.docker.compose.project=nuvlabox',
+                                                                f'com.docker.compose.project.working_dir={working_dir}',
+                                                                'nuvlabox.component=True',
+                                                                'nuvlabox.deployment=production',
+                                                                'nuvlabox.peripheral.component=True']})
+
+    core = list(set(all) - set(peripheral_managers))
+
+    for core_container in core:
+        try:
+            core_container.remove(force=True)
+        except docker.errors.NotFound:
+            # good, it has already been removed
+            pass
+
+    for pm_container in peripheral_managers:
+        try:
+            pm_container.remove(force=True)
+        except docker.errors.NotFound:
+            # good, it has already been removed
+            pass
+
+    # Now the networks
+    networks = dc.networks.list(filters={'label': ['com.docker.compose.project=nuvlabox']})
+    for net in networks:
+        try:
+            net.remove()
+        except docker.errors.APIError as e:
+            if "403" in str(e):
+                # there are still containers connected to it
+                print(f'Cannot delete network {net.name} because the following containers are still using it: ')
+                for container, values in dc.api.inspect_network(net.id).get('Containers', {}).items():
+                    # dc.api.remove_container(container, force=True)
+                    print(values.get('Name', container))
+
+                # net.remove()
+        except docker.errors.NotFound:
+            # good, it has already been removed
+            pass
+
+    # Now, finally the volume
+    if delete_volume == 1:
+        volumes = dc.volumes.list(filters={'label': ['com.docker.compose.project=nuvlabox',
+                                                     'nuvlabox.deployment=production',
+                                                     'nuvlabox.volume=True']})
+
+        for vol in volumes:
+            try:
+                vol.remove(force=True)
+            except docker.errors.APIError as e:
+                if "409" in str(e):
+                    print(f'Cannot delete volume {vol.name} because the following containers are still using it: ')
+                    for container in dc.containers.list(filters={'volume': vol.name}):
+                        print(container.name)
+            except docker.errors.NotFound:
+                # good, it has already been removed
+                pass
+except Exception as e:
+    # making sure that only the error message is printed and not the whole exception
+    sys.exit(f'Critical error in {func.co_filename}: {str(e)}')

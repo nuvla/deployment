@@ -9,6 +9,8 @@ project=${project:-$6}
 github_releases=${github_releases:-${7:-"https://github.com/nuvlabox/deployment/releases"}}
 force_restart=${force_restart:-${8:-0}}
 working_dir=${working_dir:-$9}
+current_version=${current_version:-${10}}
+hard_reset=${hard_reset:-0}
 
 nuvlabox-engine-printer "Updating NuvlaBox Engine to version ${target_version}" ${quiet} "NONE" yes
 
@@ -50,15 +52,42 @@ fi
 nuvlabox-engine-printer "Preparing to update NuvlaBox Engine running as project ${project}" ${quiet} "NONE" "yes"
 
 docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
-docker_compose_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
-
-cd ${working_dir}
 
 if [[ ${force_restart} -eq 1 ]]
 then
-  nuvlabox-engine-printer "Forcing the restart of the NuvlaBox Engine components before updating" ${quiet} "WARNING" "no"
-  docker_compose_down_command="docker-compose --no-ansi --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
+  # when doing a "down" it is better to use the original compose files
+  if [[ ! -z ${current_version} ]]
+  then
+    down_dir="/tmp/down"
+    mkdir -p ${down_dir}
+    source_code_url_current="${github_releases}/download/${current_version}"
 
+    nuvlabox-engine-printer "Downloading current config files ${compose_files} from ${source_code_url} for shutdown" ${quiet} "INFO" "no"
+
+    download=$(nuvlabox-engine-download-configs "${compose_files}" "${down_dir}" "${source_code_url_current}" 2>&1)
+
+    if [[ $? -ne 0 ]]
+    then
+      nuvlabox-engine-printer "Failed to retrieve current files ${compose_files} for shutdown: ${download}" 0 "ERROR" "no"
+      cd ${working_dir}
+    else
+      cd ${down_dir}
+    fi
+  fi
+
+  docker_compose_down_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
+
+  if [[ ${hard_reset} -eq 0 ]]
+  then
+    nuvlabox-engine-printer "Forcing the restart of the NuvlaBox Engine components before updating" ${quiet} "WARNING" "no"
+    delete_volume=0
+  else
+    nuvlabox-engine-printer "Forcing the hard reset (full re-installation) of the NuvlaBox Engine components before updating" ${quiet} "WARNING" "no"
+    docker_compose_down_command="${docker_compose_down_command} -v"
+    delete_volume=1
+  fi
+
+  echo ${hard_reset} ${docker_compose_down_command}
   nuvlabox-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
 
   if [[ ${quiet} -eq 1 ]]
@@ -73,9 +102,9 @@ then
     nuvlabox-engine-printer "Force restart failed (trying again): ${out}" ${quiet} "WARNING" "no"
     if [[ ${quiet} -eq 1 ]]
     then
-      out=$($docker_compose_down_command 2>&1)
+      out=$(nuvlabox-engine-force-cleanup "${project}" "${working_dir}" $delete_volume 2>&1)
     else
-      out="\n$($docker_compose_down_command)"
+      out="\n$(nuvlabox-engine-force-cleanup "${project}" "${working_dir}" $delete_volume)"
     fi
 
     if [[ $? -ne 0 ]]
@@ -84,6 +113,10 @@ then
     fi
   fi
 fi
+
+docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} up --remove-orphans -d"
+
+cd ${working_dir}
 
 nuvlabox-engine-printer "Executing update command: ${docker_compose_command}" ${quiet} "INFO" "no"
 

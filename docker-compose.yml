@@ -1,7 +1,7 @@
 version: "3.7"
 
 x-common: &common
-  stop_grace_period: 30s
+  stop_grace_period: 5s
   logging:
     options:
       max-size: "250k"
@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:2.1.0
+    image: nuvlabox/system-manager:2.1.1
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
@@ -41,11 +41,13 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:2.2.2
+    image: nuvlabox/agent:2.3.1
     restart: always
     oom_kill_disable: true
     privileged: true
     environment:
+      - NUVLABOX_API_KEY=${NUVLABOX_API_KEY}
+      - NUVLABOX_API_SECRET=${NUVLABOX_API_SECRET}
       - NUVLABOX_UUID=${NUVLABOX_UUID}
       - NUVLABOX_ENGINE_VERSION=2.0.0
       - NUVLABOX_IMMUTABLE_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
@@ -66,7 +68,6 @@ services:
       retries: 4
       start_period: 10s
     depends_on:
-      - system-manager
       - compute-api
 
   compute-api:
@@ -83,8 +84,6 @@ services:
       - nuvlabox-db:/srv/nuvlabox/shared
     ports:
       - 5000:5000
-    depends_on:
-      - system-manager
     healthcheck:
       test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
       interval: 20s
@@ -120,10 +119,12 @@ services:
       - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
     volumes:
       - nuvlabox-db:/srv/nuvlabox/shared
+    depends_on:
+      - agent
 
   job-engine-lite:
     <<: *common
-    image: nuvladev/job-lite:command_empty_output_fix # nuvla/job-lite:2.15.2 -> backfix once released new version
+    image: nuvla/job-lite:2.16.0
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
