@@ -188,7 +188,7 @@ def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
 
     nuvlabox_id = request.config.cache.get('nuvlabox_id_local', '')
     # check PULL capability
-    with timeout(60):
+    with timeout(120):
         while True:
             nuvlabox = api.get(nuvlabox_id)
             if 'capabilities' in nuvlabox.data:
