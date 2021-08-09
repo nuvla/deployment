@@ -305,18 +305,21 @@ case ${command} in
         rollback)
           nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlabox-engine-printer "ROLLBACK" ${quiet} "" "yes"
-          output=`qewqwe` #$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
+          output=`asdqw` #$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
             if [[ ! -z "${NUVLABOX_API_KEY}" ]] && [[ ! -z "${NUVLABOX_API_SECRET}" ]]
             then
-              nuvlabox-engine-printer "NuvlaBox Engine rollback was unsuccessful. Forcing recovery and update through full re-installation" 0 "WARNING" "no"
-              export hard_reset=1
-              output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
-              if [[ $? -ne 0 ]]
-              then
-                exit 1
-              fi
+              case "${target_version}" in
+                "2.") nuvlabox-engine-printer "NuvlaBox Engine rollback was unsuccessful. Forcing recovery and update through full re-installation" 0 "WARNING" "no"
+                      export hard_reset=1
+                      output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
+                      if [[ $? -ne 0 ]]
+                      then
+                        exit 1
+                      fi;;
+                *) exit 1;;
+              esac
             else
               exit 1
             fi

@@ -151,6 +151,7 @@ def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
 
     container_names = []
     image_names = []
+    agent_container = None
     for container in nb_containers:
         image_names.append(container.attrs['Config']['Image'])
         if container.name == 'vpn-client' and not vpnserver:
@@ -178,6 +179,8 @@ def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
                 f'Details: {json.dumps(container.attrs, indent=2)}'
 
         container_names.append(container.name)
+        if 'agent' in container.name:
+            agent_container = container
 
     logging.info('All NuvlaBox containers from local installation are stable')
     request.config.cache.set('containers', container_names)
@@ -191,6 +194,7 @@ def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
             if 'capabilities' in nuvlabox.data:
                 break
 
+            logging.warning(f'Waiting for NB agent to COMMISSION: {agent_container.logs(tail=100)}')
             time.sleep(3)
 
     assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \
