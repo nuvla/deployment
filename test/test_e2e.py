@@ -194,7 +194,7 @@ def test_nuvlabox_engine_containers_stability(request, vpnserver, nolinux):
             if 'capabilities' in nuvlabox.data:
                 break
 
-            logging.warning(f'Waiting for NB agent to COMMISSION: {agent_container.logs(tail=100)}')
+            # logging.warning(f'Waiting for NB agent to COMMISSION: {agent_container.logs(tail=100)}')
             time.sleep(3)
 
     assert 'NUVLA_JOB_PULL' in nuvlabox.data.get('capabilities', []), \

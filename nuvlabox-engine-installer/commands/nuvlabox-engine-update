@@ -87,7 +87,6 @@ then
     delete_volume=1
   fi
 
-  echo ${hard_reset} ${docker_compose_down_command}
   nuvlabox-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
 
   if [[ ${quiet} -eq 1 ]]
