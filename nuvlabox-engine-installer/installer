@@ -8,6 +8,7 @@ export save_dir=$(pwd)
 export rootfs=${ROOTFS:-/rootfs}
 export rootfs_working_dir=${ROOTFS_WORKING_DIR:-/rootfs-working-dir}
 export quiet=0
+export install_daemon_mode=0
 export force_restart=1
 export github_releases="https://github.com/nuvlabox/deployment/releases"
 export cluster_args=""
@@ -36,6 +37,7 @@ usage()
   echo -e " --target-version=<string>\t\t(optional) NuvlaBox Engine release to be installed. If not passed, it uses the master branch"
   echo -e " --project=<string>\t\t\t(optional) Project name used during the first installation. Default is 'nuvlabox'"
   echo -e " --quiet\t\t\t\t(optional) Only print final status message"
+  echo -e " --daemon\t\t\t\t(optional) If set, it will install the NuvlaBox and exit the installer"
   echo -e ""
   echo -e "UDPATE args:"
   echo -e " --compose-files=<list>\t\t\tComma-separated list of compose files to deploy"
@@ -475,6 +477,9 @@ case ${command} in
         --target-version)
           export target_version=${VALUE}
           ;;
+        --daemon)
+          export install_daemon_mode=1
+          ;;
         *)
           echo -e "${command} ERROR: unknown option $PARAM"
           usage
@@ -495,8 +500,12 @@ case ${command} in
       exit 1
     else
       # install successful
-      # print final message and finish
-      exit 0
+      if [[ $install_daemon_mode -eq 0 ]]
+        nuvlabox-engine-wait "${project}"
+      else
+        # print final message and finish
+        exit 0
+      fi
     fi
     ;;
   *)

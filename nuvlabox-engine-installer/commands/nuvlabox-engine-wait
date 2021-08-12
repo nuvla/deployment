@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+"""Used when installing a new NuvlaBox Engine
+
+After a successful installation, it waits in foreground
+until it receives a shutdown signal.
+When that happens, it launches an uninstall process to
+remove the ongoing NuvlaBox Engine
+"""
+
+import docker
+import sys
+import signal
+import socket
+import time
+
+project_name = sys.argv[1]
+
+dc = docker.from_env()
+
+myself = dc.containers.get(socket.gethostname())
+
+my_image_id = myself.image.id
+
+class GracefulShutdown:
+
+    def __init__(self):
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    def exit_gracefully(self, signum, frame):
+        print('Uninstalling the NuvlaBox Engine')
+        docker.from_env().containers.run(my_image_id,
+                                         name="nuvlabox-engine-uninstaller",
+                                         volumes={
+                                            '/var/run/docker.sock': {
+                                                'bind': '/var/run/docker.sock',
+                                                'mode': 'ro'
+                                            }
+                                        },
+                                         detach=True,
+                                         command=["--project", project_name])
+        sys.exit(0)
+
+if __name__ == '__main__':
+    on_stop = GracefulShutdown()
+    print('Waiting in foreground for shutdown signal...')
+    while True:
+        time.sleep(2)
