@@ -501,6 +501,7 @@ case ${command} in
     else
       # install successful
       if [[ $install_daemon_mode -eq 0 ]]
+      then
         nuvlabox-engine-wait "${project}"
       else
         # print final message and finish
