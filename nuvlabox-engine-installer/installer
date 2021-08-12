@@ -226,6 +226,12 @@ check_args_update()
 }
 
 
+ensure_uninstall_on_exit() {
+    trap - SIGINT SIGTERM # clear the trap
+    kill -- -$$ # Sends SIGTERM to child/sub processes
+}
+
+
 case ${command} in
   -h | --help)
     usage
@@ -491,7 +497,7 @@ case ${command} in
     banner_intro ${quiet}
     check_args_install
     reset_host_environment
-    output=$(nuvlabox-engine-install 2>&1 | tee /dev/fd/2)
+    output=0 #$(nuvlabox-engine-install 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]
     then
@@ -502,6 +508,7 @@ case ${command} in
       # install successful
       if [[ $install_daemon_mode -eq 0 ]]
       then
+        trap ensure_uninstall_on_exit SIGINT SIGTERM
         nuvlabox-engine-wait "${project}"
       else
         # print final message and finish

@@ -23,27 +23,28 @@ myself = dc.containers.get(socket.gethostname())
 my_image_id = myself.image.id
 
 class GracefulShutdown:
-
+    stop_now = False
     def __init__(self):
         signal.signal(signal.SIGINT, self.exit_gracefully)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, signum, frame):
-        print('Uninstalling the NuvlaBox Engine')
-        docker.from_env().containers.run(my_image_id,
-                                         name="nuvlabox-engine-uninstaller",
-                                         volumes={
+        self.stop_now = True
+
+if __name__ == '__main__':
+    on_stop = GracefulShutdown()
+    while not on_stop.stop_now:
+        time.sleep(1)
+
+    print('Uninstalling the NuvlaBox Engine')
+    docker.from_env().containers.run(my_image_id,
+                                        name="nuvlabox-engine-uninstaller",
+                                        volumes={
                                             '/var/run/docker.sock': {
                                                 'bind': '/var/run/docker.sock',
                                                 'mode': 'ro'
                                             }
                                         },
-                                         detach=True,
-                                         command=["--project", project_name])
-        sys.exit(0)
-
-if __name__ == '__main__':
-    on_stop = GracefulShutdown()
-    print('Waiting in foreground for shutdown signal...')
-    while True:
-        time.sleep(2)
+                                        detach=True,
+                                        command=["uninstall", "--project=" + project_name])
+    sys.exit(0)
