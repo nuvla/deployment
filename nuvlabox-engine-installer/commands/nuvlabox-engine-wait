@@ -21,6 +21,11 @@ myself = dc.containers.get(socket.gethostname())
 my_image_id = myself.image.id
 
 print('Uninstalling the NuvlaBox Engine')
+try:
+    docker.from_env().api.remove_container("nuvlabox-engine-uninstaller", force=True)
+except:
+    pass
+
 docker.from_env().containers.run(my_image_id,
                                     name="nuvlabox-engine-uninstaller",
                                     remove=True,
