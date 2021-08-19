@@ -382,6 +382,8 @@ case ${command} in
       shift
     done
     banner_intro ${quiet}
+    # in case it has been pass via the environment, it can be used by the uninstaller
+    export working_dir
     output=$(nuvlabox-engine-uninstall 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]

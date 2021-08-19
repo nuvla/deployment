@@ -9,6 +9,7 @@ remove the ongoing NuvlaBox Engine
 """
 
 import docker
+imoprt os
 import sys
 import socket
 
@@ -28,6 +29,7 @@ except:
 
 docker.from_env().containers.run(my_image_id,
                                     name="nuvlabox-engine-uninstaller",
+                                    environment=[f"working_dir={os.getenv('working_dir')}"]
                                     remove=True,
                                     volumes={
                                         '/var/run/docker.sock': {
