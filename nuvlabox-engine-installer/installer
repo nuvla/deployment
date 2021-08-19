@@ -226,7 +226,7 @@ check_args_update()
 }
 
 ensure_uninstall_on_exit() {
-    nuvlabox-engine-wait "${project}"
+    nuvlabox-engine-async-uninstall "${project}"
 }
 
 case ${command} in
