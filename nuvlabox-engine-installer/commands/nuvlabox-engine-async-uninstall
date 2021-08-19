@@ -2,9 +2,7 @@
 
 """Used when installing a new NuvlaBox Engine
 
-After a successful installation, it waits in foreground
-until it receives a shutdown signal.
-When that happens, it launches an uninstall process to
+After a successful installation, it launches an uninstall process to
 remove the ongoing NuvlaBox Engine
 """
 

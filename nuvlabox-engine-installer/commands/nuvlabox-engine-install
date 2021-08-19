@@ -74,6 +74,9 @@ health=$(nuvlabox-engine-check-health ${timer} 2>&1)
 if [[ $? -ne 0 ]]
 then
   nuvlabox-engine-printer "NuvlaBox Engine is not healthy: ${health}" 0 "ERROR" "no"
+  export quiet
+  export project
+  nuvlabox-engine-uninstall
   exit 1
 fi
 
