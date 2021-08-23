@@ -7,7 +7,7 @@ remove the ongoing NuvlaBox Engine
 """
 
 import docker
-imoprt os
+import os
 import sys
 import socket
 
