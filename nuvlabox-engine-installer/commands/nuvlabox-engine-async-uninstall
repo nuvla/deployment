@@ -27,7 +27,7 @@ except:
 
 docker.from_env().containers.run(my_image_id,
                                     name="nuvlabox-engine-uninstaller",
-                                    environment=[f"working_dir={os.getenv('working_dir')}"]
+                                    environment=[f"working_dir={os.getenv('working_dir')}"],
                                     remove=True,
                                     volumes={
                                         '/var/run/docker.sock': {
