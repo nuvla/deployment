@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-network:
     <<: *common
-    image: nuvlabox/peripheral-manager-network:1.1.2
+    image: nuvlabox/peripheral-manager-network:1.1.3
     restart: on-failure
     network_mode: host
     volumes:
