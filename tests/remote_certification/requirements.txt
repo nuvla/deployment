@@ -1,0 +1,5 @@
+pytest
+docker
+pytest-html
+nuvla-api
+six

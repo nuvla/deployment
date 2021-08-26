@@ -1,0 +1,135 @@
+name: "NuvlaBox Remote Certification Test"
+
+on:
+  push:
+    branches:
+      - cicd
+  # workflow_run:
+  #   workflows: ["NuvlaBox Installer Build"]
+  #   branches: [master]
+  #   types:
+  #     - completed
+
+env:
+  NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
+  NUVLA_DEV_APISECRET: ${{ secrets.NUVLA_DEV_APISECRET }}
+  SNYK_SIXSQCI_API_TOKEN: ${{ secrets.SNYK_SIXSQCI_API_TOKEN }}
+
+defaults:
+  run:
+    shell: bash
+    working-directory: tests/remote_certification
+
+jobs:
+  tester:
+    name: "Run NuvlaBox Remote Certification Tests"
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version: [3.8]
+        architecture: [arm] #, arm64]
+        include:
+          - architecture: arm
+            credential-id: credential/b0c42cd1-b230-4851-be87-fc7e05bdfbb3
+          # - architecture: arm64
+          #   credential-id: credential/5698ccd5-54b6-4412-b19c-46e3c6212f33
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup dependencies
+        run: |
+          python --version
+          pip --version
+          sudo npm install -g snyk
+          snyk version
+          sudo apt-get install -y python3-pytest
+          pip install -r requirements.txt
+          docker swarm init
+
+      - name: Preflight Checks
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
+
+      - name: Create Test NuvlaBox in Nuvla.io
+        if: ${{ success() }}
+        id: NewNuvlaBox
+        uses: nuvla/nuvla-create-nuvlabox-action@v2
+        with:
+          api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
+          api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
+          name: "[CI/CD Remote Certification (${{ matrix.architecture }})] Test NuvlaBox"
+          description: NuvlaBox for remote certification on ${{ matrix.architecture }} devices - commit ${{ github.sha }}, on branch ${{ github.ref }}, by ${{ github.actor }}
+
+      - name: Deploy NuvlaBox Engine in CI/CD Testbed
+        if: ${{ success() }}
+        id: DeployNuvlaBoxEngine
+        uses: nuvla/nuvla-deploy-app-action@v2
+        with:
+          api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
+          api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
+          module-id: module/e4dcd975-2717-4051-8ade-80f6ed4bcfb1
+          credential-id: ${{ matrix.credential-id }}
+          environment: "NUVLABOX_UUID=${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}"
+
+      - name: Check commissioning
+        if: ${{ success() }}
+        env:
+          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.commission-check.output.html --self-contained-html commission-check.py
+
+      - name: Test Installation Success
+        if: ${{ success() }}
+        id: TestInstallationSuccess
+        env:
+          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+        run: |
+          python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py
+          out=$(cat nuvlabox.test-successful-installation.output.html | grep ::set-nuvlabox_credential_id)
+          cred_id=$(echo $out | awk -F'::set-nuvlabox_credential_id' '{print $2}')
+          echo "::set-output name=nuvlabox_credential_id::$cred_id"
+
+      - name: Test App Deployment
+        if: ${{ success() }}
+        id: DeployTestApp
+        uses: nuvla/nuvla-deploy-app-action@v2
+        with:
+          api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
+          api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
+          module-id: module/179ee861-b378-4f74-aebf-41363df7b0d9
+          credential-id: "${{ steps.TestInstallationSuccess.outputs.nuvlabox_credential_id }}"
+
+      - if: always()
+        name: Keep test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: remote-certification-report
+          path: tests/remote_certification/nuvlabox.*.output.html
+
+      - if: always()
+        name: Cleanup Nuvla resources
+        env:
+          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
+        run: cd .. && python cleanup.py
+
+  notify:
+    if: always()
+    name: Post Workflow Status To Slack
+    needs: tester
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Workflow Notification
+        uses: Gamesight/slack-workflow-status@master
+        with:
+          # Required Input
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          slack_webhook_url: ${{ secrets.SLACK_NBE_CICD_WEBHOOK }}
+          include_jobs: true

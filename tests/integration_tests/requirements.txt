@@ -1,0 +1,7 @@
+pytest
+docker
+requests
+pytest-html
+nuvla-api
+gitpython
+six

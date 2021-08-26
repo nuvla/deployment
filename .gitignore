@@ -16,12 +16,14 @@ war/*
 logs/
 *.logs
 *.log
-test/.pytest_cache
-test/__pycache__
+tests/.pytest_cache
+tests/__pycache__
 docker-compose.test.yml
-test/.docker-compose*.yml
-test/log.json
-test/report.html
+tests/.docker-compose*.yml
+tests/log.json
+tests/report.html
+tests/assets
+tests/*/__pycache__
 
 pom.xml.next
 pom.xml.releaseBackup

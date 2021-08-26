@@ -1,0 +1,140 @@
+version: "3.7"
+
+x-common: &common
+  stop_grace_period: 30s
+  logging:
+    options:
+      max-size: "250k"
+      max-file: "10"
+  labels:
+    - "nuvlabox.component=True"
+    - "nuvlabox.deployment=production"
+
+volumes:
+  nuvlabox-db:
+    driver: local
+    labels:
+      - "nuvlabox.volume=True"
+      - "nuvlabox.deployment=production"
+
+services:
+  system-manager:
+    <<: *common
+    image: nuvladev/system-manager:master #nuvlabox/system-manager:2.1.0
+    restart: always
+    environment:
+      - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
+      - NUVLABOX_DATA_GATEWAY_IMAGE=${NUVLABOX_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+    ports:
+      - 127.0.0.1:3636:3636
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3636"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 10s
+    depends_on:
+      - on-stop
+
+  agent:
+    <<: *common
+    image: nuvladev/agent:master #nuvlabox/agent:2.1.0
+    restart: always
+    oom_kill_disable: true
+    privileged: true
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLABOX_ENGINE_VERSION=2.0.0
+      - NUVLABOX_IMMUTABLE_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
+      - HOST_HOME=${HOME}
+      - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
+      - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
+      - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+      - /:/rootfs:ro
+    ports:
+      - 127.0.0.1:5080:80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+      start_period: 10s
+    depends_on:
+      - system-manager
+      - compute-api
+
+  compute-api:
+    <<: *common
+    image: nuvladev/compute-api:master #nuvlabox/compute-api:1.1.1
+    container_name: compute-api
+    restart: on-failure
+    oom_score_adj: -900
+    pid: "host"
+    environment:
+      - HOST=${HOSTNAME:-nuvlabox}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - nuvlabox-db:/srv/nuvlabox/shared
+    ports:
+      - 5000:5000
+    depends_on:
+      - system-manager
+    healthcheck:
+      test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
+      interval: 20s
+      timeout: 10s
+      start_period: 30s
+
+  vpn-client:
+    <<: *common
+    image: nuvladev/vpn-client:master #nuvlabox/vpn-client:1.0.0
+    container_name: vpn-client
+    restart: always
+    oom_kill_disable: true
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - NUVLABOX_UUID=${NUVLABOX_UUID}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    depends_on:
+      - agent
+
+  security:
+    <<: *common
+    image: nuvladev/security:main #nuvlabox/security:1.0.3
+    restart: on-failure
+    network_mode: host
+    environment:
+      - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CVE_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
+      - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
+      - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+
+  job-engine-lite:
+    <<: *common
+    image: nuvladev/job-lite:master # nuvla/job-lite:2.15.2
+    restart: always
+    container_name: nuvlabox-job-engine-lite
+    entrypoint: /app/pause.py
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  on-stop:
+    <<: *common
+    image: nuvladev/on-stop:main #master #nuvlabox/on-stop:1.0.0
+    restart: always
+    container_name: nuvlabox-on-stop
+    command: pause
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

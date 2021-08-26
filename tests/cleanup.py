@@ -1,7 +1,8 @@
 import docker
 import nuvla
 import time
-
+import os
+from common.nuvla_api import NuvlaApi
 
 class Cleanup(object):
     def __init__(self, api, docker_client):
@@ -20,13 +21,21 @@ class Cleanup(object):
             self.decommission_nuvlabox(nuvlabox_id)
             self.delete_nuvlabox(nuvlabox_id)
 
-    def delete_install_deployment(self, deployment_id):
-        print(f'Deleting NuvlaBox installation deployment with UUID: {deployment_id}')
-        self.api.delete(deployment_id)
+    def delete_deployment(self, deployment_id):
+        print(f'Deleting deployment with UUID: {deployment_id}')
+        depl = self.api.get(deployment_id)
+        self.api.operation(depl, 'force-delete')
 
-    def stop_install_deployment(self, deployment_id):
-        print(f'Stopping NuvlaBox installation deployment with UUID: {deployment_id}')
-        self.api.get(deployment_id + "/stop")
+    def stop_deployment(self, deployment_id):
+        print(f'Stopping deployment with UUID: {deployment_id}')
+        r = self.api.get(deployment_id + "/stop")
+        while True:
+            j_status = self.api.get(r.data.get('location'))
+            if j_status.data['progress'] < 100:
+                time.sleep(1)
+                continue
+
+            break
 
     def decommission_nuvlabox(self, nuvlabox_id):
         print(f'Decommissioning NuvlaBox with UUID: {nuvlabox_id}')
@@ -51,13 +60,31 @@ class Cleanup(object):
                                           },
                                           detach=True)
 
-    def delete_zombie_mjpg_streamer(self, container_name):
-        print(f'Removing local zombie MJPG streamer with name: {container_name}')
-        try:
-            container = self.docker_client.containers.get(container_name)
-            container.remove(force=True)
-        except docker.errors.NotFound:
-            pass
 
 
+if __name__ == '__main__':
+    nuvla_client = NuvlaApi()
+    nuvla_client.login()
 
+    c = Cleanup(nuvla_client.api, docker.from_env())
+
+    nuvlabox_ids = os.environ.get('NUVLABOX_IDS', '')
+    nuvla_depls = os.environ.get('DEPLOYMENT_IDS', '')
+
+    for nbid in nuvlabox_ids.split(','):
+        if len(nbid) > 0:
+            try:
+                c.decommission_nuvlabox(nbid)
+                c.delete_nuvlabox(nbid)
+            except Exception as e:
+                print(f'Error: {str(e)}')
+                continue
+
+    for deplid in nuvla_depls.split(','):
+        if len(deplid) > 0:
+            try:
+                c.stop_deployment(deplid)
+                c.delete_deployment(deplid)
+            except Exception as e:
+                print(f'Error: {str(e)}')
+                continue
