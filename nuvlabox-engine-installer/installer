@@ -496,6 +496,10 @@ case ${command} in
     banner_intro ${quiet}
     check_args_install
     reset_host_environment
+    if [[ $install_daemon_mode -eq 0 ]]
+    then
+      trap ensure_uninstall_on_exit SIGINT SIGTERM
+    fi
     output=$(nuvlabox-engine-install 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]
@@ -507,7 +511,6 @@ case ${command} in
       # install successful
       if [[ $install_daemon_mode -eq 0 ]]
       then
-        trap ensure_uninstall_on_exit SIGINT SIGTERM
         nuvlabox-engine-printer "Waiting in foreground...stop me to shutdown the NuvlaBox Engine" 0 "INFO" "no"
         sleep inf &
         wait $!

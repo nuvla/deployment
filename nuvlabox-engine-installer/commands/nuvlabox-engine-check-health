@@ -3,12 +3,10 @@
 import docker
 import sys
 import time
-import inspect
 import signal
 from contextlib import contextmanager
 
 
-func = inspect.currentframe().f_code
 timer = int(sys.argv[1])
 
 @contextmanager
@@ -39,7 +37,11 @@ try:
     with timeout(timer):
         while not healthcheck_finished:
             time.sleep(3)
-            nb_containers = dc.containers.list(filters={'label': "nuvlabox.component=True"}, all=True)
+            try:
+                nb_containers = dc.containers.list(filters={'label': "nuvlabox.component=True"}, all=True)
+            except docker.client.APIError:
+                continue
+
             for index, container in enumerate(nb_containers):
                 # this loop breaks everytime it finds something unhealthy with the NB Engine, thus never terminating
                 # the parent infinite loop
@@ -72,5 +74,4 @@ try:
                     healthcheck_finished = True
 except Exception as e:
     # making sure that only the error message is printed and not the whole exception
-    exc_type, exc_obj, exc_tb = sys.exc_info()
-    sys.exit(f'Critical error in {func.co_filename}, on line {exc_tb.tb_frame.f_lineno}: {str(e)}')
+    raise

@@ -3,7 +3,7 @@
 quiet=${quiet:-${1:-0}}
 project=${project:-${2:-"nuvlabox"}}
 
-nuvlabox-engine-printer "Uninstalling NuvlaBox Engine - ${project} - (permanently)" ${quiet} "NONE" yes
+nuvlabox-engine-printer "Uninstalling NuvlaBox Engine - ${project} - (permanently)" ${quiet} "INFO" yes
 
 docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} down -v --remove-orphans"
 
