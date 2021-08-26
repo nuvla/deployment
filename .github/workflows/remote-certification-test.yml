@@ -1,14 +1,11 @@
 name: "NuvlaBox Remote Certification Test"
 
 on:
-  push:
-    branches:
-      - cicd
-  # workflow_run:
-  #   workflows: ["NuvlaBox Installer Build"]
-  #   branches: [master]
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ["NuvlaBox Installer Build"]
+    branches: [master]
+    types:
+      - completed
 
 env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
