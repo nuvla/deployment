@@ -201,6 +201,135 @@ WITH (KAFKA_TOPIC='subscription',
       REPLICAS=1,
       VALUE_FORMAT='JSON');
 
+--
+-- stream with subscription configurations
+CREATE STREAM SUBSCRIPTION_CONFIG_S
+(id VARCHAR KEY,
+  name VARCHAR,
+  description VARCHAR,
+  enabled BOOLEAN,
+  acl STRUCT<
+    owners ARRAY<VARCHAR>
+  >,
+  category VARCHAR,
+  "method-ids" ARRAY<VARCHAR>,
+  "resource-id" VARCHAR,
+  "resource-kind" VARCHAR,
+  criteria STRUCT<kind VARCHAR,
+                  metric VARCHAR,
+                  condition VARCHAR,
+                  "value" VARCHAR,
+                  "window" BIGINT>
+)
+WITH (KAFKA_TOPIC='subscription-config',
+      PARTITIONS=1,
+      REPLICAS=1,
+      VALUE_FORMAT='JSON');
+
+--
+-- stream of events
+CREATE STREAM EVENT_S
+    (id VARCHAR,
+     category VARCHAR,
+     content STRUCT<
+         resource STRUCT<
+             href VARCHAR
+         >,
+         state VARCHAR
+     >,
+     severity VARCHAR,
+     timestamp VARCHAR,
+     tags ARRAY<VARCHAR>,
+     acl STRUCT<
+          owners ARRAY<VARCHAR>
+     >
+    )
+    WITH (KAFKA_TOPIC='event',
+          PARTITIONS=1,
+          REPLICAS=1,
+          VALUE_FORMAT='JSON');
+---    WITH (KAFKA_TOPIC='es_nuvla-event',
+
+------------------------------------------------------
+-- BlackBox creation.
+
+CREATE STREAM SUBS_CONFIG_BLACKBOX_EVENT_S AS
+SELECT
+    s.acl->owners[1] as owner,
+    *
+FROM SUBSCRIPTION_CONFIG_S AS s
+WHERE "resource-kind" = 'event'
+    AND criteria->"value" = 'application/blackbox'
+    AND criteria->metric = 'tag'
+    AND criteria->kind = 'string'
+    AND criteria->condition = 'is'
+EMIT CHANGES;
+
+-- repartitioned by owner
+CREATE STREAM SUBS_CONFIG_BLACKBOX_EVENT_BY_OWNER_S AS
+SELECT
+    s.owner as id,
+    s.id as subs_id,
+    s.name as name,
+    s.description as description,
+    s.enabled as enabled,
+    s."method-ids" as "method-ids",
+    s.criteria as criteria
+FROM SUBS_CONFIG_BLACKBOX_EVENT_S AS s
+PARTITION BY s.owner;
+
+CREATE TABLE SUBS_CONFIG_BLACKBOX_EVENT_BY_OWNER_T
+(id VARCHAR PRIMARY KEY,
+  subs_id VARCHAR,
+  name VARCHAR,
+  description VARCHAR,
+  enabled BOOLEAN,
+  "method-ids" ARRAY<VARCHAR>,
+  criteria STRUCT<kind VARCHAR,
+                  metric VARCHAR,
+                  condition VARCHAR,
+                  "value" VARCHAR,
+                  "window" BIGINT>,
+)
+WITH (KAFKA_TOPIC='SUBS_CONFIG_BLACKBOX_EVENT_BY_OWNER_S',
+      PARTITIONS=1,
+      REPLICAS=1,
+      VALUE_FORMAT='JSON');
+
+CREATE STREAM EVENT_BB_CREATED_S
+AS SELECT
+    e.id as id,
+    e.acl->owners[1] as owner,
+    e.content->resource->href as href,
+    e.content->state as state,
+    e.timestamp as timestamp
+FROM EVENT_S as e
+WHERE e.category = 'user'
+    AND ARRAY_CONTAINS(e.tags, 'application/blackbox')
+    AND e.content->resource->href LIKE 'data-record/%'
+    AND e.content->state = 'created'
+EMIT CHANGES;
+
+INSERT INTO NOTIFICATIONS_S
+SELECT
+     subs_t.id as id,
+     AS_VALUE(subs_t.subs_id) as subs_id,
+     subs_t.name as subs_name,
+     subs_t."method-ids" as method_ids,
+     subs_t.description as subs_description,
+     CONCAT('api/', bbe.href) as resource_uri,
+     'blackbox' as resource_name,
+     'blackbox' as resource_description,
+     'content-type' as metric,
+     subs_t.criteria->condition as condition,
+     CAST(subs_t.criteria->"value" as VARCHAR) as condition_value,
+     'true' as "VALUE",
+     CONCAT(SPLIT(bbe.timestamp, '.')[1], 'Z') as timestamp,
+     true as recovery
+FROM EVENT_BB_CREATED_S AS bbe
+JOIN SUBS_CONFIG_BLACKBOX_EVENT_BY_OWNER_T AS subs_t ON bbe.owner = subs_t.id
+EMIT CHANGES;
+
 ---------------------------------
 -- NuvlaBox.
 
