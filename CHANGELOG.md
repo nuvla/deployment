@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## [2.2.23] - 2021-09-14
+
+This release update Nuvla components to following versions:
+  - [nuvla/ui:2.22.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2220---2021-09-14)
+
+
 ## [2.2.22] - 2021-08-31
 
 This release update Nuvla components to following versions:

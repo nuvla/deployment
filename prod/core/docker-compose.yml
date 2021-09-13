@@ -55,7 +55,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.21.0
+    image: nuvla/ui:2.22.0
     deploy:
       placement:
         constraints:
