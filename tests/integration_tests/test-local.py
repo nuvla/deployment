@@ -323,4 +323,4 @@ def test_cis_benchmark(request):
 #def test_security_scanner(request):
 #    agent = docker_client.containers.get(local_project_name + "_agent_1")
 
-    assert agent.exec_run('cat /srv/nuvlabox/shared/vulnerabilities').exit_code == 0
+    # assert agent.exec_run('cat /srv/nuvlabox/shared/vulnerabilities').exit_code == 0
