@@ -30,7 +30,7 @@ images:
   systemManager:
     repository: nuvlabox/system-manager
     pullPolicy: Always
-    tag: "2.1.3"
+    tag: "2.1.4"
   vpnClient:
     repository: nuvlabox/vpn-client
     pullPolicy: Always
