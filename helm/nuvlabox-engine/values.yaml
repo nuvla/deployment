@@ -10,7 +10,7 @@ images:
   agent:
     repository: nuvlabox/agent
     pullPolicy: Always
-    tag: "2.3.2"
+    tag: "2.3.3"
   dataGateway:
     repository: eclipse-mosquitto
     pullPolicy: Always
@@ -18,7 +18,7 @@ images:
   jobEngineLite:
     repository: nuvla/job-lite
     pullPolicy: Always
-    tag: "2.16.1"
+    tag: "2.16.2"
   kubernetesCredentialsManager:
     repository: nuvlabox/kubernetes-credentials-manager
     pullPolicy: Always
@@ -30,7 +30,7 @@ images:
   systemManager:
     repository: nuvlabox/system-manager
     pullPolicy: Always
-    tag: "2.1.3"
+    tag: "2.1.4"
   vpnClient:
     repository: nuvlabox/vpn-client
     pullPolicy: Always

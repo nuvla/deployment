@@ -301,7 +301,7 @@ case ${command} in
     done
     check_args_update
     banner_intro ${quiet}
-    output=`asdqw` #$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
+    output=$(nuvlabox-engine-update 2>&1 | tee /dev/fd/2)
 
     if [[ $? -ne 0 ]]
     then
@@ -310,7 +310,7 @@ case ${command} in
         rollback)
           nuvlabox-engine-printer "NuvlaBox Engine update failed. Rollback to previous version" 0 "WARNING" "no"
           nuvlabox-engine-printer "ROLLBACK" ${quiet} "" "yes"
-          output=`asdqw` #$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
+          output=$(nuvlabox-engine-rollback 2>&1 | tee /dev/fd/2)
           if [[ $? -ne 0 ]]
           then
             if [[ ! -z "${NUVLABOX_API_KEY}" ]] && [[ ! -z "${NUVLABOX_API_SECRET}" ]]
