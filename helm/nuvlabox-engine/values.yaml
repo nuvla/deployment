@@ -18,7 +18,7 @@ images:
   jobEngineLite:
     repository: nuvla/job-lite
     pullPolicy: Always
-    tag: "2.16.2"
+    tag: "2.16.3"
   kubernetesCredentialsManager:
     repository: nuvlabox/kubernetes-credentials-manager
     pullPolicy: Always
