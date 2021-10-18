@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -o pipefail
+
 tag=$1
 
 usage="\nUSAGE:\n
