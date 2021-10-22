@@ -97,8 +97,7 @@ services:
     restart: always
     oom_kill_disable: true
     network_mode: host
-    cap_add:
-      - NET_ADMIN
+    privileged: true
     devices:
       - /dev/net/tun
     environment:
