@@ -60,7 +60,8 @@ usage()
   echo -e " --join-manager=<string>\t\tToken used to join this device as a manager"
   echo -e " --join-address=<string>\t\tAdvertised manager address to join to"
   echo -e " --leave\t\t\t\tLeave the cluster. Precedes all join- options"
-  echo -e " --force-new-cluster\t\t\tLeave the cluster and force the creation of a new one, where it shall become manager. Ignore all other options"
+  echo -e " --force-new-cluster\t\t\tLeave the cluster and force the creation of a new one, where it shall become manager"
+  echo -e " --advertise-addr\t\t\tNew cluster advertise addresss"
   echo -e " --quiet\t\t\t\t(optional) Only print final status message"
 }
 
@@ -128,8 +129,11 @@ check_args_cluster()
 {
   if [[ ! -z $cluster_force_new ]]
   then
-    # nothing to do
-    export cluster_args="${cluster_args} --force-new-cluster"
+    if [[ -z $advertise_addr ]]
+    then
+      extra="--advertise-addr ${advertise_addr}"
+    fi
+    export cluster_args="${cluster_args} --force-new-cluster ${extra}"
     continue
   else
     if [[ ! -z $cluster_leave ]]
@@ -424,6 +428,9 @@ case ${command} in
           ;;
         --force-new-cluster)
           export cluster_force_new=1
+          ;;
+        --advertise-addr)
+          export advertise_addr=${VALUE}
           ;;
         --quiet)
           export quiet=1

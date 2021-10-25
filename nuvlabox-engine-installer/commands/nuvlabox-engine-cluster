@@ -11,6 +11,8 @@ parser.add_argument("--leave", action="store_true")
 parser.add_argument("--join-address", action="store", dest="join_address")
 parser.add_argument("--join-worker", action="store", dest="join_worker")
 parser.add_argument("--join-manager", action="store", dest="join_manager")
+parser.add_argument("--advertise-addr", action="store", dest="advertise_addr")
+
 
 args = parser.parse_args()
 
@@ -35,16 +37,18 @@ def leave():
     return
 
 
-def force_new_cluster():
-  if node_mode == 'standalone':
-    # just need to start the cluster
-    docker_client.swarm.init()
-  elif node_mode == 'worker':
-    # leave and start new cluster
-    leave()
-    docker_client.swarm.init()
-  else:
-    docker_client.swarm.init(force_new_cluster=True)
+def force_new_cluster(advertise_addr=None):
+  kwargs = dict()
+
+  if advertise_addr:
+    kwargs['advertise_addr'] = advertise_addr
+
+  if node_mode == 'worker':
+    leave() # first leave the existing cluster
+  elif node_mode == 'master':
+    kwargs['force_new_cluster'] = True
+
+  docker_client.swarm.init(**kwargs)
 
 
 def join(token: str, addr: str):
@@ -58,7 +62,7 @@ def join(token: str, addr: str):
 
 
 if args.force_new_cluster:
-  force_new_cluster()
+  force_new_cluster(args.advertise_addr)
 else:
   if args.leave:
     leave()
