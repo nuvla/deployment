@@ -129,7 +129,7 @@ check_args_cluster()
 {
   if [[ ! -z $cluster_force_new ]]
   then
-    if [[ -z $advertise_addr ]]
+    if [[ ! -z $advertise_addr ]]
     then
       extra="--advertise-addr ${advertise_addr}"
     fi

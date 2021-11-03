@@ -41,7 +41,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:2.3.4
+    image: nuvlabox/agent:2.4.0
     restart: always
     oom_kill_disable: true
     privileged: true
@@ -49,7 +49,7 @@ services:
       - NUVLABOX_API_KEY=${NUVLABOX_API_KEY}
       - NUVLABOX_API_SECRET=${NUVLABOX_API_SECRET}
       - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLABOX_ENGINE_VERSION=2.0.4
+      - NUVLABOX_ENGINE_VERSION=2.0.5
       - NUVLABOX_IMMUTABLE_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
@@ -123,7 +123,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:2.17.0
+    image: nuvla/job-lite:2.18.0
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
