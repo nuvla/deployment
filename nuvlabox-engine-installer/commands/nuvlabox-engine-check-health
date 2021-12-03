@@ -39,7 +39,7 @@ try:
             time.sleep(3)
             try:
                 nb_containers = dc.containers.list(filters={'label': "nuvlabox.component=True"}, all=True)
-            except docker.client.APIError:
+            except docker.errors.APIError:
                 continue
 
             for index, container in enumerate(nb_containers):
