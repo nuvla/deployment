@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Enable compression for HTTP clients
+
 ## [2.2.25] - 2021-10-29
 
 This release update Nuvla components to following versions:
