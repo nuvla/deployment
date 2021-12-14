@@ -4,7 +4,17 @@
 
 ### Changed
 
-- Enable compression for HTTP clients
+
+## [2.2.26] - 2021-12-14
+
+This release update Nuvla components to following versions:
+  - [nuvla/api-server:5.20.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5200---2021-12-09)
+  - [nuvla/ui:2.26.1](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2261---2021-11-17)
+
+### Changed
+
+ - Enable compression for HTTP clients
+ - Use GHA for build status 
 
 ## [2.2.25] - 2021-10-29
 
