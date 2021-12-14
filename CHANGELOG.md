@@ -4,6 +4,11 @@
 
 ### Changed
 
+## [2.2.27] - 2021-12-14
+
+This release update Nuvla components to following versions:
+  - [nuvla/api-server:5.21.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5210---2021-12-14)
+  - [nuvla/ui:2.26.2](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2262---2021-12-14)
 
 ## [2.2.26] - 2021-12-14
 
