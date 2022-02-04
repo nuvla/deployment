@@ -64,7 +64,9 @@ services:
         target: /opt/nuvla/server/resources/log4j.properties
     environment:
       - ES_ENDPOINTS=es
+      - ES_SNIFFER_INIT=no
       - ZK_ENDPOINTS=zk:2181
+      - KAFKA_PRODUCER_INIT=yes
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
     deploy:
       labels:
