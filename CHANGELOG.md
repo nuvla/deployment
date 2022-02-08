@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+  - Add Elasticsearch sniffer and Kafka init env vars to compose files.
+
 ### Changed
 
 ## [2.2.27] - 2022-01-17
