@@ -18,16 +18,18 @@ configs:
 
 services:
   api:
-    image: nuvla/api:5.15.0
+    image: nuvla/api:5.23.0
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
     environment:
       - ES_ENDPOINTS=es
+      - ES_SNIFFER_INIT=yes
       - ES_SNIFF_INTERVAL=5001
       - ES_SNIFF_AFTER_FAILURE_DELAY=1001
       - ZK_ENDPOINTS=zk:2181
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
+      - KAFKA_PRODUCER_INIT=yes
       - KAFKA_ENDPOINTS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
     secrets:
       - source: session.crt
@@ -55,7 +57,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.21.0
+    image: nuvla/ui:2.27.1
     deploy:
       placement:
         constraints:
@@ -74,7 +76,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:2.16.0
+    image: nuvla/job:2.18.0
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -88,7 +90,7 @@ services:
       - nuvla-backend
 
   job-distributor:
-    image: nuvla/job:2.16.0
+    image: nuvla/job:2.18.0
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
