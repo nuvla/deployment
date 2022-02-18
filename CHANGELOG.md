@@ -3,6 +3,7 @@
 ## Unreleased
 
   - Add Elasticsearch sniffer and Kafka init env vars to compose files.
+  - Add Data Records related BlackBox creation notifications via ksqldb.
 
 ### Changed
 
