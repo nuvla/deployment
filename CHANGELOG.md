@@ -4,6 +4,7 @@
 
   - Add Elasticsearch sniffer and Kafka init env vars to compose files.
   - Add Data Records related BlackBox creation notifications via ksqldb.
+  - [nuvla/kafka-notify:0.6.0](https://github.com/nuvla/kafka-notify/blob/main/CHANGELOG.md)
 
 ### Changed
 
