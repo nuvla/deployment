@@ -2,11 +2,20 @@
 
 ## Unreleased
 
-  - Add Elasticsearch sniffer and Kafka init env vars to compose files.
-  - Add Data Records related BlackBox creation notifications via ksqldb.
-  - [nuvla/kafka-notify:0.6.0](https://github.com/nuvla/kafka-notify/blob/main/CHANGELOG.md)
+## [2.2.28] - 2022-03-08
 
 ### Changed
+
+This release update Nuvla components to following versions:
+- [nuvla/api-server:5.24.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5240---2022-03-07)
+- [nuvla/ui:2.29.0](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2290---2022-03-07)
+- [nuvla/job-engine:2.19.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2190---2022-03-08)
+- [nuvla/kafka-notify:0.6.0](https://github.com/nuvla/kafka-notify/blob/main/CHANGELOG.md)
+
+### Added
+
+  - Add Elasticsearch sniffer and Kafka init env vars to compose files.
+  - Add Data Records related BlackBox creation notifications via ksqldb
 
 ## [2.2.27] - 2022-01-17
 
