@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:2.2.0
+    image: nuvlabox/system-manager:2.3.0
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
@@ -41,7 +41,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:2.4.1
+    image: nuvlabox/agent:2.6.0
     restart: always
     oom_kill_disable: true
     privileged: true
@@ -72,7 +72,7 @@ services:
 
   compute-api:
     <<: *common
-    image: nuvlabox/compute-api:1.1.1
+    image: nuvlabox/compute-api:1.1.2
     container_name: compute-api
     restart: on-failure
     oom_score_adj: -900
@@ -92,7 +92,7 @@ services:
 
   vpn-client:
     <<: *common
-    image: nuvlabox/vpn-client:1.0.0
+    image: nuvlabox/vpn-client:1.0.1
     container_name: vpn-client
     restart: always
     oom_kill_disable: true
@@ -109,7 +109,7 @@ services:
 
   security:
     <<: *common
-    image: nuvlabox/security:1.2.0
+    image: nuvlabox/security:1.2.1
     restart: on-failure
     network_mode: host
     environment:
@@ -123,7 +123,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:2.18.0
+    image: nuvla/job-lite:2.19.0
     restart: always
     container_name: nuvlabox-job-engine-lite
     entrypoint: /app/pause.py
