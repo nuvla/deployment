@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## [2.2.29] - 2022-05-02
+
+### Changed
+
+This release update Nuvla components to following versions:
+- [nuvla/api-server:5.25.0](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#5250---2022-04-29)
+- [nuvla/ui:2.30.1](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2301---2022-04-29)
+- [nuvla/job-engine:2.20.0](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#2200---2022-04-29)
+- [nuvla/kafka-notify:0.6.0](https://github.com/nuvla/kafka-notify/blob/main/CHANGELOG.md)
+
+
 ## [2.2.28] - 2022-03-08
 
 ### Changed
