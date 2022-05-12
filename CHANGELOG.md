@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Streams - updated streams for testability.
+
 ## [2.2.29] - 2022-05-02
 
 ### Changed
