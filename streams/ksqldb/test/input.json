@@ -6,22 +6,33 @@
       "value": {
         "id": "notification-method/01",
         "method": "slack",
-        "address": "https://slack.com/url?token=abc"
+        "destination": "https://slack.com/url?token=abc",
+        "acl": {
+          "owners": ["user/01"]
+        }
       }
     },
     {
       "topic": "subscription",
-      "key": "deployment/01",
+      "key": "subscription/01",
       "value": {
         "id": "subscription/01",
-        "type": "notification",
-        "kind": "event",
-        "category": "state",
-        "state": "enabled",
-        "resource": "deployment/01",
-        "notification": "notification-method/01",
+        "name": "deployment state change",
+        "description": "deployment state change",
+        "enabled": true,
         "acl": {
           "owners": ["user/01"]
+        },
+        "category": "state",
+        "method-ids": ["notification-method/01"],
+        "resource-id": "deployment/01",
+        "resource-kind": "event",
+        "criteria": {
+          "kind": "???",
+          "metric": "???",
+          "condition": ">",
+          "value": "???",
+          "window": 1
         }
       }
     },

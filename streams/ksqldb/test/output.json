@@ -1,8 +1,8 @@
 {
   "outputs": [
     {
-      "topic": "NOTIFICATIONS_SLACK_S",
-      "key": "notification-method/01",
+      "topic": "NOTIFICATIONS_S",
+      "key": "/01",
       "value": {
         "EVENT_ID": "deployment/01",
         "METHOD":"slack",

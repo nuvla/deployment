@@ -234,7 +234,7 @@ CREATE STREAM SUBSCRIPTION_CONFIG_S
   >,
   category VARCHAR,
   "method-ids" ARRAY<VARCHAR>,
-  "resource-id" VARCHAR,
+--   "resource-id" VARCHAR,
   "resource-kind" VARCHAR,
   criteria STRUCT<kind VARCHAR,
                   metric VARCHAR,
@@ -246,7 +246,29 @@ WITH (KAFKA_TOPIC='subscription-config',
       PARTITIONS=1,
       REPLICAS=1,
       VALUE_FORMAT='JSON');
-
+-- {
+--   "description": "New BlackBox created 3",
+--   "category": "notification",
+--   "method-ids": [
+--     "notification-method/f6ea7523-b330-484e-a2a3-28f88016878b",
+--     "notification-method/a909e4da-3ceb-4c4b-bb48-31ef371c62ae"
+--   ],
+--   "name": "BlackBox created 3",
+--   "criteria": {
+--     "metric": "tag",
+--     "kind": "string",
+--     "condition": "is",
+--     "value": "application/blackbox"
+--   },
+--   "id": "subscription-config/48d3b858-3298-4442-8684-98576abdc071",
+--   "acl": {
+--     "owners": [
+--       "user/e5be6cc1-6942-4991-acf4-7d5cf95b9cc6"
+--     ],
+--   },
+--   "enabled": true,
+--   "resource-kind": "event"
+-- }
 --
 -- stream of events
 CREATE STREAM EVENT_S
