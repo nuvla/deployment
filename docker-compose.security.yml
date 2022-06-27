@@ -1,0 +1,29 @@
+version: "3.7"
+
+x-common: &common
+  stop_grace_period: 5s
+  logging:
+    options:
+      max-size: "250k"
+      max-file: "10"
+  labels:
+    - "nuvlabox.component=True"
+    - "nuvlabox.deployment=production"
+    - "nuvlabox.peripheral.component=True"
+    - "nuvlabox.peripheral.type=network"
+
+services:
+  security:
+    <<: *common
+    image: nuvlabox/security:2.0.0
+    restart: on-failure
+    network_mode: host
+    privileged: true
+    environment:
+      - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CVE_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
+      - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
+      - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
+    volumes:
+      - nuvlabox-db:/srv/nuvlabox/shared
+    depends_on:
+      - agent

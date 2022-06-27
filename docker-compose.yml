@@ -107,20 +107,6 @@ services:
     depends_on:
       - agent
 
-  security:
-    <<: *common
-    image: nuvlabox/security:1.2.1
-    restart: on-failure
-    network_mode: host
-    environment:
-      - EXTERNAL_CVE_VULNERABILITY_DB=${EXTERNAL_CVE_VULNERABILITY_DB:-"https://github.com/nuvla/vuln-db/blob/main/databases/all.aggregated.csv.gz?raw=true"}
-      - EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL=${EXTERNAL_CVE_VULNERABILITY_DB_UPDATE_INTERVAL:-86400}
-      - SECURITY_SCAN_INTERVAL=${SECURITY_SCAN_INTERVAL:-1800}
-    volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
-    depends_on:
-      - agent
-
   job-engine-lite:
     <<: *common
     image: nuvla/job-lite:2.19.0
