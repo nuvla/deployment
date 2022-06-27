@@ -16,7 +16,7 @@ services:
   security:
     <<: *common
     image: nuvlabox/security:2.0.0
-    restart: on-failure
+    restart: unless-stopped
     network_mode: host
     privileged: true
     environment:
