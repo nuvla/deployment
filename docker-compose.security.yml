@@ -15,7 +15,7 @@ x-common: &common
 services:
   security:
     <<: *common
-    image: nuvlabox/security:2.0.0
+    image: nuvlabox/security:2.0.1
     restart: unless-stopped
     network_mode: host
     privileged: true
