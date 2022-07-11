@@ -6,6 +6,7 @@ on:
     branches: [master]
     types:
       - completed
+  workflow_dispatch:
 
 env:
   NUVLA_DEV_APIKEY: ${{ secrets.NUVLA_DEV_APIKEY }}
