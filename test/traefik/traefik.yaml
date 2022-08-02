@@ -17,11 +17,13 @@ entryPoints:
     http:
       middlewares:
         traefik-compress:
-          compress: {}
+          compress:
 
 api:
   dashboard: true
   insecure: true
 
 log:
-  level: INFO
+  level: DEBUG
+
+accessLog: {}

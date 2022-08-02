@@ -67,9 +67,12 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
+        - "traefik.http.services.api.loadbalancer.server.port=8200"
         - "traefik.http.services.api.loadbalancer.healthcheck.path=/api/cloud-entry-point"
         - "traefik.http.middlewares.api.headers.customrequestheaders.nuvla-authn-info="
         - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
+        - "traefik.http.routers.qpi.entrypoints=websecure"
+        - "traefik.http.routers.api.tls=true"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -83,8 +86,11 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
+        - "traefik.http.services.ui.loadbalancer.server.port=80"
         - "traefik.http.services.ui.loadbalancer.healthcheck.path=/ui/index.html"
-        - "traefik.http.routers.api.rule=Path(`/,/ui/,/{a:ui.*}`)"
+        - "traefik.http.routers.ui.rule=PathPrefix(`/`)"
+        - "traefik.http.routers.ui.entrypoints=websecure"
+        - "traefik.http.routers.ui.tls=true"
       restart_policy:
         condition: on-failure
         delay: 5s
