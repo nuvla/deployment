@@ -2,13 +2,12 @@ version: '3.7'
 
 services:
   proxy:
-    image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.exposedByDefault=false --loglevel=info
+    image: traefik:v2.8
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.toml
-        target: /traefik.toml
+      - source: traefik.yaml
+        target: /traefik.yaml
     ports:
       - "80:80"
       - "443:443"
@@ -68,11 +67,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.port=8200"
-        - "traefik.backend=api"
-        - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
-        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=PathPrefix:/api"
+        - "traefik.http.services.api.loadbalancer.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.http.middlewares.api.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -86,11 +83,8 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.port=80"
-        - "traefik.backend=ui"
-        - "traefik.backend.healthcheck.path=/ui/index.html"
-        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
+        - "traefik.http.services.ui.loadbalancer.healthcheck.path=/ui/index.html"
+        - "traefik.http.routers.api.rule=Path(`/,/ui/,/{a:ui.*}`)"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -248,8 +242,8 @@ services:
       SMTP_PASSWORD: "${SMTP_PASSWORD}"
 
 configs:
-  traefik.toml:
-    file: ./traefik/traefik.toml
+  traefik.yaml:
+    file: ./traefik/traefik.yaml
   log4j.properties:
     file: ./log4j.properties
   ksql.queries.file:
