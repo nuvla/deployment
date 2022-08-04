@@ -67,12 +67,13 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.services.api.loadbalancer.server.port=8200"
-        - "traefik.http.services.api.loadbalancer.healthcheck.path=/api/cloud-entry-point"
-        - "traefik.http.middlewares.api.headers.customrequestheaders.nuvla-authn-info="
-        - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
-        - "traefik.http.routers.api.entrypoints=websecure"
-        - "traefik.http.routers.api.tls=true"
+        - "traefik.http.services.api-service.loadbalancer.server.port=8200"
+        - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.http.middlewares.api-middleware.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.routers.api-router.rule=PathPrefix(`/api`)"
+        - "traefik.http.routers.api-router.entrypoints=websecure"
+        - "traefik.http.routers.api-router.tls=true"
+        - "traefik.http.routers.api-router.middlewares=api-middleware"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -86,11 +87,11 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.services.ui.loadbalancer.server.port=80"
-        - "traefik.http.services.ui.loadbalancer.healthcheck.path=/ui/index.html"
-        - "traefik.http.routers.ui.rule=Path(`/`) || PathPrefix(`/ui`)"
-        - "traefik.http.routers.ui.entrypoints=websecure"
-        - "traefik.http.routers.ui.tls=true"
+        - "traefik.http.services.ui-service.loadbalancer.server.port=80"
+        - "traefik.http.services.ui-service.loadbalancer.healthcheck.path=/ui/index.html"
+        - "traefik.http.routers.ui-router.rule=Path(`/`) || PathPrefix(`/ui`)"
+        - "traefik.http.routers.ui-router.entrypoints=websecure"
+        - "traefik.http.routers.ui-router.tls=true"
       restart_policy:
         condition: on-failure
         delay: 5s
