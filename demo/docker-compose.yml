@@ -2,13 +2,12 @@ version: '3.7'
 
 services:
   proxy:
-    image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=demo_frontend --docker.exposedByDefault=false --loglevel=info
+    image: traefik:v2.8
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.toml
-        target: /traefik.toml
+      - source: traefik.yaml
+        target: /traefik.yaml
     ports:
       - "80:80"
       - "443:443"
@@ -71,11 +70,14 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.port=8200"
-        - "traefik.backend=api"
-        - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
-        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=PathPrefix:/api"
+        - "traefik.docker.network=frontend"
+        - "traefik.http.services.api-service.loadbalancer.server.port=8200"
+        - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.http.middlewares.api-middleware.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.routers.api-router.rule=PathPrefix(`/api`)"
+        - "traefik.http.routers.api-router.entrypoints=websecure"
+        - "traefik.http.routers.api-router.tls=true"
+        - "traefik.http.routers.api-router.middlewares=api-middleware"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -94,11 +96,11 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.port=80"
-        - "traefik.backend=ui"
-        - "traefik.backend.healthcheck.path=/ui/index.html"
-        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
+        - "traefik.http.services.ui-service.loadbalancer.server.port=80"
+        - "traefik.http.services.ui-service.loadbalancer.healthcheck.path=/ui/index.html"
+        - "traefik.http.routers.ui-router.rule=Path(`/`) || PathPrefix(`/ui`)"
+        - "traefik.http.routers.ui-router.entrypoints=websecure"
+        - "traefik.http.routers.ui-router.tls=true"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -256,8 +258,8 @@ services:
       SMTP_PASSWORD: "${SMTP_PASSWORD}"
 
 configs:
-  traefik.toml:
-    file: ./traefik/traefik.toml
+  traefik.yaml:
+    file: ./traefik/traefik.yaml
   log4j.properties:
     file: ./log4j.properties
   ksql.queries.file:
@@ -269,7 +271,11 @@ configs:
 
 networks:
   frontend:
+    driver: "overlay"
+    name: "frontend"
   backend:
+    driver: "overlay"
+    name: "backend"
 
 volumes:
   esdata:

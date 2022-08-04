@@ -1,0 +1,32 @@
+providers:
+  docker:
+    exposedByDefault: false
+    swarmMode: true
+    network: traefik-public
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+    http:
+      middlewares:
+        traefik-compress:
+          compress:
+
+log:
+  level: INFO
+
+certificatesResolvers:
+  cert-resolver:
+    acme:
+      email: foobar@example.com
+      storage: /lets-encrypt/acme.json
+      httpChallenge:
+        entryPoint: web

@@ -1,19 +1,17 @@
-version: '3.3'
+version: '3.7'
 
 services:
   traefik:
-    image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=traefik-public --docker.exposedByDefault=false --loglevel=info
+    image: traefik:v2.8
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - lets-encrypt:/lets-encrypt
     configs:
-      - source: traefik.toml
-        target: /traefik.toml
+      - source: traefik.yaml
+        target: /traefik.yaml
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     deploy:
       placement:
         constraints:
@@ -29,8 +27,8 @@ volumes:
     driver: local
 
 configs:
-  traefik.toml:
-    file: ./traefik/traefik.toml
+  traefik.yaml:
+    file: ./traefik/traefik.yaml
 
 networks:
   traefik-public:
