@@ -71,15 +71,13 @@ services:
         reservations:
           memory: 64M
       labels:
-        - traefik.frontend.rule=PathPrefixStrip:/grafana
-        - traefik.enable=true
-        - traefik.port=3000
-        - traefik.docker.network=traefik-public
-        # Traefik service that listens to HTTP
-        - traefik.redirectorservice.frontend.entryPoints=http
-        - traefik.redirectorservice.frontend.redirect.entryPoint=https
-        # Traefik service that listens to HTTPS
-        - traefik.webservice.frontend.entryPoints=https
+        - "traefik.enable=true"
+        - "traefik.http.services.grafana-service.loadbalancer.server.port=3000"
+        - "traefik.http.middlewares.grafana-middleware.stripprefix.prefixes=/grafana"
+        - "traefik.http.routers.grafana-router.rule=PathPrefix(`/grafana`)"
+        - "traefik.http.routers.grafana-router.entrypoints=websecure"
+        - "traefik.http.routers.grafana-router.tls=true"
+        - "traefik.http.routers.grafana-router.middlewares=grafana-middleware"
     configs:
       - source: gf_prometheus_datasource
         target: /etc/grafana/provisioning/datasources/prometheus.yaml  
@@ -202,16 +200,13 @@ services:
         reservations:
           memory: 128M
       labels:
-        - traefik.frontend.rule=PathPrefix:/prometheus/
-        - traefik.enable=true
-        - traefik.port=9090
-        - traefik.docker.network=traefik-public
-        # Traefik service that listens to HTTP
-        - traefik.redirectorservice.frontend.entryPoints=http
-        - traefik.redirectorservice.frontend.redirect.entryPoint=https
-        # Traefik service that listens to HTTPS
-        - traefik.webservice.frontend.entryPoints=https
-        - traefik.frontend.auth.basic.users=${ADMIN_USER:-admin}:${ADMIN_HASHED_PASSWORD:?provide ADMIN_HASHED_PASSWORD value}
+        - "traefik.enable=true"
+        - "traefik.http.services.prometheus-service.loadbalancer.server.port=9090"
+        - "traefik.http.middlewares.prometheus-middleware.basicauth.users=${ADMIN_USER:-admin}:${ADMIN_HASHED_PASSWORD:?provide ADMIN_HASHED_PASSWORD value}"
+        - "traefik.http.routers.prometheus-router.rule=PathPrefix(`/prometheus`)"
+        - "traefik.http.routers.prometheus-router.entrypoints=websecure"
+        - "traefik.http.routers.prometheus-router.tls=true"
+        - "traefik.http.routers.prometheus-router.middlewares=prometheus-middleware"
     networks:
       - net
       - traefik-public
