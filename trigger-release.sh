@@ -18,9 +18,9 @@ then
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [ "$branch" != "master" ]
+if [ "$branch" != "main" ]
 then
-  echo "ERR: this script can only be executed on the master branch"
+  echo "ERR: this script can only be executed on the main branch"
   exit 1
 fi
 

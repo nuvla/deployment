@@ -34,7 +34,7 @@ usage()
   echo -e "INSTALL args:"
   echo -e " --compose-files=<list>\t\t\t(optional) Comma-separated list of compose files to deploy. If not passed, it uses all"
   echo -e " --environment=<list>\t\t\t(optional) Comma-separated list of ENV=VALUE keypairs"
-  echo -e " --target-version=<string>\t\t(optional) NuvlaEdge Engine release to be installed. If not passed, it uses the master branch"
+  echo -e " --target-version=<string>\t\t(optional) NuvlaEdge Engine release to be installed. If not passed, it uses the main branch"
   echo -e " --project=<string>\t\t\t(optional) Project name used during the first installation. Default is 'nuvlaedge'"
   echo -e " --quiet\t\t\t\t(optional) Only print final status message"
   echo -e " --daemon\t\t\t\t(optional) If set, it will install the NuvlaEdge and exit the installer"

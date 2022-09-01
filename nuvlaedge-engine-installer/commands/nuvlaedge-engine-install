@@ -1,7 +1,7 @@
 #!/bin/sh
 
 compose_files=${compose_files:-$1}
-target_version=${target_version:-${2:-"master"}}
+target_version=${target_version:-${2:-"main"}}
 quiet=${quiet:-${3:-0}}
 environment=${environment:-$4}
 project=${project:-${5:-nuvlaedge}}
@@ -27,7 +27,7 @@ then
   fi
 fi
 
-if [[ ! -z ${target_version} ]] && [[ "${target_version}" != "master" ]]
+if [[ ! -z ${target_version} ]] && [[ "${target_version}" != "master" ]] && [[ "${target_version}" != "main" ]]
 then
   source_code_url="${github_releases}/download/${target_version}"
 

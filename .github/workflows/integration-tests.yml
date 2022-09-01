@@ -3,7 +3,7 @@ name: "NuvlaEdge Local Integration Testing"
 on:
   workflow_run:
     workflows: ["NuvlaEdge Installer Build"]
-    branches: [master]
+    branches: [main]
     types:
       - completed
   workflow_dispatch:

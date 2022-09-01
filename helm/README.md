@@ -34,7 +34,7 @@ The following components are optional:
  - peripheral-manager-bluetooth
  - peripheral-manager-gpu
  - peripheral-manager-modbus
- 
+
 To enable them at installation time, simply add `--set security=true --set peripheralManagerGPU=true     # etc.` to the command above, according to your preferences.
 
 ### Parameterization
@@ -51,6 +51,6 @@ Example:
 helm install --set NUVLAEDGE_UUID=<paste_NUVLAEDGE_UUID_from_nuvla> \
     --set kubernetesNode=<TARGET_KUBERNETES_NODE_NAME> \
     --set images.agent.repository=nuvladev/agent \
-    --set images.agent.tag=master \
+    --set images.agent.tag=main \
     # etc...
 ```
