@@ -34,17 +34,17 @@ then
   exit 1
 fi
 
-sed -i.old "s/NUVLABOX_ENGINE_VERSION.*/NUVLABOX_ENGINE_VERSION=$tag/g" docker-compose.yml
+sed -i.old "s/NUVLAEDGE_ENGINE_VERSION.*/NUVLAEDGE_ENGINE_VERSION=$tag/g" docker-compose.yml
 rm docker-compose.yml.old
 
-#sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlabox-engine-installer/container-release.sh
-#rm nuvlabox-engine-installer/container-release.sh.old
+#sed -i.old "s/DOCKER_IMAGE=.*/DOCKER_IMAGE=$tag/g" nuvlaedge-engine-installer/container-release.sh
+#rm nuvlaedge-engine-installer/container-release.sh.old
 
-git add docker-compose.yml #nuvlabox-engine-installer/container-release.sh
-git commit -m "Update NuvlaBox Engine version to $tag"
+git add docker-compose.yml #nuvlaedge-engine-installer/container-release.sh
+git commit -m "Update NuvlaEdge Engine version to $tag"
 git push
 
-git tag -a $tag -m "Triggering automatic release for NuvlaBox Engine - $tag"
+git tag -a $tag -m "Triggering automatic release for NuvlaEdge Engine - $tag"
 git push origin $tag
 
 set +x

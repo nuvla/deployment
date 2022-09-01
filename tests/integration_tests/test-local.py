@@ -18,14 +18,14 @@ from common.nuvla_api import NuvlaApi
 from common.timeout import timeout
 
 
-NUVLABOX_DATA_GATEWAY_IMAGE="eclipse-mosquitto:1.6.12"
-NUVLABOX_IMMUTABLE_SSH_PUB_KEY="testpubkey"
+NUVLAEDGE_DATA_GATEWAY_IMAGE="eclipse-mosquitto:1.6.12"
+NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY="testpubkey"
 VPN_INTERFACE_NAME="testvpn"
-HOST="testnuvlabox"
+HOST="testnuvlaedge"
 HOST_HOME=os.getenv('HOME')
 
 local_project_name = str(uuid.uuid4())
-nuvlabox_id = os.environ.get('NUVLABOX_ID')
+nuvlaedge_id = os.environ.get('NUVLAEDGE_ID')
 docker_client = docker.from_env()
 nuvla = NuvlaApi()
 nuvla.login()
@@ -41,42 +41,42 @@ key = NamedTemporaryFile()
 # atexit.register(cleaner.goodbye)
 
 repo = Repo("../..")
-if repo.active_branch.name == "master":
-    nbe_installer_image = "nuvlabox/installer:master"
+if repo.active_branch.name == "main":
+    nbe_installer_image = "nuvlaedge/installer:main"
 else:
     nbe_installer_image = f"nuvladev/installer:{repo.active_branch.name}"
 
 
-def test_deploy_nuvlaboxes(request):
-    assert nuvlabox_id != '', 'Missing NuvlaBox ID for local installation'
+def test_deploy_nuvlaedgees(request):
+    assert nuvlaedge_id != '', 'Missing NuvlaEdge ID for local installation'
 
     # deploy local NB
     docker_client.images.pull(nbe_installer_image)
     request.config.cache.set('local_project_name', local_project_name)
 
-    nb_env = f'NUVLABOX_UUID={nuvlabox_id},HOST_HOME={HOST_HOME},SKIP_MINIMUM_REQUIREMENTS=True,'\
-            f'NUVLABOX_DATA_GATEWAY_IMAGE={NUVLABOX_DATA_GATEWAY_IMAGE},'\
-            f'NUVLABOX_SSH_PUB_KEY={NUVLABOX_IMMUTABLE_SSH_PUB_KEY},'\
+    nb_env = f'NUVLAEDGE_UUID={nuvlaedge_id},HOST_HOME={HOST_HOME},SKIP_MINIMUM_REQUIREMENTS=True,'\
+            f'NUVLAEDGE_DATA_GATEWAY_IMAGE={NUVLAEDGE_DATA_GATEWAY_IMAGE},'\
+            f'NUVLAEDGE_SSH_PUB_KEY={NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY},'\
             f'VPN_INTERFACE_NAME={VPN_INTERFACE_NAME},HOST={HOST}'
     try:
         docker_client.containers.run(nbe_installer_image,
                                     command=f"install --project={local_project_name} --daemon --environment={nb_env}",
-                                    name="nuvlabox-engine-installer",
+                                    name="nuvlaedge-engine-installer",
                                     volumes={
                                         '/var/run/docker.sock': {'bind': '/var/run/docker.sock',
                                                                 'mode': 'ro'}
                                     })
     except docker.errors.ContainerError as e:
-        logging.error(f'Cannot install local NuvlaBox Engine. Reason: {str(e)}')
+        logging.error(f'Cannot install local NuvlaEdge Engine. Reason: {str(e)}')
 
-    installer_container = docker_client.containers.get("nuvlabox-engine-installer")
+    installer_container = docker_client.containers.get("nuvlaedge-engine-installer")
 
     assert installer_container.attrs['State']['ExitCode'] == 0, 'NBE installer failed'
-    logging.info(f'NuvlaBox ({nuvlabox_id}) Engine successfully installed with project name {local_project_name}')
+    logging.info(f'NuvlaEdge ({nuvlaedge_id}) Engine successfully installed with project name {local_project_name}')
 
 
-def test_nuvlabox_engine_containers_stability(request):
-    nb_containers = docker_client.containers.list(filters={'label': 'nuvlabox.component=True'}, all=True)
+def test_nuvlaedge_engine_containers_stability(request):
+    nb_containers = docker_client.containers.list(filters={'label': 'nuvlaedge.component=True'}, all=True)
 
     container_names = []
     image_names = []
@@ -84,7 +84,7 @@ def test_nuvlabox_engine_containers_stability(request):
         image_names.append(container.attrs['Config']['Image'])
 
         assert (container.attrs['RestartCount'] == 0 or container.attrs.get('State', {}).get('ExitCode', 0) == 0), \
-            f'Local NuvlaBox container {container.name} is unstable: {json.dumps(container.attrs, indent=2)}\n\n' \
+            f'Local NuvlaEdge container {container.name} is unstable: {json.dumps(container.attrs, indent=2)}\n\n' \
                 f'Logs: {container.logs()}'
 
         # we allow for containers to have exited, provided they have exited without an error
@@ -94,12 +94,12 @@ def test_nuvlabox_engine_containers_stability(request):
             continue
 
         assert container.status.lower() in ['running', 'paused'], \
-            f'Local NuvlaBox container {container.name} is not running. Logs are: {container.logs()}. ' \
+            f'Local NuvlaEdge container {container.name} is not running. Logs are: {container.logs()}. ' \
                 f'Details: {json.dumps(container.attrs, indent=2)}'
 
         container_names.append(container.name)
 
-    logging.info('All NuvlaBox containers from local installation are stable')
+    logging.info('All NuvlaEdge containers from local installation are stable')
     request.config.cache.set('containers', container_names)
     request.config.cache.set('images', image_names)
 
@@ -110,10 +110,10 @@ def test_ssh_key_bootstrap():
         f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir(HOST_HOME)}'
 
     with open(authorized_keys) as ak:
-        assert NUVLABOX_IMMUTABLE_SSH_PUB_KEY in ak.read()
+        assert NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY in ak.read()
 
 
-def test_nuvlabox_engine_local_agent_api(request):
+def test_nuvlaedge_engine_local_agent_api(request):
     agent_api = 'http://localhost:5080/api/'
     r = requests.get(agent_api + 'healthcheck')
     assert r.status_code == 200, f'{agent_api} is not up'
@@ -126,18 +126,18 @@ def test_nuvlabox_engine_local_agent_api(request):
     }
     r = requests.post(agent_api + 'commission', json=commission)
     assert r.status_code == 200, f'Commissioning {commission} via {agent_api}, has failed'
-    logging.info(f'NuvlaBox commissioning is working (tested with payload: {commission})')
+    logging.info(f'NuvlaEdge commissioning is working (tested with payload: {commission})')
 
-    nuvlabox = nuvla.api.get(nuvlabox_id)
-    assert 'TEST_TAG' in nuvlabox.data.get('tags', []), f'Commissioning false positive. Tags were not propagated'
-    request.config.cache.set('nuvlabox_id_local_isg', nuvlabox.data['infrastructure-service-group'])
+    nuvlaedge = nuvla.api.get(nuvlaedge_id)
+    assert 'TEST_TAG' in nuvlaedge.data.get('tags', []), f'Commissioning false positive. Tags were not propagated'
+    request.config.cache.set('nuvlaedge_id_local_isg', nuvlaedge.data['infrastructure-service-group'])
 
     # check peripherals api
     mock_peripheral_identifier = 'mock:usb:peripheral'
     mock_peripheral = {
         'identifier': mock_peripheral_identifier,
         'interface': 'USB',
-        'version': int(nuvlabox.data['version']),
+        'version': int(nuvlaedge.data['version']),
         'name': '(local NB) Mock USB Peripheral',
         'available': True,
         'classes': ['video']
@@ -203,81 +203,81 @@ def test_nuvlabox_engine_local_agent_api(request):
     logging.info(f'Agent API ({agent_api}) for peripheral management is up and running')
 
 
-def test_nuvlabox_engine_local_compute_api(request):
+def test_nuvlaedge_engine_local_compute_api(request):
     volume = docker_client.api.inspect_volume(local_project_name + "_nuvlabox-db").get('Mountpoint')
-    request.config.cache.set('nuvlabox_volume_path', volume)
+    request.config.cache.set('nuvlaedge_volume_path', volume)
 
     agent = docker_client.containers.get(local_project_name + "_agent_1")
 
-    raw_cert = agent.exec_run('cat /srv/nuvlabox/shared/cert.pem').output
+    raw_cert = agent.exec_run('cat /srv/nuvlaedge/shared/cert.pem').output
     cert.write(raw_cert)
     cert.flush()
 
-    raw_key = agent.exec_run('cat /srv/nuvlabox/shared/key.pem').output
+    raw_key = agent.exec_run('cat /srv/nuvlaedge/shared/key.pem').output
     key.write(raw_key)
     key.flush()
 
     compute_api = 'https://localhost:5000/'
 
     r = requests.get(compute_api + 'containers/json', verify=False, cert=(cert.name, key.name))
-    assert r.status_code == 200, f'NuvlaBox compute API {compute_api} is not working'
+    assert r.status_code == 200, f'NuvlaEdge compute API {compute_api} is not working'
     assert len(r.json()) > 0, \
-        f'NuvlaBox compute API {compute_api} should have reported (at least) the NuvlaBox containers'
+        f'NuvlaEdge compute API {compute_api} should have reported (at least) the NuvlaEdge containers'
 
     logging.info(f'Compute API ({compute_api}) is up, running and secured')
 
 
-def test_nuvlabox_engine_local_datagateway():
-    nuvlabox_network = 'nuvlabox-shared-network'
+def test_nuvlaedge_engine_local_datagateway():
+    nuvlaedge_network = 'nuvlaedge-shared-network'
 
     docker_net = None
     try:
-        docker_net = docker_client.networks.get(nuvlabox_network)
+        docker_net = docker_client.networks.get(nuvlaedge_network)
     except docker.errors.NotFound:
-        logging.warning(f'NuvlaBox network {nuvlabox_network} not found')
+        logging.warning(f'NuvlaEdge network {nuvlaedge_network} not found')
 
-    assert nuvlabox_network == docker_net.name, f'Network {nuvlabox_network} does not exist'
+    assert nuvlaedge_network == docker_net.name, f'Network {nuvlaedge_network} does not exist'
 
     check_dg = docker_client.containers.run('alpine',
                                             command='sh -c "ping -c 1 data-gateway 2>&1 >/dev/null && echo OK"',
-                                            network=nuvlabox_network,
+                                            network=nuvlaedge_network,
                                             remove=True)
 
     assert 'OK' in check_dg.decode(), f'Cannot reach Data Gateway containers: {check_dg}'
 
-    logging.info(f'NuvlaBox shared network ({nuvlabox_network}) is functional')
+    logging.info(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional')
 
-    cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlabox-status -C 1"'
+    cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"'
     check_mqtt = docker_client.containers.run('alpine',
                                             command=cmd,
-                                            network=nuvlabox_network,
+                                            network=nuvlaedge_network,
                                             remove=True)
 
     nb_status = json.loads(check_mqtt.decode())
-    assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaBox status failed: {nb_status}'
+    assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
 
-    logging.info('NuvlaBox MQTT messaging is working')
+    logging.info('NuvlaEdge MQTT messaging is working')
 
 
-def test_nuvlabox_engine_local_system_manager():
+def test_nuvlaedge_engine_local_system_manager():
     system_manager_dashboard = 'http://127.0.0.1:3636/dashboard'
 
     r = requests.get(system_manager_dashboard)
-    assert r.status_code == 200, f'Internal NuvlaBox dashboard {system_manager_dashboard} is down'
-    assert 'NuvlaBox Local Dashboard' in r.text, \
-        f'Internal NuvlaBox dashboard {system_manager_dashboard} has wrong content'
+    assert r.status_code == 200, f'Internal NuvlaEdge dashboard {system_manager_dashboard} is down'
+    assert 'NuvlaEdge Local Dashboard' in r.text, \
+        f'Internal NuvlaEdge dashboard {system_manager_dashboard} has wrong content'
 
     r = requests.get(system_manager_dashboard + '/logs')
-    assert r.status_code == 200, f'Internal NuvlaBox dashboard {system_manager_dashboard}/logs is down'
-    assert 'NuvlaBox Local Dashboard - Logs' in r.text, \
-        f'Internal NuvlaBox dashboard {system_manager_dashboard}/logs has wrong content'
+    assert r.status_code == 200, f'Internal NuvlaEdge dashboard {system_manager_dashboard}/logs is down'
+    assert 'NuvlaEdge Local Dashboard - Logs' in r.text, \
+        f'Internal NuvlaEdge dashboard {system_manager_dashboard}/logs has wrong content'
 
     r = requests.get(system_manager_dashboard + '/peripherals')
-    assert r.status_code == 200, f'Internal NuvlaBox dashboard {system_manager_dashboard}/peripherals is down'
-    assert 'NuvlaBox Local Dashboard - Peripherals' in r.text, \
-        f'Internal NuvlaBox dashboard {system_manager_dashboard}/peripherals has wrong content'
+    assert r.status_code == 200, f'Internal NuvlaEdge dashboard {system_manager_dashboard}/peripherals is down'
+    assert 'NuvlaEdge Local Dashboard - Peripherals' in r.text, \
+        f'Internal NuvlaEdge dashboard {system_manager_dashboard}/peripherals has wrong content'
 
-    logging.info(f'NuvlaBox internal dashboard ({system_manager_dashboard}) is up and running')
+    logging.info(f'NuvlaEdge internal dashboard ({system_manager_dashboard}) is up and running')
 
 
 def test_cis_benchmark(request):
@@ -323,4 +323,4 @@ def test_cis_benchmark(request):
 #def test_security_scanner(request):
 #    agent = docker_client.containers.get(local_project_name + "_agent_1")
 
-    # assert agent.exec_run('cat /srv/nuvlabox/shared/vulnerabilities').exit_code == 0
+    # assert agent.exec_run('cat /srv/nuvlaedge/shared/vulnerabilities').exit_code == 0

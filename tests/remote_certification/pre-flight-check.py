@@ -18,10 +18,10 @@ def test_nuvla_login():
     assert nuvla.api.is_authenticated(), "The provided Nuvla API key credential is not valid"
 
 
-def test_zero_nuvlaboxes():
-    logging.info('We shall not run this test if there are leftover NuvlaBox resources in Nuvla...')
+def test_zero_nuvlaedges():
+    logging.info('We shall not run this test if there are leftover NuvlaEdge resources in Nuvla...')
     search_filter = 'name^="[CI/CD Remote Certification " and state="COMMISSIONED"'
-    existing_nuvlaboxes = nuvla.api.get('nuvlabox',
+    existing_nuvlaedges = nuvla.api.get('nuvlabox',
                                         filter=search_filter)
     # if there are NBs then it means a previous test run left uncleaned resources. This must be fixed manually
-    assert existing_nuvlaboxes.data.get('count', 0) == 0, 'There are leftovers from previous tests'
+    assert existing_nuvlaedges.data.get('count', 0) == 0, 'There are leftovers from previous tests'

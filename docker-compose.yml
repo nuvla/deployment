@@ -7,27 +7,27 @@ x-common: &common
       max-size: "250k"
       max-file: "10"
   labels:
-    - "nuvlabox.component=True"
-    - "nuvlabox.deployment=production"
+    - "nuvlaedge.component=True"
+    - "nuvlaedge.deployment=production"
 
 volumes:
   nuvlabox-db:
     driver: local
     labels:
-      - "nuvlabox.volume=True"
-      - "nuvlabox.deployment=production"
+      - "nuvlaedge.volume=True"
+      - "nuvlaedge.deployment=production"
 
 services:
   system-manager:
     <<: *common
-    image: nuvlabox/system-manager:2.4.0
+    image: nuvlaedge/system-manager:2.5.0
     restart: always
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
-      - NUVLABOX_DATA_GATEWAY_IMAGE=${NUVLABOX_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
+      - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlabox-db:/srv/nuvlabox/shared
+      - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
       - 127.0.0.1:3636:3636
     healthcheck:
@@ -41,23 +41,23 @@ services:
 
   agent:
     <<: *common
-    image: nuvlabox/agent:2.8.0
+    image: nuvlaedge/agent:2.9.0
     restart: always
     oom_kill_disable: true
     privileged: true
     environment:
-      - NUVLABOX_API_KEY=${NUVLABOX_API_KEY}
-      - NUVLABOX_API_SECRET=${NUVLABOX_API_SECRET}
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
-      - NUVLABOX_ENGINE_VERSION=2.4.0
-      - NUVLABOX_IMMUTABLE_SSH_PUB_KEY=${NUVLABOX_SSH_PUB_KEY}
+      - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY}
+      - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET}
+      - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
+      - NUVLAEDGE_ENGINE_VERSION=2.4.0
+      - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY}
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlabox-db:/srv/nuvlabox/shared
+      - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
     ports:
       - 127.0.0.1:5080:80
@@ -72,16 +72,16 @@ services:
 
   compute-api:
     <<: *common
-    image: nuvlabox/compute-api:1.2.0
+    image: nuvlaedge/compute-api:1.3.0
     container_name: compute-api
     restart: on-failure
     oom_score_adj: -900
     pid: "host"
     environment:
-      - HOST=${HOSTNAME:-nuvlabox}
+      - HOST=${HOSTNAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - nuvlabox-db:/srv/nuvlabox/shared
+      - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
       - 5000:5000
     healthcheck:
@@ -92,7 +92,7 @@ services:
 
   vpn-client:
     <<: *common
-    image: nuvlabox/vpn-client:1.1.0
+    image: nuvlaedge/vpn-client:1.2.0
     container_name: vpn-client
     restart: always
     oom_kill_disable: true
@@ -101,9 +101,9 @@ services:
     devices:
       - /dev/net/tun
     environment:
-      - NUVLABOX_UUID=${NUVLABOX_UUID}
+      - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
     volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
+      - nuvlabox-db:/srv/nuvlaedge/shared
     depends_on:
       - agent
 
@@ -111,16 +111,16 @@ services:
     <<: *common
     image: nuvla/job-lite:3.1.0
     restart: always
-    container_name: nuvlabox-job-engine-lite
+    container_name: nuvlaedge-job-engine-lite
     entrypoint: /app/pause.py
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
   on-stop:
     <<: *common
-    image: nuvlabox/on-stop:1.1.0
+    image: nuvlaedge/on-stop:1.2.0
     restart: always
-    container_name: nuvlabox-on-stop
+    container_name: nuvlaedge-on-stop
     command: pause
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

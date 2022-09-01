@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-manager-deployment
+  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  labels:
+    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      component: system-manager
+  template:
+    metadata:
+      labels:
+        component: system-manager
+        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
+      containers:
+        - name: system-manager
+          image: "{{ .Values.images.systemManager.repository }}:{{ .Values.images.systemManager.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.systemManager.pullPolicy }}
+          env:
+            - name: SKIP_MINIMUM_REQUIREMENTS
+              value: {{ .Values.SKIP_MINIMUM_REQUIREMENTS | default "False" | quote }}
+            - name: MY_HOST_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MY_NAMESPACE
+              value: {{ include "nuvlaedge-engine.namespace" . }}
+          ports:
+            - containerPort: 3636
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:3636
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          volumeMounts:
+            - mountPath: /rootfs
+              name: rootfs
+              readOnly: true
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
+
+      ## VOLUMES
+      volumes:
+        - name: rootfs
+          hostPath:
+            path: /
+        - name: nuvlaedge-db
+          hostPath:
+            path: /var/lib/{{ include "nuvlaedge-engine.namespace" . }}

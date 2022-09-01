@@ -1,0 +1,104 @@
+# Default values for nuvlaedge-engine.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+vpnClientComponentName: vpn-client
+
+images:
+  agent:
+    repository: nuvlaedge/agent
+    pullPolicy: Always
+    tag: "2.9.0"
+  dataGateway:
+    repository: eclipse-mosquitto
+    pullPolicy: Always
+    tag: "2.0"
+  jobEngineLite:
+    repository: nuvla/job-lite
+    pullPolicy: Always
+    tag: "3.1.0"
+  kubernetesCredentialsManager:
+    repository: nuvlaedge/kubernetes-credentials-manager
+    pullPolicy: Always
+    tag: "1.0.0"
+  security:
+    repository: nuvlaedge/security
+    pullPolicy: Always
+    tag: "2.2.0"
+  systemManager:
+    repository: nuvlaedge/system-manager
+    pullPolicy: Always
+    tag: "2.5.0"
+  vpnClient:
+    repository: nuvlaedge/vpn-client
+    pullPolicy: Always
+    tag: "1.2.0"
+  peripheralManagerUSB:
+    repository: nuvlaedge/peripheral-manager-usb
+    pullPolicy: Always
+    tag: "2.2.0"
+  peripheralManagerNetwork:
+    repository: nuvlaedge/peripheral-manager-network
+    pullPolicy: Always
+    tag: "1.3.0"
+  peripheralManagerModbus:
+    repository: nuvlaedge/peripheral-manager-modbus
+    pullPolicy: Always
+    tag: "1.4.0"
+  peripheralManagerBluetooth:
+    repository: nuvlaedge/peripheral-manager-bluetooth
+    pullPolicy: Always
+    tag: "1.3.0"
+  peripheralManagerGPU:
+    repository: nuvlaedge/peripheral-manager-gpu
+    pullPolicy: Always
+    tag: "1.2.0"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {"helm.sh/hook": "pre-install"}
+  name: "nuvlaedge-service-account"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+tolerations: []
+
+affinity: {}

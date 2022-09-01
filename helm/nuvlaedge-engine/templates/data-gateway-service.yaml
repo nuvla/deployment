@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-gateway
+  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  labels:
+    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+spec:
+  publishNotReadyAddresses: True
+  ports:
+    - port: 1883
+      targetPort: 1883
+  selector:
+    component: data-gateway

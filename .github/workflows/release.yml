@@ -1,4 +1,4 @@
-# Automatic release of NuvlaBox Engine, for every new tag
+# Automatic release of NuvlaEdge Engine, for every new tag
 name: "tagged-release"
 
 on:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   tagged-release:
-    name: "Tagged NuvlaBox Engine Release"
+    name: "Tagged NuvlaEdge Engine Release"
     runs-on: "ubuntu-latest"
 
     steps:

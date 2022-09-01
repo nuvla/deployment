@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vpn-client-deployment
+  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  labels:
+    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: {{ .Values.vpnClientComponentName }}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.vpnClientComponentName }}
+        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+    spec:
+      hostNetwork: true
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
+      containers:
+        - name: {{ .Values.vpnClientComponentName }}
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          image: "{{ .Values.images.vpnClient.repository }}:{{ .Values.images.vpnClient.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.vpnClient.pullPolicy }}
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - /dev/net/tun
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-tun
+            - mountPath: /srv/nuvlaedge/shared
+              name: nuvlaedge-db
+
+      volumes:
+        - name: dev-tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+        - name: nuvlaedge-db
+          hostPath:
+            path: /var/lib/{{ include "nuvlaedge-engine.namespace" . }}

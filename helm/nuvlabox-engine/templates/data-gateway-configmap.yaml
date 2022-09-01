@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: data-gateway
-  namespace: {{ include "nuvlabox-engine.namespace" . }}
-data:
-  mosquitto.conf: |-
-    port 1883
-    allow_anonymous true

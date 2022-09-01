@@ -7,20 +7,20 @@ x-common: &common
       max-size: "250k"
       max-file: "10"
   labels:
-    - "nuvlabox.component=True"
-    - "nuvlabox.deployment=production"
-    - "nuvlabox.peripheral.component=True"
-    - "nuvlabox.peripheral.type=usb"
+    - "nuvlaedge.component=True"
+    - "nuvlaedge.deployment=production"
+    - "nuvlaedge.peripheral.component=True"
+    - "nuvlaedge.peripheral.type=usb"
 
 services:
   peripheral-manager-usb:
     <<: *common
-    image: nuvlabox/peripheral-manager-usb:2.1.0
+    image: nuvlaedge/peripheral-manager-usb:2.2.0
     restart: always
     network_mode: host
     volumes:
       - /dev:/dev:ro
       - /run/udev/control:/run/udev/control:ro
-      - nuvlabox-db:/srv/nuvlabox/shared
+      - nuvlabox-db:/srv/nuvlaedge/shared
     depends_on:
       - agent

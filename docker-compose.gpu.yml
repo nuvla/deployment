@@ -7,15 +7,15 @@ x-common: &common
       max-size: "250k"
       max-file: "10"
   labels:
-    - "nuvlabox.component=True"
-    - "nuvlabox.deployment=production"
-    - "nuvlabox.peripheral.component=True"
-    - "nuvlabox.peripheral.type=gpu"
+    - "nuvlaedge.component=True"
+    - "nuvlaedge.deployment=production"
+    - "nuvlaedge.peripheral.component=True"
+    - "nuvlaedge.peripheral.type=gpu"
 
 services:
   peripheral-manager-gpu:
     <<: *common
-    image: nuvlabox/peripheral-manager-gpu:1.1.0
+    image: nuvlaedge/peripheral-manager-gpu:1.2.0
     restart: on-failure
     volumes:
       - /etc/:/etcfs/:ro

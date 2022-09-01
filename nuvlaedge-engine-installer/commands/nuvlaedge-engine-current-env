@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+import docker
+import sys
+import inspect
+
+func = inspect.currentframe().f_code
+project = sys.argv[1]
+
+dc = docker.from_env()
+
+try:
+    filter_label = ["nuvlaedge.component=True", f"com.docker.compose.project={project}"]
+
+    nuvlaedge_containers = dc.containers.list(filters={'label': filter_label})
+
+    full_environment = {}
+    for container in nuvlaedge_containers:
+        env = container.attrs.get('Config', {}).get('Env', [])
+        for env_var in env:
+            try:
+                k,v = env_var.split('=')
+            except ValueError:
+                # ignore this env
+                continue
+            if k not in full_environment or v:
+                full_environment[k] = v
+
+    str_environment = ','.join([f'{key}={value}' for key, value in full_environment.items()])
+
+    print(str_environment)
+except Exception as e:
+    # making sure that only the error message is printed and not the whole exception
+    sys.exit(f'Critical error in {func.co_filename}: {str(e)}')

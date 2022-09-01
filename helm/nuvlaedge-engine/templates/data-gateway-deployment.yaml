@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-gateway-deployment
+  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  labels:
+    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      component: data-gateway
+  template:
+    metadata:
+      labels:
+        component: data-gateway
+        {{- include "nuvlaedge-engine.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.kubernetesNode }}
+      containers:
+        - name: data-gateway
+          image: "{{ .Values.images.dataGateway.repository }}:{{ .Values.images.dataGateway.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.images.dataGateway.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - "sleep 10 && /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf"
+          ports:
+            - containerPort: 1883
+          volumeMounts:
+            - mountPath: /mosquitto/config/
+              name: data-gateway-config
+
+      ## VOLUMES
+      volumes:
+        - name: data-gateway-config
+          configMap:
+            name: data-gateway

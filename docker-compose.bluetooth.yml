@@ -7,18 +7,18 @@ x-common: &common
       max-size: "250k"
       max-file: "10"
   labels:
-    - "nuvlabox.component=True"
-    - "nuvlabox.deployment=production"
-    - "nuvlabox.peripheral.component=True"
-    - "nuvlabox.peripheral.type=bluetooth"
+    - "nuvlaedge.component=True"
+    - "nuvlaedge.deployment=production"
+    - "nuvlaedge.peripheral.component=True"
+    - "nuvlaedge.peripheral.type=bluetooth"
 
 services:
   peripheral-manager-bluetooth:
     <<: *common
-    image: nuvlabox/peripheral-manager-bluetooth:1.2.0
+    image: nuvlaedge/peripheral-manager-bluetooth:1.3.0
     restart: on-failure
     network_mode: host
     volumes:
-      - nuvlabox-db:/srv/nuvlabox/shared
+      - nuvlabox-db:/srv/nuvlaedge/shared
     depends_on:
       - agent

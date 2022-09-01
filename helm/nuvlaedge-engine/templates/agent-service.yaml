@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent
+  namespace: {{ include "nuvlaedge-engine.namespace" . }}
+  labels:
+    {{- include "nuvlaedge-engine.labels" . | nindent 4 }}
+spec:
+  publishNotReadyAddresses: True
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    component: agent

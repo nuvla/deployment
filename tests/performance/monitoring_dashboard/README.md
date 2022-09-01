@@ -1,4 +1,4 @@
-# NuvlaBox Performance Monitoring 
+# NuvlaEdge Performance Monitoring
 
 This will deploy a monitoring stack based on cAdvisor, Prometheus and Grafana.
 
@@ -8,7 +8,7 @@ To launch the monitoring stack, run:
 
 ```shell
 docker-compose -f <compose-file> up -d
-# where the compose-file is one of the 
+# where the compose-file is one of the
 # docker-compose.<arch>.yml files available in this folder
 ```
 
@@ -22,6 +22,6 @@ you'll need to manually enable the probes available under the `probes` folder.
 For example:
 
 ```bash
-# from anywhere within the host device where the NuvlaBox is running
+# from anywhere within the host device where the NuvlaEdge is running
 ./probes/get-mem-for-all-processes.sh &
 ```

@@ -1,8 +1,8 @@
-name: "NuvlaBox Remote Certification Test"
+name: "NuvlaEdge Remote Certification Test"
 
 on:
   workflow_run:
-    workflows: ["NuvlaBox Installer Build"]
+    workflows: ["NuvlaEdge Installer Build"]
     branches: [master]
     types:
       - completed
@@ -19,7 +19,7 @@ defaults:
 
 jobs:
   tester:
-    name: "Run NuvlaBox Remote Certification Tests"
+    name: "Run NuvlaEdge Remote Certification Tests"
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
@@ -52,46 +52,46 @@ jobs:
 
       - name: Preflight Checks
         run: |
-          python -m pytest -vv -x --html=nuvlabox.pre-flight-check.output.html --self-contained-html pre-flight-check.py
+          python -m pytest -vv -x --html=nuvlaedge.pre-flight-check.output.html --self-contained-html pre-flight-check.py
 
-      - name: Create Test NuvlaBox in Nuvla.io
+      - name: Create Test NuvlaEdge in Nuvla.io
         if: ${{ success() }}
-        id: NewNuvlaBox
+        id: NewNuvlaEdge
         uses: nuvla/nuvla-create-nuvlabox-action@v2
         with:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
-          name: "[CI/CD Remote Certification (${{ matrix.architecture }})] Test NuvlaBox"
-          description: NuvlaBox for remote certification on ${{ matrix.architecture }} devices - commit ${{ github.sha }}, on branch ${{ github.ref }}, by ${{ github.actor }}
+          name: "[CI/CD Remote Certification (${{ matrix.architecture }})] Test NuvlaEdge"
+          description: NuvlaEdge for remote certification on ${{ matrix.architecture }} devices - commit ${{ github.sha }}, on branch ${{ github.ref }}, by ${{ github.actor }}
 
-      - name: Deploy NuvlaBox Engine in CI/CD Testbed
+      - name: Deploy NuvlaEdge Engine in CI/CD Testbed
         if: ${{ success() }}
-        id: DeployNuvlaBoxEngine
+        id: DeployNuvlaEdgeEngine
         uses: nuvla/nuvla-deploy-app-action@v2
         with:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
           module-id: module/e4dcd975-2717-4051-8ade-80f6ed4bcfb1
           credential-id: ${{ matrix.credential-id }}
-          environment: "NUVLABOX_UUID=${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}"
+          environment: "NUVLAEDGE_UUID=${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}"
 
       - name: Check commissioning
         if: ${{ success() }}
         env:
-          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          NUVLAEDGE_ID: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.commission-check.output.html --self-contained-html commission-check.py
+          python -m pytest -vv -x --html=nuvlaedge.commission-check.output.html --self-contained-html commission-check.py
 
       - name: Test Installation Success
         if: ${{ success() }}
         id: TestInstallationSuccess
         env:
-          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          NUVLAEDGE_ID: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.test-successful-installation.output.html --self-contained-html test-successful-installation.py
-          out=$(cat nuvlabox.test-successful-installation.output.html | grep ::set-nuvlabox_credential_id)
-          cred_id=$(echo $out | awk -F'::set-nuvlabox_credential_id' '{print $2}')
-          echo "::set-output name=nuvlabox_credential_id::$cred_id"
+          python -m pytest -vv -x --html=nuvlaedge.test-successful-installation.output.html --self-contained-html test-successful-installation.py
+          out=$(cat nuvlaedge.test-successful-installation.output.html | grep ::set-nuvlaedge_credential_id)
+          cred_id=$(echo $out | awk -F'::set-nuvlaedge_credential_id' '{print $2}')
+          echo "::set-output name=nuvlaedge_credential_id::$cred_id"
 
       - name: Test App Deployment
         if: ${{ success() }}
@@ -101,20 +101,20 @@ jobs:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
           module-id: module/179ee861-b378-4f74-aebf-41363df7b0d9
-          credential-id: "${{ steps.TestInstallationSuccess.outputs.nuvlabox_credential_id }}"
+          credential-id: "${{ steps.TestInstallationSuccess.outputs.nuvlaedge_credential_id }}"
 
       - if: always()
         name: Keep test results
         uses: actions/upload-artifact@v2
         with:
           name: remote-certification-report
-          path: tests/remote_certification/nuvlabox.*.output.html
+          path: tests/remote_certification/nuvlaedge.*.output.html
 
       - if: always()
         name: Cleanup Nuvla resources
         env:
-          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
-          DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaBoxEngine.outputs.DEPLOYMENT_ID }}
+          NUVLAEDGE_IDS: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
+          DEPLOYMENT_IDS: ${{ steps.DeployTestApp.outputs.DEPLOYMENT_ID }},${{ steps.DeployNuvlaEdgeEngine.outputs.DEPLOYMENT_ID }}
         run: cd .. && python cleanup.py
 
   notify:

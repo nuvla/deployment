@@ -1,0 +1,81 @@
+#!/bin/sh
+
+compose_files=${compose_files:-$1}
+target_version=${target_version:-${2:-"master"}}
+quiet=${quiet:-${3:-0}}
+environment=${environment:-$4}
+project=${project:-${5:-nuvlaedge}}
+github_releases=${github_releases:-${6:-"https://github.com/nuvlaedge/deployment/releases"}}
+save_dir=${save_dir:-${7:-$(pwd)}}
+
+nuvlaedge-engine-printer "Installing NuvlaEdge Engine to version: ${target_version}" ${quiet} "NONE" yes
+
+if [[ ! -z "${environment}" ]]
+then
+  env_file="${save_dir}/.env"
+  nuvlaedge-engine-printer "Setting environment for install, at ${env_file}" ${quiet} "INFO" "no"
+
+  env_lines=$(echo ${environment} | sed 's/,/\\n/g')
+  nuvlaedge-engine-printer "Environment variables:\n${env_lines}" ${quiet} "DEBUG" "no"
+
+  echo -e "${env_lines}" > ${env_file}
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlaedge-engine-printer "Install failed! Unable to store enviroment ${env_lines} in ${env_file}." 0 "ERROR" "no"
+    exit 1
+  fi
+fi
+
+if [[ ! -z ${target_version} ]] && [[ "${target_version}" != "master" ]]
+then
+  source_code_url="${github_releases}/download/${target_version}"
+
+  nuvlaedge-engine-printer "Downloading config files ${compose_files} from ${source_code_url}" ${quiet} "INFO" "no"
+
+  download=$(nuvlaedge-engine-download-configs "${compose_files}" "${save_dir}" "${source_code_url}" 2>&1)
+
+  if [[ $? -ne 0 ]]
+  then
+    nuvlaedge-engine-printer "Install failed! Unable to retrieve files ${compose_files} from ${source_code_url}: ${download}" 0 "ERROR" "no"
+    exit 1
+  fi
+fi
+
+nuvlaedge-engine-printer "Preparing to install NuvlaEdge Engine running as project ${project}" ${quiet} "NONE" "yes"
+
+docker_compose_args=$(echo "-f $(echo ${compose_files} | sed 's/,/ -f /g')")
+docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} up -d"
+
+nuvlaedge-engine-printer "Executing install command: ${docker_compose_command}" ${quiet} "INFO" "no"
+
+if [[ ${quiet} -eq 1 ]]
+then
+  out=$($docker_compose_command 2>&1)
+else
+  out="\n$($docker_compose_command)"
+fi
+
+if [[ $? -ne 0 ]]
+then
+  nuvlaedge-engine-printer "Install failed when executing Docker Compose command ${docker_compose_command}.${out}" 0 "ERROR" "no"
+  exit 1
+fi
+
+wait=5
+nuvlaedge-engine-printer "Waiting ${wait} seconds and then checking NuvlaEdge Engine health..." ${quiet} "INFO" "no"
+sleep ${wait}
+
+# set timeout for 10 minutes
+timer=600
+nuvlaedge-engine-printer "Checking NuvlaEdge Engine health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
+health=$(nuvlaedge-engine-check-health ${timer} 2>&1)
+
+if [[ $? -ne 0 ]]
+then
+  nuvlaedge-engine-printer "NuvlaEdge Engine is not healthy: ${health}" 0 "ERROR" "no"
+  exit 1
+fi
+
+# if we got here, then install was successful
+nuvlaedge-engine-printer "NuvlaEdge Engine installed to version: ${target_version}!" 0 "" "no"

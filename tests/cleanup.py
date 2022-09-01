@@ -13,13 +13,13 @@ class Cleanup(object):
     def goodbye():
         print("End of NBE E2E tests, bye")
 
-    def delete_nuvlabox(self, nuvlabox_id):
-        print(f"Deleting NuvlaBox with UUID: {nuvlabox_id}")
+    def delete_nuvlaedge(self, nuvlaedge_id):
+        print(f"Deleting NuvlaEdge with UUID: {nuvlaedge_id}")
         try:
-            self.api.delete(nuvlabox_id)
+            self.api.delete(nuvlaedge_id)
         except nuvla.api.api.NuvlaResourceOperationNotAvailable:
-            self.decommission_nuvlabox(nuvlabox_id)
-            self.delete_nuvlabox(nuvlabox_id)
+            self.decommission_nuvlaedge(nuvlaedge_id)
+            self.delete_nuvlaedge(nuvlaedge_id)
 
     def delete_deployment(self, deployment_id):
         print(f'Deleting deployment with UUID: {deployment_id}')
@@ -37,19 +37,19 @@ class Cleanup(object):
 
             break
 
-    def decommission_nuvlabox(self, nuvlabox_id):
-        print(f'Decommissioning NuvlaBox with UUID: {nuvlabox_id}')
-        self.api.get(nuvlabox_id + "/decommission")
+    def decommission_nuvlaedge(self, nuvlaedge_id):
+        print(f'Decommissioning NuvlaEdge with UUID: {nuvlaedge_id}')
+        self.api.get(nuvlaedge_id + "/decommission")
         time.sleep(5)
 
-    def remove_local_nuvlabox(self, project, image):
-        print(f'Removing local NuvlaBox Engine installation with project: {project}')
+    def remove_local_nuvlaedge(self, project, image):
+        print(f'Removing local NuvlaEdge Engine installation with project: {project}')
         try:
-            self.docker_client.api.remove_container("nuvlabox-engine-installer")
+            self.docker_client.api.remove_container("nuvlaedge-engine-installer")
         except docker.errors.NotFound:
             pass
         except Exception as e:
-            print(f'Cannot remove local NuvlaBox installer container. Reason: {str(e)}. Moving on')
+            print(f'Cannot remove local NuvlaEdge installer container. Reason: {str(e)}. Moving on')
 
         self.docker_client.containers.run(image,
                                           command=f"uninstall --project={project}",
@@ -68,14 +68,14 @@ if __name__ == '__main__':
 
     c = Cleanup(nuvla_client.api, docker.from_env())
 
-    nuvlabox_ids = os.environ.get('NUVLABOX_IDS', '')
+    nuvlaedge_ids = os.environ.get('NUVLAEDGE_IDS', '')
     nuvla_depls = os.environ.get('DEPLOYMENT_IDS', '')
 
-    for nbid in nuvlabox_ids.split(','):
+    for nbid in nuvlaedge_ids.split(','):
         if len(nbid) > 0:
             try:
-                c.decommission_nuvlabox(nbid)
-                c.delete_nuvlabox(nbid)
+                c.decommission_nuvlaedge(nbid)
+                c.delete_nuvlaedge(nbid)
             except Exception as e:
                 print(f'Error: {str(e)}')
                 continue

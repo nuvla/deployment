@@ -1,8 +1,8 @@
-name: "NuvlaBox Local Integration Testing"
+name: "NuvlaEdge Local Integration Testing"
 
 on:
   workflow_run:
-    workflows: ["NuvlaBox Installer Build"]
+    workflows: ["NuvlaEdge Installer Build"]
     branches: [master]
     types:
       - completed
@@ -20,7 +20,7 @@ defaults:
 
 jobs:
   tester:
-    name: "Run NuvlaBox Integration Tests"
+    name: "Run NuvlaEdge Integration Tests"
     runs-on: "ubuntu-latest"
     strategy:
       matrix:
@@ -49,36 +49,36 @@ jobs:
         if: ${{ success() }}
         id: ImageScan
         run: |
-          python -m pytest -vv -x --html=nuvlabox.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py
+          python -m pytest -vv -x --html=nuvlaedge.vulnerabilities-scan.output.html --self-contained-html vulnerability-scan.py
 
-      - name: Create Test NuvlaBox in Nuvla.io
+      - name: Create Test NuvlaEdge in Nuvla.io
         if: ${{ success() }}
-        id: NewNuvlaBox
+        id: NewNuvlaEdge
         uses: nuvla/nuvla-create-nuvlabox-action@v2
         with:
           api-key: ${{ secrets.NUVLA_DEV_APIKEY }}
           api-secret: ${{ secrets.NUVLA_DEV_APISECRET }}
-          name: "(local) Test NuvlaBox"
-          description: NuvlaBox for integration testing - commit ${{ github.sha }}, on branch ${{ github.ref }}, by ${{ github.actor }}
+          name: "(local) Test NuvlaEdge"
+          description: NuvlaEdge for integration testing - commit ${{ github.sha }}, on branch ${{ github.ref }}, by ${{ github.actor }}
 
       - name: Run integration tests locally
         if: ${{ success() }}
         env:
-          NUVLABOX_ID: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          NUVLAEDGE_ID: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
         run: |
-          python -m pytest -vv -x --html=nuvlabox.test-local.output.html --self-contained-html test-local.py
+          python -m pytest -vv -x --html=nuvlaedge.test-local.output.html --self-contained-html test-local.py
 
       - if: always()
         name: Keep test results
         uses: actions/upload-artifact@v2
         with:
           name: integration-tests-report
-          path: tests/integration_tests/nuvlabox.*.output.html
+          path: tests/integration_tests/nuvlaedge.*.output.html
 
       - if: always()
         name: Cleanup Nuvla resources
         env:
-          NUVLABOX_IDS: ${{ steps.NewNuvlaBox.outputs.NUVLABOX_UUID }}
+          NUVLAEDGE_IDS: ${{ steps.NewNuvlaEdge.outputs.NUVLABOX_UUID }}
         run: cd .. && python cleanup.py
 
   notify:
