@@ -15,4 +15,6 @@ ENV PATH="$PATH:${workdir}/common:${workdir}/commands" \
     ROOTFS="/rootfs"  \
     ROOTFS_WORKING_DIR="/rootfs-working-dir"
 
+RUN chmod +x installer
+
 ENTRYPOINT ["./installer"]
