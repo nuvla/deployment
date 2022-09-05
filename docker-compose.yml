@@ -41,7 +41,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlaedge/agent:2.9.0
+    image: nuvlaedge/agent:2.9.1
     restart: always
     oom_kill_disable: true
     privileged: true

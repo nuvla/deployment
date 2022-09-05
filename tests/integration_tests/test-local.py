@@ -105,9 +105,11 @@ def test_nuvlaedge_engine_containers_stability(request):
 
 
 def test_ssh_key_bootstrap():
-    authorized_keys = HOST_HOME + "/.ssh/authorized_keys"
+    ssh_dir = HOST_HOME + "/.ssh"
+    authorized_keys = ssh_dir + "/authorized_keys"
+
     assert os.path.isfile(authorized_keys), \
-        f'Cannot find SSH keys file in {HOST_HOME}: {os.listdir(HOST_HOME)}'
+        f'Cannot find SSH keys file in {ssh_dir}: {os.listdir(ssh_dir)}'
 
     with open(authorized_keys) as ak:
         assert NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY in ak.read()
@@ -228,7 +230,7 @@ def test_nuvlaedge_engine_local_compute_api(request):
 
 
 def test_nuvlaedge_engine_local_datagateway():
-    nuvlaedge_network = 'nuvlaedge-shared-network'
+    nuvlaedge_network = 'nuvlabox-shared-network'
 
     docker_net = None
     try:
