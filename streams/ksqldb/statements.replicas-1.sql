@@ -415,6 +415,7 @@ CREATE TABLE NUVLABOX_T
 (id VARCHAR PRIMARY KEY,
   name VARCHAR,
   description VARCHAR,
+  tags ARRAY<VARCHAR>,
   acl STRUCT<
     "owners" ARRAY<VARCHAR>,
     "view-data" ARRAY<VARCHAR>
@@ -485,6 +486,7 @@ SELECT
     parent as id,
     nb.name as name,
     nb.description as description,
+    nb.tags as tags,
     online,
     "online-prev" as online_prev,
     resources,
@@ -513,6 +515,7 @@ CREATE TABLE SUBS_NB_STATE_T (
    PARTITIONS=1,
    REPLICAS=1,
    VALUE_FORMAT='JSON');
+-- try providing cleanup.policy compact.
 
 CREATE OR REPLACE TABLE SUBS_NB_STATE_T
 AS SELECT
@@ -524,7 +527,7 @@ WHERE
     "resource-kind" = 'nuvlabox'
     AND criteria->kind = 'boolean'
     AND criteria->metric = 'state'
-GROUP BY "resource-id"
+GROUP BY "resource-id", owner
 EMIT CHANGES;
 
 INSERT INTO NOTIFICATIONS_S

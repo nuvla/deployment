@@ -16,13 +16,13 @@ configs:
     file: ../../streams/kafka/elastic-source-nuvlabox-all.json
 
 services:
-
   # Kafka broker with Connect.
   kafka:
     image: confluentinc/cp-kafka:7.2.1
     ports:
-      - "9092:9092"
-      - "9101:9101"
+      - 9092:9092
+      - 9101:9101
+      - 8083:8083
     volumes:
       - streams-kafka:/var/lib/kafka/data
     configs:
@@ -32,23 +32,29 @@ services:
         target: /etc/kafka/elastic-source-nuvlabox-all.json
     networks:
       - nuvla-backend
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == worker-streams
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.labels.type == worker-streams
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9101
       KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      ES_SOURCE_CONNECT: "true"
       ES_SOURCE_CONNECT_VER: "1.3"
       FROM_SCRATCH: "false"
     command:
@@ -58,51 +64,62 @@ services:
         ### Cleanup from previous launch
         [ "$$FROM_SCRATCH" == "true" ] && rm -f /var/lib/kafka/data/meta.properties
 
+        # Docker workaround: Remove check for KAFKA_ZOOKEEPER_CONNECT parameter
+        sed -i '/KAFKA_ZOOKEEPER_CONNECT/d' /etc/confluent/docker/configure
+
+        # Docker workaround: Ignore cub zk-ready
+        sed -i 's/cub zk-ready/echo ignore zk-ready/' /etc/confluent/docker/ensure
+
+        # KRaft required step: Format the storage directory with a new cluster ID
+        echo "kafka-storage format --ignore-formatted -t $$(kafka-storage random-uuid) -c /etc/kafka/kafka.properties" >> /etc/confluent/docker/ensure
+
         ### Start Kafka
         echo "Launching Kafka"
         /etc/confluent/docker/run &
 
-        ### Install ES Connect source
-        mkdir -p /usr/share/java/elastic-source-connect
-        curl -L --output /usr/share/java/elastic-source-connect/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar \
-            https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/releases/download/v$${ES_SOURCE_CONNECT_VER}/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar
+        if [ "$ES_SOURCE_CONNECT" == "true" ]; then
+          ### Install ES Connect source
+          mkdir -p /usr/share/java/elastic-source-connect
+          curl -L --output /usr/share/java/elastic-source-connect/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar \
+              https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/releases/download/v$${ES_SOURCE_CONNECT_VER}/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar
 
-        ### Start Kafka Connect worker
-        echo "Launching Kafka Connect worker"
-        connect-distributed -daemon /etc/kafka/connect-distributed.properties
-        echo "Waiting for Kafka Connect to start listening on localhost:8083"
-        kc_endpoint=http://localhost:8083
-        while : ; do
-          curl_status=$$(curl -s -o /dev/null -w %{http_code} $$kc_endpoint/connectors)
-          echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
-          if [ $$curl_status -eq 200 ] ; then
-            break
-          fi
-          sleep 5
-        done
+          ### Start Kafka Connect worker
+          echo "Launching Kafka Connect worker"
+          connect-distributed -daemon /etc/kafka/connect-distributed.properties
+          echo "Waiting for Kafka Connect to start listening on localhost:8083"
+          kc_endpoint=http://0.0.0.0:8083
+          while : ; do
+            curl_status=$$(curl -s -o /dev/null -w %{http_code} $$kc_endpoint/connectors)
+            echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
+            if [ $$curl_status -eq 200 ] ; then
+              break
+            fi
+            sleep 5
+          done
 
-        ### Start Elasticsearch Connect
-        echo "Start ES source connector"
-        curl -X POST -H "Content-Type: application/json" --data @/etc/kafka/elastic-source-nuvlabox-all.json $$kc_endpoint/connectors
-        sleep 1
-        curl $$kc_endpoint/connectors/elastic-source-nuvlabox-status/status
+          ### Start Elasticsearch Connect
+          echo "Start ES source connector"
+          curl -X POST -H "Content-Type: application/json" --data @/etc/kafka/elastic-source-nuvlabox-all.json $$kc_endpoint/connectors
+          sleep 1
+          curl $$kc_endpoint/connectors/elastic-source-nuvlabox-status/status
+        fi
 
         sleep infinity
 
   # ksqlDB stream processor
   ksqldb-server:
-    image: confluentinc/ksqldb-server:0.27.1
+    image: confluentinc/cp-ksqldb-server:7.2.1
     ports:
-      - "8088:8088"
+      - 8088:8088
     networks:
       - nuvla-backend
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == worker-streams
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.labels.type == worker-streams
     environment:
       KSQL_CONFIG_DIR: "/etc/ksqldb"
-      KSQL_BOOTSTRAP_SERVERS: "kafka:9092"
+      KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
       KSQL_HOST_NAME: ksqldb-server
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
@@ -115,19 +132,36 @@ services:
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.2.1
     ports:
-      - "9021:9021"
+      - 9021:9021
     networks:
       - nuvla-backend
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == frontend
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.labels.type == frontend
     environment:
-      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:29092'
       CONTROL_CENTER_KSQL_KSQLDB1_URL: "http://ksqldb-server:8088"
-      CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL: "http://ksqldb-server:8088"
+      CONTROL_CENTER_KSQL_KSQLDB1_ADVERTISED_URL: "http://localhost:8088"
       CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       PORT: 9021
+
+  # akhq.io (Apache Kafka Headquarters)
+  akhq:
+    image: tchiotludo/akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:29092"
+              connect:
+                - name: "connect"
+                  url: "http://kafka:8083"
+
+    ports:
+      - 8080:8080
