@@ -41,7 +41,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlaedge/agent:2.9.3
+    image: nuvlaedge/agent:2.9.4
     restart: always
     oom_kill_disable: true
     privileged: true
@@ -109,7 +109,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:3.1.2
+    image: nuvla/job-lite:3.2.2
     restart: always
     container_name: nuvlaedge-job-engine-lite
     entrypoint: /app/pause.py
