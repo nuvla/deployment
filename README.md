@@ -7,7 +7,7 @@
 
 ![CI Build](https://github.com/nuvlaedge/deployment/actions/workflows/main.yml/badge.svg)
 ![CI Release](https://github.com/nuvlaedge/deployment/actions/workflows/release.yml/badge.svg)
-![CI Test](https://github.com/nuvlaedge/deployment/actions/workflows/test.yml/badge.svg)
+![CI Test](https://github.com/nuvlaedge/deployment/actions/workflows/integration-tests.yml/badge.svg)
 
 
 This repository container the definitions for the installation of the NuvlaEdge Engine.
