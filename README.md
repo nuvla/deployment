@@ -51,7 +51,7 @@ _**artifact:** docker-compose.yml_
 In this scenario, we assume you are using Nuvla at https://nuvla.io.
 
  1. login into https://nuvla.io or your Nuvla installation
- 2. create a `nuvlaedge`/`nuvlabox` resource and save the UUID
+ 2. create a `nuvlaedge` resource and save the UUID
  3. simply `export NUVLAEDGE_UUID=` UUID you saved, **or** paste that UUID in the `docker-compose.yml` file, under the NUVLAEDGE_UUID environment variable
  4. If you are using your own Nuvla installation also `export NUVLA_ENDPOINT=` IP of the local Nuvla instance, **or** paste that IP in the `docker-compose.yml` file, under the NUVLA_ENDPOINT environment variable
  5. install the NuvlaEdge Engine
