@@ -18,7 +18,7 @@ configs:
 
 services:
   api:
-    image: nuvla/api:6.0.0
+    image: nuvla/api:6.0.8
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -59,7 +59,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.31.0
+    image: nuvla/ui:2.32.11
     deploy:
       placement:
         constraints:
@@ -78,7 +78,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:3.0.0
+    image: nuvla/job:3.2.4
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -92,7 +92,7 @@ services:
       - nuvla-backend
 
   job-distributor:
-    image: nuvla/job:3.0.0
+    image: nuvla/job:3.2.4
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
