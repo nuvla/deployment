@@ -252,7 +252,7 @@ services:
       SMTP_PASSWORD: "${SMTP_PASSWORD}"
 
 configs:
-  traefik.yaml:
+  traefik.yaml-1:
     file: ./traefik/traefik.yaml
   dynamic.yaml-1:
     file: ./traefik/dynamic.yaml
