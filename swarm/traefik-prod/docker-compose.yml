@@ -7,7 +7,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - lets-encrypt:/lets-encrypt
     configs:
-      - source: traefik.yaml
+      - source: traefik.yaml-1
         target: /traefik.yaml
       - source: dynamic.yaml-1
         target: /dynamic.yaml

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Changed
+
+This release update Nuvla components to following versions:
+
+
+- Dependencies - traefik:v2.9
+- Traefik - Respond with 503 when no api-server or ui
+- ES - Send hostname to sniffer to resolve to current IP  
+
+
 ## [2.3.1] - 2022-12-20
 
 ### Changed
