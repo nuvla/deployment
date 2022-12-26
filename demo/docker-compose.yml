@@ -2,12 +2,14 @@ version: '3.7'
 
 services:
   proxy:
-    image: traefik:v2.8
+    image: traefik:v2.9
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.yaml
+      - source: traefik.yaml-1
         target: /traefik.yaml
+      - source: dynamic.yaml-1
+        target: /dynamic.yaml
     ports:
       - "80:80"
       - "443:443"
@@ -26,6 +28,7 @@ services:
     image: nuvla/es:7.11.1.0
     environment:
       - cluster.name=elasticsearch
+      - http.publish_host=es
       - xpack.security.enabled=false
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -258,8 +261,10 @@ services:
       SMTP_PASSWORD: "${SMTP_PASSWORD}"
 
 configs:
-  traefik.yaml:
+  traefik.yaml-1:
     file: ./traefik/traefik.yaml
+  dynamic.yaml-1:
+    file: ./traefik/dynamic.yaml
   log4j.properties:
     file: ./log4j.properties
   ksql.queries.file:

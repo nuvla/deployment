@@ -2,13 +2,15 @@ version: '3.7'
 
 services:
   traefik:
-    image: traefik:v2.8
+    image: traefik:v2.9
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - lets-encrypt:/lets-encrypt
     configs:
       - source: traefik.yaml
         target: /traefik.yaml
+      - source: dynamic.yaml-1
+        target: /dynamic.yaml
     ports:
       - "80:80"
       - "443:443"
@@ -27,8 +29,10 @@ volumes:
     driver: local
 
 configs:
-  traefik.yaml:
+  traefik.yaml-1:
     file: ./traefik/traefik.yaml
+  dynamic.yaml-1:
+    file: ./traefik/dynamic.yaml
 
 networks:
   traefik-public:

@@ -27,6 +27,7 @@ services:
     environment:
       - xpack.security.enabled=false
       - node.name=es
+      - http.publish_host=es
       - discovery.seed_hosts=es
       - cluster.initial_master_nodes=es
       - cluster.name=elasticsearch
