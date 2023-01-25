@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Traefik proxy network to host to get real client IP
+
 ## [2.3.1] - 2022-12-20
 
 ### Changed
