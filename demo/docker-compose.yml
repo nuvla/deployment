@@ -9,9 +9,18 @@ services:
       - source: traefik.yaml
         target: /traefik.yaml
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
     deploy:
       placement:
         constraints:
