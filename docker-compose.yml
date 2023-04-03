@@ -22,16 +22,21 @@ services:
     <<: *common
     image: nuvlaedge/system-manager:2.5.0
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
       - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
+      - MANAGER_PORT=${MANAGER_PORT:-3636}
+      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
+      - AGENT_PORT=${AGENT_PORT:-5080}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
-      - 127.0.0.1:3636:3636
+      - "127.0.0.1:${MANAGER_PORT:-3636}:3636"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3636"]
+      test: ["CMD", "curl", "-f", "http://localhost:${MANAGER_PORT:-3636}"]
       interval: 30s
       timeout: 10s
       retries: 4
@@ -43,6 +48,7 @@ services:
     <<: *common
     image: nuvlaedge/agent:2.9.6
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
     privileged: true
     environment:
@@ -55,12 +61,16 @@ services:
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
+      - MANAGER_PORT=${MANAGER_PORT:-3636}
+      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
+      - AGENT_PORT=${AGENT_PORT:-5080}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
     ports:
-      - 127.0.0.1:5080:80
+      - "127.0.0.1:${AGENT_PORT:-5080}:80"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/healthcheck"]
       interval: 30s
@@ -73,8 +83,8 @@ services:
   compute-api:
     <<: *common
     image: nuvlaedge/compute-api:1.3.0
-    container_name: compute-api
     restart: on-failure
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     oom_score_adj: -900
     pid: "host"
     environment:
@@ -83,7 +93,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
-      - 5000:5000
+      - "${COMPUTE_API_PORT:-5000}:5000"
     healthcheck:
       test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
       interval: 20s
@@ -93,8 +103,8 @@ services:
   vpn-client:
     <<: *common
     image: nuvlaedge/vpn-client:1.2.0
-    container_name: vpn-client
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
     oom_kill_disable: true
     network_mode: host
     privileged: true
@@ -111,7 +121,7 @@ services:
     <<: *common
     image: nuvla/job-lite:3.2.2
     restart: always
-    container_name: nuvlaedge-job-engine-lite
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     entrypoint: /app/pause.py
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -119,8 +129,8 @@ services:
   on-stop:
     <<: *common
     image: nuvlaedge/on-stop:1.2.0
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
     restart: always
-    container_name: nuvlaedge-on-stop
     command: pause
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

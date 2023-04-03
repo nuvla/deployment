@@ -17,6 +17,7 @@ services:
     <<: *common
     image: nuvlaedge/peripheral-manager-gpu:1.2.0
     restart: on-failure
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-gpu
     volumes:
       - /etc/:/etcfs/:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro

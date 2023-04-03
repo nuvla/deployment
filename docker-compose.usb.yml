@@ -17,6 +17,7 @@ services:
     <<: *common
     image: nuvlaedge/peripheral-manager-usb:2.2.0
     restart: always
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-usb
     network_mode: host
     volumes:
       - /dev:/dev:ro

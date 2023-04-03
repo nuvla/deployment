@@ -16,6 +16,7 @@ services:
   peripheral-manager-modbus:
     <<: *common
     image: nuvlaedge/peripheral-manager-modbus:1.4.0
+    container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-modbus
     restart: on-failure
     depends_on:
       - agent
