@@ -33,14 +33,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-    ports:
-      - "127.0.0.1:${MANAGER_PORT:-3636}:3636"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${MANAGER_PORT:-3636}"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
-      start_period: 10s
     depends_on:
       - on-stop
 
