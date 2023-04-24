@@ -4,6 +4,16 @@
 
 ### Changed
 
+## [2.3.2] - 2023-04-24
+
+### Changed
+
+This release update Nuvla components to following versions:
+
+- [nuvla/api-server:6.0.12](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#6012---2023-04-24)
+- [nuvla/ui:2.33.5](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2335---2023-04-24)
+- [nuvla/job-engine:3.2.6](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#326---2023-04-24)
+
 - Traefik proxy network to host to get real client IP
 
 ## [2.3.1] - 2022-12-20
