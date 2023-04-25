@@ -78,7 +78,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:3.2.6
+    image: nuvla/job:3.2.7
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -92,7 +92,7 @@ services:
       - nuvla-backend
 
   job-distributor:
-    image: nuvla/job:3.2.6
+    image: nuvla/job:3.2.7
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
