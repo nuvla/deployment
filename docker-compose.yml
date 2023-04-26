@@ -20,7 +20,7 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvladev/system-manager:main
+    image: nuvlaedge/system-manager:2.6.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
@@ -37,7 +37,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvladev/agent:main
+    image: nuvlaedge/agent:2.10.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
@@ -64,7 +64,7 @@ services:
 
   compute-api:
     <<: *common
-    image: nuvladev/compute-api:main
+    image: nuvlaedge/compute-api:1.3.0
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-compute-api
     oom_score_adj: -900
@@ -84,7 +84,7 @@ services:
 
   vpn-client:
     <<: *common
-    image: nuvladev/vpn-client:main
+    image: nuvlaedge/vpn-client:1.2.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-vpn-client
     oom_kill_disable: true
@@ -101,7 +101,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvladev/job-lite:master
+    image: nuvla/job-lite:3.2.7
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     entrypoint: /app/pause.py
@@ -110,7 +110,7 @@ services:
 
   on-stop:
     <<: *common
-    image: nuvladev/on-stop:main
+    image: nuvlaedge/on-stop:1.2.0
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-on-stop
     restart: always
     command: pause
