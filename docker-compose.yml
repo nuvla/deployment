@@ -20,63 +20,47 @@ volumes:
 services:
   system-manager:
     <<: *common
-    image: nuvlaedge/system-manager:2.5.0
+    image: nuvlaedge/system-manager:2.6.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
-      - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
-      - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:1.6.12}
-      - MANAGER_PORT=${MANAGER_PORT:-3636}
-      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
-      - AGENT_PORT=${AGENT_PORT:-5080}
       - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
+      - NUVLAEDGE_DATA_GATEWAY_NAME=${NUVLAEDGE_DATA_GATEWAY_NAME:-data-gateway}
+      - NUVLAEDGE_DATA_GATEWAY_ENABLED=${NUVLAEDGE_DATA_GATEWAY_ENABLED:-True}
+      - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
+      - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
+      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
-    ports:
-      - "127.0.0.1:${MANAGER_PORT:-3636}:3636"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${MANAGER_PORT:-3636}"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
-      start_period: 10s
     depends_on:
       - on-stop
 
   agent:
     <<: *common
-    image: nuvlaedge/agent:2.9.6
+    image: nuvlaedge/agent:2.10.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
     privileged: true
     environment:
-      - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY}
-      - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY:-}
+      - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET:-}
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
-      - NUVLAEDGE_ENGINE_VERSION=2.5.5
-      - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY}
+      - NUVLAEDGE_ENGINE_VERSION=latest
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
+      - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY:-}
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
-      - MANAGER_PORT=${MANAGER_PORT:-3636}
       - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
-      - AGENT_PORT=${AGENT_PORT:-5080}
-      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
-    ports:
-      - "127.0.0.1:${AGENT_PORT:-5080}:80"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/api/healthcheck"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
-      start_period: 10s
     depends_on:
       - compute-api
 
@@ -119,7 +103,7 @@ services:
 
   job-engine-lite:
     <<: *common
-    image: nuvla/job-lite:3.2.2
+    image: nuvla/job-lite:3.2.7
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-job-engine-lite
     entrypoint: /app/pause.py
