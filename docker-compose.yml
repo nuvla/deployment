@@ -24,11 +24,11 @@ services:
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-system-manager
     environment:
-      - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
-      - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
-      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
-      - AGENT_PORT=${AGENT_PORT:-5080}
       - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
+      - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
+      - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
+      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -43,30 +43,22 @@ services:
     oom_kill_disable: true
     privileged: true
     environment:
-      - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY}
-      - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET}
+      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
+      - NUVLAEDGE_API_KEY=${NUVLAEDGE_API_KEY:-}
+      - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET:-}
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
       - NUVLAEDGE_ENGINE_VERSION=latest
-      - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY}
+      - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
+      - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY:-}
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
       - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
-      - AGENT_PORT=${AGENT_PORT:-5080}
-      - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-nuvlaedge}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
       - /:/rootfs:ro
-    ports:
-      - "127.0.0.1:${AGENT_PORT:-5080}:80"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/api/healthcheck"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
-      start_period: 10s
     depends_on:
       - compute-api
 
