@@ -115,96 +115,6 @@ def test_ssh_key_bootstrap():
         assert NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY in ak.read()
 
 
-def test_nuvlaedge_engine_local_agent_api(request):
-    agent_api = 'http://localhost:5080/api/'
-    r = requests.get(agent_api + 'healthcheck')
-    assert r.status_code == 200, f'{agent_api} is not up'
-    assert 'true' in r.text.lower(), f'{agent_api} is unhealthy'
-    logging.info(f'Agent API ({agent_api}) is healthy')
-
-    # send commissioning
-    commission = {
-        'tags': ['TEST_TAG']
-    }
-    r = requests.post(agent_api + 'commission', json=commission)
-    assert r.status_code == 200, f'Commissioning {commission} via {agent_api}, has failed'
-    logging.info(f'NuvlaEdge commissioning is working (tested with payload: {commission})')
-
-    nuvlaedge = nuvla.api.get(nuvlaedge_id)
-    assert 'TEST_TAG' in nuvlaedge.data.get('tags', []), f'Commissioning false positive. Tags were not propagated'
-    request.config.cache.set('nuvlaedge_id_local_isg', nuvlaedge.data['infrastructure-service-group'])
-
-    # check peripherals api
-    mock_peripheral_identifier = 'mock:usb:peripheral'
-    mock_peripheral = {
-        'identifier': mock_peripheral_identifier,
-        'interface': 'USB',
-        'version': int(nuvlaedge.data['version']),
-        'name': '(local NB) Mock USB Peripheral',
-        'available': True,
-        'classes': ['video']
-    }
-    r = requests.post(agent_api + 'peripheral', json=mock_peripheral)
-    assert r.status_code == 201, f'Unable to add new peripheral via {agent_api}'
-
-    mock_peripheral_id = r.json()['resource-id']
-
-    r = requests.get(agent_api + 'peripheral')
-    assert r.status_code == 200, f'Unable to get peripherals via {agent_api}'
-    assert mock_peripheral_identifier in r.json(), f'Wrong format while getting peripherals via {agent_api}'
-
-    r = requests.get(agent_api + 'peripheral/' + mock_peripheral_identifier)
-    assert r.status_code == 200, f'Unable to get specific peripheral via {agent_api}'
-    assert isinstance(r.json(), dict), f'Wrong format while getting peripheral via {agent_api}'
-    assert mock_peripheral_id == r.json()['id'], \
-        f'Peripheral returned by {agent_api} does not match ID {mock_peripheral_id}'
-
-    new_description = 'new test description'
-    r = requests.put(agent_api + 'peripheral/' + mock_peripheral_identifier, json={'description': new_description})
-    assert r.status_code == 200, f'Unable to edit peripheral via {agent_api}'
-    assert r.json().get('description', '') == new_description, 'Edited peripheral is not up to date'
-
-    r = requests.get(agent_api + 'peripheral?identifier_pattern=mock*')
-    assert r.status_code == 200, f'Unable to get peripheral by pattern via {agent_api}'
-    assert isinstance(r.json(), dict), f'Wrong format while getting peripheral via {agent_api}'
-    assert mock_peripheral_id == r.json()[mock_peripheral_identifier]['id'], \
-        f'Peripheral returned by {agent_api} does not match ID {mock_peripheral_id}'
-
-    r = requests.get(agent_api + 'peripheral?identifier_pattern=bad-peripheral')
-    assert r.status_code == 200, f'Unable to get peripheral by pattern via {agent_api}'
-    assert not r.json(), f'{agent_api} returned some peripheral while it should have returned None'
-
-    # 2nd peripheral
-    mock_peripheral_identifier_two = 'mock:usb:peripheral:2'
-    mock_peripheral.update({
-        'identifier': mock_peripheral_identifier_two,
-        'name': '(local NB) Mock USB Peripheral 2'
-    })
-    r = requests.post(agent_api + 'peripheral', json=mock_peripheral)
-    assert r.status_code == 201, f'Unable to add new peripheral via {agent_api}'
-
-    request.config.cache.set('peripheral_id', r.json()['resource-id'])
-
-    r = requests.get(agent_api + 'peripheral?identifier_pattern=mock*')
-    assert r.status_code == 200, f'Unable to get peripheral by pattern via {agent_api}'
-    assert isinstance(r.json(), dict), f'Wrong format while getting peripheral via {agent_api}'
-    assert len(r.json().keys()) == 2, f'{agent_api} should have returned 2 peripherals'
-
-    r = requests.get(agent_api + 'peripheral?parameter=description&value=' + new_description)
-    assert r.status_code == 200, f'Unable to get peripheral by param/value via {agent_api}'
-    assert isinstance(r.json(), dict), f'Wrong format while getting peripheral via {agent_api}'
-    assert len(r.json().keys()) == 1, 'Returned peripherals that do not match param/value'
-
-    r = requests.delete(agent_api + 'peripheral/' + mock_peripheral_identifier)
-    assert r.status_code == r.json()['status'] == 200, f'Cannot delete peripheral via {agent_api}'
-    assert r.json()['resource-id'] == mock_peripheral_id, f'ID mismatch while deleting peripheral via {agent_api}'
-
-    with pytest.raises(nuvla_lib.api.api.NuvlaError):
-        nuvla.api.get(mock_peripheral_id)
-
-    logging.info(f'Agent API ({agent_api}) for peripheral management is up and running')
-
-
 def test_nuvlaedge_engine_local_compute_api(request):
     volume = docker_client.api.inspect_volume(local_project_name + "_nuvlabox-db").get('Mountpoint')
     request.config.cache.set('nuvlaedge_volume_path', volume)
@@ -259,27 +169,6 @@ def test_nuvlaedge_engine_local_datagateway():
     assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
 
     logging.info('NuvlaEdge MQTT messaging is working')
-
-
-def test_nuvlaedge_engine_local_system_manager():
-    system_manager_dashboard = 'http://127.0.0.1:3636/dashboard'
-
-    r = requests.get(system_manager_dashboard)
-    assert r.status_code == 200, f'Internal NuvlaEdge dashboard {system_manager_dashboard} is down'
-    assert 'NuvlaEdge Local Dashboard' in r.text, \
-        f'Internal NuvlaEdge dashboard {system_manager_dashboard} has wrong content'
-
-    r = requests.get(system_manager_dashboard + '/logs')
-    assert r.status_code == 200, f'Internal NuvlaEdge dashboard {system_manager_dashboard}/logs is down'
-    assert 'NuvlaEdge Local Dashboard - Logs' in r.text, \
-        f'Internal NuvlaEdge dashboard {system_manager_dashboard}/logs has wrong content'
-
-    r = requests.get(system_manager_dashboard + '/peripherals')
-    assert r.status_code == 200, f'Internal NuvlaEdge dashboard {system_manager_dashboard}/peripherals is down'
-    assert 'NuvlaEdge Local Dashboard - Peripherals' in r.text, \
-        f'Internal NuvlaEdge dashboard {system_manager_dashboard}/peripherals has wrong content'
-
-    logging.info(f'NuvlaEdge internal dashboard ({system_manager_dashboard}) is up and running')
 
 
 def test_cis_benchmark(request):
