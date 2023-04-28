@@ -15,7 +15,7 @@ x-common: &common
 services:
   security:
     <<: *common
-    image: nuvlaedge/security:2.2.0
+    image: nuvlaedge/security:2.3.0
     restart: unless-stopped
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-security
     network_mode: host

@@ -15,8 +15,10 @@ x-common: &common
 services:
   peripheral-manager-modbus:
     <<: *common
-    image: nuvlaedge/peripheral-manager-modbus:1.4.0
+    image: nuvlaedge/peripheral-manager-modbus:1.5.0
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-modbus
     restart: on-failure
+    volumes:
+      - nuvlabox-db:/srv/nuvlaedge/shared
     depends_on:
       - agent

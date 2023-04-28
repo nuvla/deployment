@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-bluetooth:
     <<: *common
-    image: nuvlaedge/peripheral-manager-bluetooth:1.3.0
+    image: nuvlaedge/peripheral-manager-bluetooth:1.4.0
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-bluetooth
     network_mode: host
