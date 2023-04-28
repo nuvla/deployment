@@ -86,7 +86,7 @@ def exec_check(command, container, results, messages, logs):
 
 
 last_messages = []
-last_logs = []
+last_logs = {}
 
 try:
     docker_client = docker.from_env()
