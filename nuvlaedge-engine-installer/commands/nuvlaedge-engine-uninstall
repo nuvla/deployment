@@ -3,6 +3,8 @@
 quiet=${quiet:-${1:-0}}
 project=${project:-${2:-"nuvlaedge"}}
 
+export COMPOSE_PROJECT_NAME="${project}"
+
 nuvlaedge-engine-printer "Uninstalling NuvlaEdge Engine - ${project} - (permanently)" ${quiet} "INFO" yes
 
 docker_compose_command="docker-compose --ansi never --log-level ERROR -p ${project} down -v --remove-orphans"

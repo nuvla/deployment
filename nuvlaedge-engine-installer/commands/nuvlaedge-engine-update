@@ -19,6 +19,7 @@ then
   nuvlaedge-engine-printer "Update failed! Cannot update without a project name." 0 "ERROR" "no"
   exit 1
 fi
+export COMPOSE_PROJECT_NAME="${project}"
 
 if [[ ! -z "${environment}" ]]
 then

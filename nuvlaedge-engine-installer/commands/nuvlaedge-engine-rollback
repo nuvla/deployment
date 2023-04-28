@@ -15,6 +15,7 @@ then
   nuvlaedge-engine-printer "Rollback failed! Cannot restore NuvlaEdge without a project name." 0 "ERROR" "no"
   exit 1
 fi
+export COMPOSE_PROJECT_NAME="${project}"
 
 nuvlaedge-engine-printer "Initiating NuvlaEdge Engine rollback to previous version" ${quiet} "NONE" yes
 
@@ -54,13 +55,13 @@ then
   exit 1
 fi
 
-docker_compose_command="docker-compose -p ${project}${docker_compose_args} up -d"
+docker_compose_command="docker-compose -p ${project} ${docker_compose_args} up -d"
 
 
 if [[ ${force_restart} -eq 1 ]]
 then
   nuvlaedge-engine-printer "Forcing the restart of the NuvlaEdge Engine components before rolling back" ${quiet} "WARNING" "no"
-  docker_compose_down_command="docker-compose --ansi never --log-level ERROR -p ${project}${docker_compose_args} down --remove-orphans"
+  docker_compose_down_command="docker-compose --ansi never --log-level ERROR -p ${project} ${docker_compose_args} down --remove-orphans"
 
   nuvlaedge-engine-printer "Executing 'down' command: ${docker_compose_down_command}" ${quiet} "WARNING" "no"
 
