@@ -1,8 +1,11 @@
-FROM nuvla/job-docker-compose-client:master
+FROM python:3.8-alpine3.12
 
 ARG workdir="/opt/nuvlaedge"
 
 WORKDIR ${workdir}
+
+COPY --from=nuvla/job-docker-compose-client:master /usr/local/bin/docker-compose /usr/local/bin/
+COPY --from=nuvla/job-docker-compose-client:master /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
 
 COPY . .
 
