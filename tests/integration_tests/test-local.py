@@ -119,7 +119,7 @@ def test_nuvlaedge_engine_local_compute_api(request):
     volume = docker_client.api.inspect_volume(local_project_name + "_nuvlabox-db").get('Mountpoint')
     request.config.cache.set('nuvlaedge_volume_path', volume)
 
-    agent = docker_client.containers.get(local_project_name + "_agent_1")
+    agent = docker_client.containers.get(local_project_name + "-agent")
 
     raw_cert = agent.exec_run('cat /srv/nuvlaedge/shared/cert.pem').output
     cert.write(raw_cert)
@@ -140,7 +140,7 @@ def test_nuvlaedge_engine_local_compute_api(request):
 
 
 def test_nuvlaedge_engine_local_datagateway():
-    nuvlaedge_network = 'nuvlabox-shared-network'
+    nuvlaedge_network = local_project_name + '-shared-network'
 
     docker_net = None
     try:
@@ -212,6 +212,6 @@ def test_cis_benchmark(request):
 
 # TODO: this cannot be easily tested anymore since it now has a delayed start, and takes longer
 #def test_security_scanner(request):
-#    agent = docker_client.containers.get(local_project_name + "_agent_1")
+#    agent = docker_client.containers.get(local_project_name + "-agent")
 
     # assert agent.exec_run('cat /srv/nuvlaedge/shared/vulnerabilities').exit_code == 0
