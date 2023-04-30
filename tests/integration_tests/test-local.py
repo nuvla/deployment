@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import signal
 import json
 import docker
 import pytest
@@ -8,14 +7,12 @@ import uuid
 import requests
 import logging
 import os
-import nuvla as nuvla_lib
+
 from tempfile import NamedTemporaryFile
 from git import Repo
 
 import sys
 sys.path.append('../')
-from common.nuvla_api import NuvlaApi
-from common.timeout import timeout
 
 
 NUVLAEDGE_DATA_GATEWAY_IMAGE="eclipse-mosquitto:1.6.12"
@@ -27,8 +24,6 @@ HOST_HOME=os.getenv('HOME')
 local_project_name = str(uuid.uuid4())
 nuvlaedge_id = os.environ.get('NUVLAEDGE_ID')
 docker_client = docker.from_env()
-nuvla = NuvlaApi()
-nuvla.login()
 
 # need to create .ssh folder otherwise the SSH key installation
 # cannot be tested
