@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 
-import json
 import docker
-import pytest
-import uuid
-import requests
+import json
 import logging
 import os
-
-from tempfile import NamedTemporaryFile
-from git import Repo
-
+import pytest
+import requests
 import sys
+import time
+import uuid
+
+from git import Repo
+from tempfile import NamedTemporaryFile
+
 sys.path.append('../')
 
 
@@ -154,11 +155,18 @@ def test_nuvlaedge_engine_local_datagateway():
 
     logging.info(f'NuvlaEdge shared network ({nuvlaedge_network}) is functional')
 
-    cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"'
-    check_mqtt = docker_client.containers.run('alpine',
+    def run_test_container():
+        cmd = 'sh -c "apk add mosquitto-clients >/dev/null && mosquitto_sub -h data-gateway -t nuvlaedge-status -C 1"'
+        return docker_client.containers.run('alpine',
                                             command=cmd,
                                             network=nuvlaedge_network,
                                             remove=True)
+    try:
+        check_mqtt = run_test_container()
+    except:
+        logging.info(f'NuvlaEdge data-gateway not ready yet. Waiting 15 seconds and retry...')
+        time.sleep(15)
+        check_mqtt = run_test_container()
 
     nb_status = json.loads(check_mqtt.decode())
     assert nb_status['status'] == 'OPERATIONAL', f'MQTT check of the NuvlaEdge status failed: {nb_status}'
