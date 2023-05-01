@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Changed
+## Released
 
 ## [2.3.2] - 2023-04-24
 
