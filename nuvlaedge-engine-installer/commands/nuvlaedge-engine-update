@@ -140,7 +140,7 @@ sleep ${wait}
 # set timeout for 10 minutes
 timer=600
 nuvlaedge-engine-printer "Checking NuvlaEdge Engine health (will timeout after ${timer} sec)..." ${quiet} "INFO" "no"
-health=$(nuvlaedge-engine-check-health ${timer} 2>&1)
+health=$(nuvlaedge-engine-check-health ${timer} "${project}" 2>&1)
 
 if [[ $? -ne 0 ]]
 then

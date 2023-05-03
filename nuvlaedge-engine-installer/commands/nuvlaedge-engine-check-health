@@ -7,8 +7,18 @@ import signal
 import logging
 from contextlib import contextmanager
 
+args_count = len(sys.argv)
+timer = int(sys.argv[1]) if args_count > 1 else 60
+project = sys.argv[2] if args_count > 2 else None
+verbose = True if args_count > 3 else False
 
-timer = int(sys.argv[1])
+OK = True
+NOK = False
+RETRY = None
+
+INTERVAL=10
+
+initial_restart_count = {}
 
 @contextmanager
 def timeout(deadline):
@@ -31,12 +41,23 @@ def raise_timeout(signum, frame):
     raise TimeoutError
 
 
+def any_false(iterable):
+    for i in iterable:
+        if i == False:
+            return True
+    return False
+
+
 def is_agent(container):
     return container.labels.get('com.docker.compose.service', '') == 'agent'
 
 
-def get_containers(docker_client):
-    filters = {'label': 'nuvlaedge.component=True'}
+def get_containers(docker_client, project=None):
+    filter_labels = ['nuvlaedge.component=True']
+    if project:
+        filter_labels.append(f'com.docker.compose.project={project}')
+
+    filters = {'label': filter_labels}
     return docker_client.containers.list(filters=filters, all=True)
 
 
@@ -47,31 +68,40 @@ def get_container_logs(container):
 def check_container_running(container):
     status = container.status
     if not status or status.lower() != 'running':
-        return False, f'status not running: {status}'
-    return True, ''
+        return RETRY, f'status not running: {status}'
+    return OK, ''
 
 
 def check_restart_count(container):
+    global initial_restart_count
+
+    name = container.name
     restart_count = container.attrs.get('RestartCount', 0)
-    if restart_count != 0:
-        return False, f'restart count not zero: {restart_count}'
-    return True, ''
+
+    if name not in initial_restart_count:
+        initial_restart_count[name] = restart_count
+        return RETRY, f'initial restart count: {restart_count}'
+
+    if restart_count > initial_restart_count[name]:
+        return NOK, (f'restart count too high: {restart_count} '
+                     f'(initial value: {initial_restart_count[name]})')
+    return OK, ''
 
 
 def check_health_state(container):
     state = container.attrs.get('State')
     if not state:
-        return False, 'state not available'
+        return RETRY, 'state not available'
 
     health = state.get('Health')
     if not health:
-        return True, 'health not available (not an issue)'
+        return OK, 'health not available (not an issue)'
 
     status = health.get('Status')
     if not status or status.lower() != 'healthy':
-        return False, f'status not healthy: {status}'
+        return RETRY, f'status not healthy: {status}'
 
-    return True, ''
+    return OK, ''
 
 
 def exec_check(command, container, results, messages, logs):
@@ -84,6 +114,9 @@ def exec_check(command, container, results, messages, logs):
     if not res:
         logs[container.name] = get_container_logs(container)
 
+
+if verbose:
+    logging.basicConfig(level=logging.INFO)
 
 last_messages = []
 last_logs = {}
@@ -98,9 +131,12 @@ try:
             messages = []
 
             try:
-                containers = get_containers(docker_client)
+                containers = get_containers(docker_client, project)
             except docker.errors.APIError:
                 continue
+
+            if not containers:
+                raise Exception('NuvlaEdge not healthy: no containers found')
 
             for container in containers:
                 local_results = []
@@ -109,15 +145,23 @@ try:
                     exec_check(check_restart_count, *args)
                     exec_check(check_container_running, *args)
                 exec_check(check_health_state, *args)
-                results.append(local_results and all(local_results))
+
+                result = None
+                if any_false(local_results):
+                    result = False
+                elif local_results and all(local_results):
+                    result = True
+                results.append(result)
 
             last_messages = messages
             last_logs = logs
 
             if all(results):
                 break
+            elif any_false(results):
+                raise Exception('NuvlaEdge installation not healthy')
 
-            time.sleep(3)
+            time.sleep(INTERVAL)
 
 except Exception as e:
     messages = "\n".join(last_messages)
@@ -127,4 +171,7 @@ except Exception as e:
     for container_name, logs in last_logs.items():
         print(f'{container_name}: \n{logs}')
     # making sure that only the error message is printed and not the whole exception
-    raise
+    # raise
+    exit(1)
+else:
+    print('NuvlaEdge installation healthy')
