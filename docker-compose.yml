@@ -30,7 +30,6 @@ services:
       - NUVLAEDGE_DATA_GATEWAY_ENABLED=${NUVLAEDGE_DATA_GATEWAY_ENABLED:-True}
       - NUVLAEDGE_DATA_GATEWAY_IMAGE=${NUVLAEDGE_DATA_GATEWAY_IMAGE:-eclipse-mosquitto:2.0.15-openssl}
       - SKIP_MINIMUM_REQUIREMENTS=${SKIP_MINIMUM_REQUIREMENTS:-False}
-      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -56,7 +55,6 @@ services:
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
-      - COMPUTE_API_PORT=${COMPUTE_API_PORT:-5000}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
@@ -77,7 +75,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - nuvlabox-db:/srv/nuvlaedge/shared
     ports:
-      - "${COMPUTE_API_PORT:-5000}:5000"
+      - "${COMPUTE_API_PORT:-}5000"
     healthcheck:
       test: netstat -tulpn | grep LISTEN | grep 5000 | grep socat
       interval: 20s
