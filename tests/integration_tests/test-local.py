@@ -117,22 +117,22 @@ def test_nuvlaedge_engine_local_compute_api(request):
 
     agent = docker_client.containers.get(local_project_name + "-agent")
 
-    raw_cert = agent.exec_run('cat /srv/nuvlaedge/shared/cert.pem').output
-    cert.write(raw_cert)
-    cert.flush()
+    url = 'https://compute-api:5000/containers/json'
+    cert_path = '/srv/nuvlaedge/shared'
+    cmd = f'curl -ksS --cacert {cert_path}/ca.pem --cert {cert_path}/cert.pem --key {cert_path}/key.pem {url}'
+    result = agent.exec_run(cmd)
+    output = result.output
+    exit_code = result.exit_code
+    
+    assert exit_code == 0, \
+        f'NuvlaEdge compute API is not working (exit code {exit_code}): {output}'
+    
+    containers = json.loads(output)
 
-    raw_key = agent.exec_run('cat /srv/nuvlaedge/shared/key.pem').output
-    key.write(raw_key)
-    key.flush()
+    assert len(containers) > 0, \
+        f'NuvlaEdge compute API should have reported (at least) the NuvlaEdge containers: {containers}'
 
-    compute_api = 'https://localhost:5000/'
-
-    r = requests.get(compute_api + 'containers/json', verify=False, cert=(cert.name, key.name))
-    assert r.status_code == 200, f'NuvlaEdge compute API {compute_api} is not working'
-    assert len(r.json()) > 0, \
-        f'NuvlaEdge compute API {compute_api} should have reported (at least) the NuvlaEdge containers'
-
-    logging.info(f'Compute API ({compute_api}) is up, running and secured')
+    logging.info(f'Compute API is up, running, secured and accessible by agent')
 
 
 def test_nuvlaedge_engine_local_datagateway():
