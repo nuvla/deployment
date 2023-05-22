@@ -1,7 +1,12 @@
 The NuvlaEdge Engine has just been installed on your Kubernetes node {{ .Values.kubernetesNode }}, on namespace {{ .Release.Namespace }}.
 
+1. After the initial installation, to approve the certificate signing request
+   for the certificate used to manage the NuvlaEdge instance please run the
+   following command as system admin of the K8s cluster
 
-1. To get the internal NuvlaEdge dashboard URL, you can run:
+   kubectl certificate approve {{ .Values.credManager.csr_name }}
+
+2. To get the internal NuvlaEdge dashboard URL, you can run:
 
   echo $(kubectl get svc -n {{ include "nuvlaedge-engine.namespace" . }} system-manager -o jsonpath="{.spec.clusterIP}")":3636"
 

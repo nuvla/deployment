@@ -31,16 +31,6 @@ spec:
                   fieldPath: spec.nodeName
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge-engine.namespace" . }}
-          ports:
-            - containerPort: 3636
-          livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost:3636
-            initialDelaySeconds: 10
-            periodSeconds: 30
           volumeMounts:
             - mountPath: /rootfs
               name: rootfs

@@ -26,10 +26,14 @@ spec:
           securityContext:
             privileged: true
           env:
+            - name: NUVLAEDGE_LOG_LEVEL
+              value: {{ .Values.agentConfig.log_level }}
             - name: NUVLAEDGE_UUID
               value: {{ .Values.NUVLAEDGE_UUID }}
             - name: NUVLAEDGE_ENGINE_VERSION
-              value: "2.0.0"
+              value: {{ .Values.images.agent.tag }}
+            - name: NUVLAEDGE_EXCLUDED_MONITORS
+              value: {{ .Values.agentConfig.excluded_monitors }}
             - name: NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY
               value: {{ .Values.NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY }}
             - name: NUVLA_ENDPOINT
@@ -45,23 +49,15 @@ spec:
             - name: VPN_INTERFACE_NAME
               value: {{ .Values.VPN_INTERFACE_NAME | default "vpn" | quote }}
             - name: MY_HOST_NODE_IP
-              value: status.hostIP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: MY_HOST_NODE_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge-engine.namespace" . }}
-          ports:
-            - containerPort: 80
-          livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost/api/healthcheck
-            initialDelaySeconds: 10
-            periodSeconds: 30
           volumeMounts:
             - mountPath: /rootfs
               name: rootfs
