@@ -38,7 +38,7 @@ services:
 
   agent:
     <<: *common
-    image: nuvlaedge/agent:2.11.0
+    image: nuvlaedge/agent:2.12.0
     restart: always
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-agent
     oom_kill_disable: true
@@ -49,10 +49,13 @@ services:
       - NUVLAEDGE_API_SECRET=${NUVLAEDGE_API_SECRET:-}
       - NUVLAEDGE_UUID=${NUVLAEDGE_UUID}
       - NUVLAEDGE_ENGINE_VERSION=2.7.0
+      - NUVLAEDGE_EXCLUDED_MONITORS=${NUVLAEDGE_EXCLUDED_MONITORS:-}
+      - NUVLAEDGE_THREAD_MONITORS=${NUVLAEDGE_THREAD_MONITORS:-False}
       - NUVLAEDGE_LOG_LEVEL=${NUVLAEDGE_LOG_LEVEL:-INFO}
       - NUVLAEDGE_IMMUTABLE_SSH_PUB_KEY=${NUVLAEDGE_SSH_PUB_KEY:-}
       - HOST_HOME=${HOME}
       - VPN_INTERFACE_NAME=${VPN_INTERFACE_NAME:-vpn}
+      - VPN_CONFIG_EXTRA
       - NUVLA_ENDPOINT=${NUVLA_ENDPOINT:-nuvla.io}
       - NUVLA_ENDPOINT_INSECURE=${NUVLA_ENDPOINT_INSECURE:-False}
     volumes:
