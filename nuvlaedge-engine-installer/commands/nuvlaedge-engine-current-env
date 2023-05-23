@@ -7,12 +7,27 @@ import inspect
 func = inspect.currentframe().f_code
 project = sys.argv[1]
 
+
+def _get_containers(docker_client, project=None, labels=None):
+    filter_labels = []
+    if labels:
+        filter_labels.extend(labels)
+    if project:
+        filter_labels.append(f'com.docker.compose.project={project}')
+    filters = {'label': filter_labels}
+    return docker_client.containers.list(filters=filters, all=True)
+
+
+def get_containers(docker_client, project=None):
+    return list(set(
+        _get_containers(docker_client, project, ['nuvlabox.component=True']) +
+        _get_containers(docker_client, project, ['nuvlaedge.component=True'])))
+
+
 dc = docker.from_env()
 
 try:
-    filter_label = ["nuvlaedge.component=True", f"com.docker.compose.project={project}"]
-
-    nuvlaedge_containers = dc.containers.list(filters={'label': filter_label})
+    nuvlaedge_containers = get_containers(dc, project)
 
     full_environment = {}
     for container in nuvlaedge_containers:

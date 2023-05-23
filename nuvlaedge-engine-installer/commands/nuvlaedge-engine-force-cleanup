@@ -11,19 +11,39 @@ project_name = sys.argv[1]
 working_dir = sys.argv[2]
 delete_volume = int(sys.argv[3])
 
-
 print(f"Args: "
       f"ProjectName={project_name}, WorkingDir={working_dir}, DeleteVolume={True if delete_volume == 1 else False}")
+
+
+def _get_containers(docker_client, project=None, labels=None):
+    filter_labels = []
+    if labels:
+        filter_labels.extend(labels)
+    if project:
+        filter_labels.append(f'com.docker.compose.project={project}')
+    filters = {'label': filter_labels}
+    return docker_client.containers.list(filters=filters, all=True)
+
+
+def get_containers(docker_client, project=None, labels=[]):
+    return list(set(
+        _get_containers(docker_client, project, labels +
+                                                ['nuvlabox.component=True',
+                                                 'nuvlabox.deployment=production']) +
+        _get_containers(docker_client, project, labels +
+                                                ['nuvlaedge.component=True',
+                                                 'nuvlaedge.deployment=production'])
+    ))
+
+
 try:
     dc = docker.from_env()
 
+    labels = [f'com.docker.compose.project.working_dir={working_dir}']
+
     # Start by shutting down the System Manager cause it may revive others by itself
-    sm = dc.containers.list(all=True,
-                            filters={'label': ['com.docker.compose.project=nuvlaedge',
-                                               f'com.docker.compose.project.working_dir={working_dir}',
-                                               'nuvlaedge.component=True',
-                                               'nuvlaedge.deployment=production',
-                                               'com.docker.compose.service=system-manager']})
+    sm = get_containers(dc, project_name,
+                        labels + ['com.docker.compose.service=system-manager'])
 
     for container in sm:
         try:
@@ -33,18 +53,10 @@ try:
             pass
 
     # Then start by the core containers
-    all = dc.containers.list(all=True,
-                             filters={'label': ['com.docker.compose.project=nuvlaedge',
-                                                f'com.docker.compose.project.working_dir={working_dir}',
-                                                'nuvlaedge.component=True',
-                                                'nuvlaedge.deployment=production']})
+    all = get_containers(dc, project_name, labels)
 
-    peripheral_managers = dc.containers.list(all=True,
-                                             filters={'label': ['com.docker.compose.project=nuvlaedge',
-                                                                f'com.docker.compose.project.working_dir={working_dir}',
-                                                                'nuvlaedge.component=True',
-                                                                'nuvlaedge.deployment=production',
-                                                                'nuvlaedge.peripheral.component=True']})
+    peripheral_managers = get_containers(dc, project_name,
+                                         labels + ['nuvlaedge.peripheral.component=True'])
 
     core = list(set(all) - set(peripheral_managers))
 
@@ -63,7 +75,7 @@ try:
             pass
 
     # Now the networks
-    networks = dc.networks.list(filters={'label': ['com.docker.compose.project=nuvlaedge']})
+    networks = dc.networks.list(filters={'label': [f'com.docker.compose.project={project_name}']})
     for net in networks:
         try:
             net.remove()
@@ -82,9 +94,12 @@ try:
 
     # Now, finally the volume
     if delete_volume == 1:
-        volumes = dc.volumes.list(filters={'label': ['com.docker.compose.project=nuvlaedge',
-                                                     'nuvlaedge.deployment=production',
-                                                     'nuvlaedge.volume=True']})
+        volumes = dc.volumes.list(filters={'label': [f'com.docker.compose.project={project_name}',
+                                                     'nuvlabox.deployment=production',
+                                                     'nuvlabox.volume=True']})
+        volumes += dc.volumes.list(filters={'label': [f'com.docker.compose.project={project_name}',
+                                                      'nuvlaedge.deployment=production',
+                                                      'nuvlaedge.volume=True']})
 
         for vol in volumes:
             try:

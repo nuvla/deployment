@@ -52,13 +52,20 @@ def is_agent(container):
     return container.labels.get('com.docker.compose.service', '') == 'agent'
 
 
-def get_containers(docker_client, project=None):
-    filter_labels = ['nuvlaedge.component=True']
+def _get_containers(docker_client, project=None, labels=None):
+    filter_labels = []
+    if labels:
+        filter_labels.extend(labels)
     if project:
         filter_labels.append(f'com.docker.compose.project={project}')
-
     filters = {'label': filter_labels}
     return docker_client.containers.list(filters=filters, all=True)
+
+
+def get_containers(docker_client, project=None):
+    return list(set(
+        _get_containers(docker_client, project, ['nuvlabox.component=True']) +
+        _get_containers(docker_client, project, ['nuvlaedge.component=True'])))
 
 
 def get_container_logs(container):
