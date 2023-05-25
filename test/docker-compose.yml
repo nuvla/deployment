@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   proxy:
-    image: traefik:v2.8
+    image: traefik:v2.9
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
@@ -22,9 +22,6 @@ services:
         protocol: tcp
         mode: host
     deploy:
-      placement:
-        constraints:
-          - node.role == manager
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -48,7 +45,7 @@ services:
       - test-net
 
   zk:
-    image: zookeeper:3.4
+    image: zookeeper:3.4.13
     environment:
       - ZOO_MY_ID=3
     deploy:
@@ -68,14 +65,14 @@ services:
         target: /opt/nuvla/server/resources/log4j.properties
     environment:
       - ES_ENDPOINTS=es
-      - ES_SNIFFER_INIT=yes
+      - ES_SNIFFER_INIT=no
       - ZK_ENDPOINTS=zk:2181
-      - KAFKA_PRODUCER_INIT=yes
-      - NUVLA_SUPER_PASSWORD=${NUVLA_SUPER_PASSWORD:-supeR8-supeR8}
-      - KAFKA_ENDPOINTS=kafka:9092
+      - KAFKA_PRODUCER_INIT=no
+      - NUVLA_SUPER_PASSWORD=supeR8-supeR8
     deploy:
       labels:
         - "traefik.enable=true"
+        - "traefik.docker.network=frontend"
         - "traefik.http.services.api-service.loadbalancer.server.port=8200"
         - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
         - "traefik.http.middlewares.api-middleware.headers.customrequestheaders.nuvla-authn-info="
@@ -130,144 +127,11 @@ services:
     networks:
       - test-net
 
-  # Zookeeper for Kafka
-  kafka-zk:
-    image: confluentinc/cp-zookeeper:6.1.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - test-net
-    volumes:
-    - kafka-zk-data:/var/lib/zookeeper/data
-    - kafka-zk-datalog:/var/lib/zookeeper/log
-
-  # Kafka broker with Connect.
-  kafka:
-    image: confluentinc/cp-kafka:6.1.0
-    ports:
-      - "9092:9092"
-    volumes:
-      - kafka-data:/var/lib/kafka/data
-    configs:
-      - source: kafka-conf-distributed
-        target: /etc/kafka/connect-distributed.properties
-      - source: elastic-source-nuvlabox-all
-        target: /etc/kafka/elastic-source-nuvlabox-all.json
-    networks:
-      - test-net
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'kafka-zk:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost
-      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
-      ES_SOURCE_CONNECT_VER: "1.3"
-      FROM_SCRATCH: "false"
-    command:
-      - bash
-      - -xc
-      - |
-        ### Cleanup from previous launch
-        [ "$$FROM_SCRATCH" == "true" ] && rm -f /var/lib/kafka/data/meta.properties
-
-        ### Start Kafka
-        echo "Launching Kafka"
-        /etc/confluent/docker/run &
-
-        ### Install ES Connect source
-        mkdir -p /usr/share/java/elastic-source-connect
-        curl -L --output /usr/share/java/elastic-source-connect/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar \
-            https://github.com/DarioBalinzo/kafka-connect-elasticsearch-source/releases/download/v$${ES_SOURCE_CONNECT_VER}/elastic-source-connect-$${ES_SOURCE_CONNECT_VER}-jar-with-dependencies.jar
-
-        ### Start Kafka Connect worker
-        echo "Launching Kafka Connect worker"
-        connect-distributed -daemon /etc/kafka/connect-distributed.properties
-        echo "Waiting for Kafka Connect to start listening on localhost:8083"
-        kc_endpoint=http://localhost:8083
-        while : ; do
-          curl_status=$$(curl -s -o /dev/null -w %{http_code} $$kc_endpoint/connectors)
-          echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
-          if [ $$curl_status -eq 200 ] ; then
-            break
-          fi
-          sleep 5
-        done
-
-        ### Start Elasticsearch Connect
-        echo "Start ES source connector"
-        curl -X POST -H "Content-Type: application/json" --data @/etc/kafka/elastic-source-nuvlabox-all.json $$kc_endpoint/connectors
-        sleep 1
-        curl $$kc_endpoint/connectors/elastic-source-nuvlabox-status/status
-
-        sleep infinity
-
-  # ksqlDB stream processor
-  ksqldb-server:
-    image: confluentinc/ksqldb-server:0.15.0
-    ports:
-      - "8088:8088"
-    configs:
-      - source: ksql.queries.file
-        target: /etc/ksqldb/nuvla-statements.sql
-    environment:
-      KSQL_CONFIG_DIR: "/etc/ksqldb"
-      KSQL_BOOTSTRAP_SERVERS: "kafka:29092"
-      KSQL_HOST_NAME: ksqldb-server
-      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
-      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
-      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
-      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
-      KSQL_KSQL_QUERIES_FILE: /etc/ksqldb/nuvla-statements.sql
-      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
-    networks:
-      - test-net
-
-  # Notification service to Slack
-  notify-slack:
-    image: nuvladev/kafka-notify:master
-    networks:
-      - test-net
-    command:
-      - slack
-    environment:
-      NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
-
-  # Notification service to Email
-  notify-email:
-    image: nuvladev/kafka-notify:master
-    networks:
-      - test-net
-    command:
-      - email
-    environment:
-      NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
-      # If not provided, will be taken from configuration/nuvla resource if defined there.
-      SMTP_HOST: "${SMTP_HOST}"
-      SMTP_PORT: "${SMTP_PORT}"
-      SMTP_SSL: "${SMTP_SSL}"
-      SMTP_USER: "${SMTP_USER}"
-      SMTP_PASSWORD: "${SMTP_PASSWORD}"
-
 configs:
   traefik.yaml:
     file: ./traefik/traefik.yaml
   log4j.properties:
     file: ./log4j.properties
-  ksql.queries.file:
-    file: ../streams/ksqldb/statements.replicas-1.sql
-  kafka-conf-distributed:
-    file: ../streams/kafka/connect-distributed.properties
-  elastic-source-nuvlabox-all:
-    file: ../streams/kafka/elastic-source-nuvlabox-all.json
 
 networks:
   test-net:
@@ -279,10 +143,4 @@ volumes:
   zkdata:
     driver: local
   zkdatalog:
-    driver: local
-  kafka-zk-data:
-    driver: local
-  kafka-zk-datalog:
-    driver: local
-  kafka-data:
     driver: local

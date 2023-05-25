@@ -1,0 +1,281 @@
+version: '3.7'
+
+services:
+  proxy:
+    image: traefik:v2.9
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    configs:
+      - source: traefik.yaml
+        target: /traefik.yaml
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  es:
+    image: nuvla/es:7.11.1.0
+    environment:
+      - cluster.name=elasticsearch
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - test-net
+
+  zk:
+    image: zookeeper:3.4.13
+    environment:
+      - ZOO_MY_ID=3
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    volumes:
+      - zkdata:/data
+      - zkdatalog:/datalog
+    networks:
+      - test-net
+
+  api:
+    image: nuvladev/api:master
+    configs:
+      - source: log4j.properties
+        target: /opt/nuvla/server/resources/log4j.properties
+    environment:
+      - ES_ENDPOINTS=es
+      - ES_SNIFFER_INIT=yes
+      - ZK_ENDPOINTS=zk:2181
+      - KAFKA_PRODUCER_INIT=yes
+      - NUVLA_SUPER_PASSWORD=${NUVLA_SUPER_PASSWORD:-supeR8-supeR8}
+      - KAFKA_ENDPOINTS=kafka:9092
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.api-service.loadbalancer.server.port=8200"
+        - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.http.middlewares.api-middleware.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.routers.api-router.rule=PathPrefix(`/api`)"
+        - "traefik.http.routers.api-router.entrypoints=websecure"
+        - "traefik.http.routers.api-router.tls=true"
+        - "traefik.http.routers.api-router.middlewares=api-middleware"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  # User interface takes the paths /, /ui/*, anything else
+  # is routed elsewhere.
+  ui:
+    image: nuvladev/ui:master
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.ui-service.loadbalancer.server.port=80"
+        - "traefik.http.services.ui-service.loadbalancer.healthcheck.path=/ui/index.html"
+        - "traefik.http.routers.ui-router.rule=Path(`/`) || PathPrefix(`/ui`)"
+        - "traefik.http.routers.ui-router.entrypoints=websecure"
+        - "traefik.http.routers.ui-router.tls=true"
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  job-executor:
+    image: nuvladev/job:master
+    command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  job-distributor:
+    image: nuvladev/job:master
+    entrypoint: /app/job_distributor.py
+    command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+    networks:
+      - test-net
+
+  # Kafka broker
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    healthcheck:
+      test: nc -z localhost 9092 || exit 1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    ports:
+      - 9092:9092
+      - 9101:9101
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    networks:
+      - test-net
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      FROM_SCRATCH: "true"
+    user: root
+    command:
+      - bash
+      - -xc
+      - |
+        ### Cleanup from previous launch
+        [ "$$FROM_SCRATCH" == "true" ] && rm -f $$KAFKA_LOG_DIRS/meta.properties
+
+        # Docker workaround: Remove check for KAFKA_ZOOKEEPER_CONNECT parameter
+        sed -i '/KAFKA_ZOOKEEPER_CONNECT/d' /etc/confluent/docker/configure
+
+        # Docker workaround: Ignore cub zk-ready
+        sed -i 's/cub zk-ready/echo ignore zk-ready/' /etc/confluent/docker/ensure
+
+        # KRaft required step: Format the storage directory with a new cluster ID
+        echo "kafka-storage format --ignore-formatted -t $$(kafka-storage random-uuid) -c /etc/kafka/kafka.properties" >> /etc/confluent/docker/ensure
+
+        ### Start Kafka
+        echo "Launching Kafka"
+        /etc/confluent/docker/run &
+
+        sleep infinity
+
+  # ksqlDB stream processor
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:7.2.1
+    depends_on:
+      - kafka_config_topics
+    healthcheck:
+      test: nc -z localhost 1099
+      start_period: 30s
+      retries: 5
+    ports:
+      - 8088:8088
+    networks:
+      - test-net
+    configs:
+      - source: ksql-queries-file
+        target: /etc/ksqldb/statements.sql
+    environment:
+      KSQL_CONFIG_DIR: /etc/ksqldb
+      KSQL_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_CONNECT_URL: http://connect:8083
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
+      KSQL_KSQL_QUERIES_FILE: /etc/ksqldb/statements.sql
+      KSQL_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+      JMX_PORT: 1099
+
+  # Notification service to Slack
+  notify-slack:
+    image: nuvla/kafka-notify:0.6.1
+    depends_on:
+      - ksqldb-server
+    networks:
+      - test-net
+    command:
+      - slack
+    environment:
+      NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
+
+  # Notification service to Email
+  notify-email:
+    image: nuvla/kafka-notify:0.6.1
+    depends_on:
+      - ksqldb-server
+    networks:
+      - test-net
+    command:
+      - email
+    environment:
+      NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
+      # If not provided, will be taken from configuration/nuvla resource if defined there.
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_SSL: "${SMTP_SSL}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+
+  subs-notifs:
+    image: nuvla/subs-notifs:0.0.7
+    depends_on:
+      - ksqldb-server
+    networks:
+      - test-net
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
+      ES_HOSTS: "${ES:-es:9200}"
+
+configs:
+  traefik.yaml:
+    file: ./traefik/traefik.yaml
+  log4j.properties:
+    file: ./log4j.properties
+  ksql-queries-file:
+    file: ../streams/ksqldb/statements.replicas-1.sql
+
+networks:
+  test-net:
+    attachable: true
+
+volumes:
+  esdata:
+    driver: local
+  zkdata:
+    driver: local
+  zkdatalog:
+    driver: local
+  kafka-data:
+    driver: local
