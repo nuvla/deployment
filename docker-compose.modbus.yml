@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-modbus:
     <<: *common
-    image: nuvlaedge/peripheral-manager-modbus:1.5.0
+    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/peripheral-manager-modbus:1.5.0
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-modbus
     restart: on-failure
     volumes:

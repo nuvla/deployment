@@ -15,7 +15,7 @@ x-common: &common
 services:
   peripheral-manager-network:
     <<: *common
-    image: nuvlaedge/peripheral-manager-network:1.4.0
+    image: ${DOCKER_REGISTRY:-}${NUVLAEDGE_ORG:-nuvlaedge}/peripheral-manager-network:1.4.0
     restart: on-failure
     container_name: ${COMPOSE_PROJECT_NAME:-nuvlaedge}-peripheral-network
     network_mode: host
