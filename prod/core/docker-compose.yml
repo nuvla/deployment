@@ -18,7 +18,7 @@ configs:
 
 services:
   api:
-    image: nuvla/api:5.25.2
+    image: nuvla/api:6.0.12
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -42,11 +42,13 @@ services:
           - node.labels.type == frontend
       labels:
         - "traefik.enable=true"
-        - "traefik.port=8200"
-        - "traefik.backend=api"
-        - "traefik.backend.healthcheck.path=/api/cloud-entry-point"
-        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=PathPrefix:/api"
+        - "traefik.http.services.api-service.loadbalancer.server.port=8200"
+        - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
+        - "traefik.http.middlewares.api-middleware.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.routers.api-router.rule=Host(`example.com`) && PathPrefix(`/api`)"
+        - "traefik.http.routers.api-router.entrypoints=websecure"
+        - "traefik.http.routers.api-router.tls.certresolver=cert-resolver"
+        - "traefik.http.routers.api-router.middlewares=api-middleware"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -57,18 +59,18 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.30.3
+    image: nuvla/ui:2.33.5
     deploy:
       placement:
         constraints:
           - node.labels.type == worker-job
       labels:
         - "traefik.enable=true"
-        - "traefik.port=80"
-        - "traefik.backend=ui"
-        - "traefik.backend.healthcheck.path=/ui/index.html"
-        - "traefik.frontend.headers.customRequestHeaders=nuvla-authn-info:"
-        - "traefik.frontend.rule=Path:/,/ui/,/{a:ui.*}"
+        - "traefik.http.services.ui-service.loadbalancer.server.port=80"
+        - "traefik.http.services.ui-service.loadbalancer.healthcheck.path=/ui/index.html"
+        - "traefik.http.routers.ui-router.rule=Path(`/`) || PathPrefix(`/ui`)"
+        - "traefik.http.routers.ui-router.entrypoints=websecure"
+        - "traefik.http.routers.ui-router.tls=true"
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -76,7 +78,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:2.20.2
+    image: nuvla/job:3.2.7
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -90,7 +92,7 @@ services:
       - nuvla-backend
 
   job-distributor:
-    image: nuvla/job:2.20.2
+    image: nuvla/job:3.2.7
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:

@@ -32,6 +32,7 @@
    :description               "example Ubuntu 18.04 image allowing access via SSH public/private key pair"
    :logo-url                  "https://nuv.la/images/modules-logos/ubuntu.svg"
    :subtype                   "component"
+   :compatibility             "swarm"
    :path                      "examples/ubuntu-new-module"
    :parent-path               "examples"
    :data-accept-content-types ["application/octet-stream"]

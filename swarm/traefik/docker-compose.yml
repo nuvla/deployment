@@ -2,22 +2,30 @@ version: '3.3'
 
 services:
   traefik:
-    image: traefik:1.7
-    command: --api --web --docker --docker.swarmMode --docker.watch --docker.network=traefik-public --docker.exposedByDefault=false --loglevel=info
+    image: traefik:v2.8
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.toml
-        target: /traefik.toml
+      - source: traefik.yaml
+        target: /traefik.yaml
     secrets:
       - source: nuvla.crt
         target: /nuvla.crt
       - source: nuvla.key
         target: /nuvla.key
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
     deploy:
       placement:
         constraints:
@@ -29,8 +37,8 @@ services:
       - traefik-public
 
 configs:
-  traefik.toml:
-    file: ./traefik/traefik.toml
+  traefik.yaml:
+    file: ./traefik/traefik.yaml
 
 secrets:
   nuvla.crt:
