@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Updates to the following event streaming components: Kafka v3.3.0, ksqlDB v0.25.0
+
 ## Released
 
 ## [2.3.2] - 2023-04-24

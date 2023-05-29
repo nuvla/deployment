@@ -1,13 +1,11 @@
-Demonstration Nuvla Deployment
-==============================
+# Demonstration Nuvla Deployment
 
 This directory contains a Docker compose file that describes a
 complete Nuvla deployment for demonstrations.  This deployment does
 not provide any means for handling the long-term persistence of data
 and consequently, should not be used for production.
 
-Prerequisites
--------------
+## Prerequisites
 
 If running Docker locally, you'll need to initialize your deployment
 to run in swarm mode. Just run the command:
@@ -18,8 +16,7 @@ docker swarm init
 
 The `docker stack` commands below should then work.
 
-Starting
---------
+## Starting
 
 This can be started with the command:
 
@@ -57,16 +54,14 @@ running remotely.
 > certificates, so you will have to authorize a security exception in
 > your browser or from your command line tool.
 
-Bootstrapping
--------------
+## Bootstrapping
 
 If NUVLA_SUPER_PASSWORD env variable is set and super user doesn't
 already exist, the super user will be created at the server
 startup. The default value is "supeR8-supeR8", but you can use a
 different value if you wish.
 
-Stopping
---------
+## Stopping
 
 To stop the server, simply do the following:
 
@@ -94,8 +89,7 @@ docker volume prune
 Be careful with the prune command, as it will remove all unused
 volumes from all deployments.
 
-Manual Clean Up
----------------
+## Manual Clean Up
 
 When running the command to remove the stack, it should asynchonously
 delete all the resources associated with the stack. Unfortunately,
@@ -108,3 +102,17 @@ issue](https://github.com/moby/moby/issues/32620) and a related
 that describes the `network rm` problems.
 
 The only clean workaround is to restart the Docker daemon.
+
+## Deploying demo Nuvla instance with notifications
+
+For demonstration of the notification feature of Nuvla use `docker-compose-notifs.yml`
+for the deployment. To configure email notifications, please set the following 
+environment variables before launching the deployment.
+
+```
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_SSL: "${SMTP_SSL}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+```
