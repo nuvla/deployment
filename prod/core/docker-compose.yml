@@ -18,7 +18,7 @@ configs:
 
 services:
   api:
-    image: nuvla/api:6.0.12
+    image: nuvla/api:6.0.17
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -59,7 +59,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.33.5
+    image: nuvla/ui:2.33.9
     deploy:
       placement:
         constraints:
