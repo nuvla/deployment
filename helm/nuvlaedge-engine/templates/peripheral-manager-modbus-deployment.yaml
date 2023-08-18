@@ -27,6 +27,7 @@ spec:
           env:
             - name: MY_NAMESPACE
               value: {{ include "nuvlaedge-engine.namespace" . }}
+            # test
             - name: MY_HOST_NODE_IP
               valueFrom:
                 fieldRef:
