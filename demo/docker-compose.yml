@@ -63,7 +63,7 @@ services:
       - backend
 
   api:
-    image: nuvla/api:6.0.18
+    image: nuvla/api:6.0.19
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -114,7 +114,7 @@ services:
       - frontend
 
   job-executor:
-    image: nuvla/job:3.5.1
+    image: nuvla/job:3.5.2
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 2
@@ -125,7 +125,7 @@ services:
       - backend
 
   job-distributor:
-    image: nuvla/job:3.5.1
+    image: nuvla/job:3.5.2
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:

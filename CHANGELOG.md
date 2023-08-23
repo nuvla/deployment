@@ -4,9 +4,16 @@
 
 ### Changed
 
-- Updates to the following event streaming components: Kafka v3.3.0, ksqlDB v0.25.0
-
 ## Released
+
+## [2.3.5] - 2023-08-23
+
+This release update Nuvla components to following versions:
+
+- [nuvla/api-server:6.0.19](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#6019---2023-08-22)
+- [nuvla/ui:2.33.12](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#23312---2023-07-28)
+- [nuvla/job-engine:3.5.2](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#352---2023-08-22)
+- Updates to the following event streaming components: Kafka v3.3.0, ksqlDB v0.25.0
 
 ## [2.3.2] - 2023-04-24
 
