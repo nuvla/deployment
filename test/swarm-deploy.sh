@@ -37,7 +37,7 @@ CREATE_CMD="create --driver exoscale
 deploy() {
     swsize=${1:-1}
     echo "::: Provisioning master: $MNAME"
-    $DM_BIN $CREATE_CMD --exoscale-image 'Linux Ubuntu 20.04 LTS 64-bit' "$MNAME"
+    $DM_BIN $CREATE_CMD --exoscale-image 'Linux Ubuntu 18.04 LTS 64-bit' "$MNAME"
     ip=$($DM_BIN ip "$MNAME")
     $DM_BIN ssh "$MNAME" "sudo docker swarm init --force-new-cluster --advertise-addr $ip"
     
@@ -46,7 +46,7 @@ deploy() {
         for i in $(seq 1 $((swsize - 1))); do
             WNAME=${MNAME}-worker${i}
             echo "::: Provisioning worker: $WNAME"
-            $DM_BIN $CREATE_CMD --exoscale-image 'Linux Ubuntu 20.04 LTS 64-bit' "$WNAME"
+            $DM_BIN $CREATE_CMD --exoscale-image 'Linux Ubuntu 18.04 LTS 64-bit' "$WNAME"
             $DM_BIN ssh "$WNAME" "sudo docker swarm join --token ${joinToken} ${ip}:2377"
         done
     fi
