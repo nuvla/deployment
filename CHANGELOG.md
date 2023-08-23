@@ -6,6 +6,16 @@
 
 ## Released
 
+## [2.3.6](https://github.com/nuvla/deployment/compare/2.3.4...v2.3.6) (2023-08-23)
+
+
+### Bug Fixes
+
+* functionnal test fix ([9024a2a](https://github.com/nuvla/deployment/commit/9024a2ac98d3a64c7de0c894cba856c4eac1a5f2))
+* Remove maven ([af97ac5](https://github.com/nuvla/deployment/commit/af97ac588e89a0d9837bdaf50e283afdfa4b3787))
+* Remove references to travis ([af97ac5](https://github.com/nuvla/deployment/commit/af97ac588e89a0d9837bdaf50e283afdfa4b3787))
+* Replace release process script by release please github action ([af97ac5](https://github.com/nuvla/deployment/commit/af97ac588e89a0d9837bdaf50e283afdfa4b3787))
+
 ## [2.3.5] - 2023-08-23
 
 This release update Nuvla components to following versions:
@@ -649,5 +659,3 @@ manage data, and deploy and use NuvlaBox resources at the edge.
 ### Changed
 
 - Initial release to test deployment process.
-
- 
