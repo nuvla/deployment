@@ -12,8 +12,14 @@ services:
       - source: dynamic.yaml-1
         target: /dynamic.yaml
     ports:
-      - "80:80"
-      - "443:443"
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
     deploy:
       placement:
         constraints:

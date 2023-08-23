@@ -53,7 +53,7 @@ services:
 # the Zookeeper documentation.
 
   zk:
-    image: zookeeper:3.4
+    image: zookeeper:3.4.13
     environment:
       - ZOO_MY_ID=3
       - ZOO_AUTOPURGE_PURGEINTERVAL=4

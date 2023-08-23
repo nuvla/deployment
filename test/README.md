@@ -1,5 +1,4 @@
-Complete TEST Nuvla Deployment
-==============================
+# Complete TEST Nuvla Deployment
 
 This directory contains a Docker compose file that describes a complete
 Nuvla deployment for TEST purposes.
@@ -20,10 +19,10 @@ backend services.  The deployment includes:
    and `/ui*` paths. Unknown '/ui*' paths will be redirected to the
    `index.html` file.
    
- - **job-\***: Engine for asynchronous processing of jobs. Job
+ - **job**: Engine for asynchronous processing of jobs. Job
    executor, distributor, and cleanup containers are started as part
    of the deployment.
-   
+ 
  - **proxy**: Traefik load balancer and router. Deployed Nuvla service
    accessible on port 443 with a self-signed certificate. The web
    interface for traefik is available on port 8080 via HTTP.
@@ -32,13 +31,14 @@ A single network `*_test-net` is created for the deployment. You can
 attach test containers to this network to debug individual services.
 For example, the command:
 
+```sh
     docker run -it --network nuvla_test-net  ubuntu:16.04
+```
 
 will attach an ubuntu machine to the network. The network prefix
 corresponds to the stack name (see below).
 
-Prerequisites
--------------
+## Prerequisites
 
 If running Docker locally, you'll need to initialize your deployment
 to run in swarm mode. Just run the command:
@@ -49,8 +49,7 @@ docker swarm init
 
 The `docker stack` commands below should then work.
 
-Starting
---------
+## Starting
 
 This can be started with the command:
 
@@ -85,8 +84,7 @@ running remotely.
 > certificates, so you will have to authorize a security exception in
 > your browser or from your command line tool.
 
-Bootstrapping
--------------
+## Bootstrapping
 
 If NUVLA_SUPER_PASSWORD environment variable is set for the API server
 and super user doesn't already exist, the super user will be created
@@ -100,8 +98,7 @@ your shell before deploying the stack, or edit the contents of the
 **The default super password should not be used for long-lived
 deployments!**
 
-Stopping
---------
+## Stopping
 
 To stop the server, simply do the following:
 
@@ -133,8 +130,7 @@ volumes from all deployments.
 redeploy the stack for updates rather than stopping and starting the
 stack.**
 
-Clean Up Problems
------------------
+## Clean Up Problems
 
 When running the command to remove the stack, it should asynchonously
 delete all the resources associated with the stack. Unfortunately,
@@ -152,3 +148,17 @@ The only clean workaround is to restart the Docker daemon.
 
 Although it will leave dangling network definitions, you can just use
 a different name for a new deployment to avoid the restart.
+
+## Deploying test Nuvla instance with notifications
+
+For demonstration of the notification feature of Nuvla use `docker-compose-notifs.yml`
+for the deployment. To configure email notifications, please set the following
+environment variables before launching the deployment.
+
+```
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_SSL: "${SMTP_SSL}"
+      SMTP_USER: "${SMTP_USER}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+```

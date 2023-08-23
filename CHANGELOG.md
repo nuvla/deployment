@@ -4,13 +4,32 @@
 
 ### Changed
 
-This release update Nuvla components to following versions:
-
-
 - Dependencies - traefik:v2.9
 - Traefik - Respond with 503 when no api-server or ui
-- ES - Send hostname to sniffer to resolve to current IP  
+- ES - Send hostname to sniffer to resolve to current IP
 
+## Released
+
+## [2.3.5] - 2023-08-23
+
+This release update Nuvla components to following versions:
+
+- [nuvla/api-server:6.0.19](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#6019---2023-08-22)
+- [nuvla/ui:2.33.12](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#23312---2023-07-28)
+- [nuvla/job-engine:3.5.2](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#352---2023-08-22)
+- Updates to the following event streaming components: Kafka v3.3.0, ksqlDB v0.25.0
+
+## [2.3.2] - 2023-04-24
+
+### Changed
+
+This release update Nuvla components to following versions:
+
+- [nuvla/api-server:6.0.12](https://github.com/nuvla/api-server/blob/master/CHANGELOG.md#6012---2023-04-24)
+- [nuvla/ui:2.33.5](https://github.com/nuvla/ui/blob/master/CHANGELOG.md#2335---2023-04-24)
+- [nuvla/job-engine:3.2.6](https://github.com/nuvla/job-engine/blob/master/CHANGELOG.md#326---2023-04-24)
+
+- Traefik proxy network to host to get real client IP
 
 ## [2.3.1] - 2022-12-20
 

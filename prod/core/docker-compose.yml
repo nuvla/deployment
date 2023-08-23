@@ -18,7 +18,7 @@ configs:
 
 services:
   api:
-    image: nuvla/api:6.0.8
+    image: nuvla/api:6.0.19
     configs:
       - source: log4j.properties
         target: /opt/nuvla/server/resources/log4j.properties
@@ -59,7 +59,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.32.11
+    image: nuvla/ui:2.33.12
     deploy:
       placement:
         constraints:
@@ -78,7 +78,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:3.2.4
+    image: nuvla/job:3.5.2
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -92,7 +92,7 @@ services:
       - nuvla-backend
 
   job-distributor:
-    image: nuvla/job:3.2.4
+    image: nuvla/job:3.5.2
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -105,41 +105,3 @@ services:
         delay: 5s
     networks:
       - nuvla-backend
-
-  notify-slack:
-    image: nuvla/kafka-notify:0.6.0
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == worker-job
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-    networks:
-      - nuvla-backend
-    command:
-      - slack
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
-
-  notify-email:
-    image: nuvla/kafka-notify:0.6.0
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == worker-job
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-    networks:
-      - nuvla-backend
-    command:
-      - email
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
-      # If not provided, will be taken from configuration/nuvla resource if defined there.
-      SMTP_HOST: "${SMTP_HOST}"
-      SMTP_PORT: "${SMTP_PORT}"
-      SMTP_SSL: "${SMTP_SSL}"
-      SMTP_USER: "${SMTP_USER}"
-      SMTP_PASSWORD: "${SMTP_PASSWORD}"
