@@ -183,6 +183,13 @@
         <groupId>de.jutzig</groupId>
         <artifactId>github-release-plugin</artifactId>
         <version>1.4.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus.utils</artifactId>
+            <version>3.5.1</version>
+          </dependency>
+        </dependencies>
         <configuration>
           <description>Nuvla Service Deployment</description>
           <releaseName>${project.version}</releaseName>
