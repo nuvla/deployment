@@ -1,0 +1,33 @@
+name: release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: simple
+          changelog-types: '[{"type":"deps","section":"Dependencies","hidden":false},{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"chore","section":"Miscellaneous","hidden":false}]'
+          release-as: 2.3.6
+          bootstrap-sha: 344892a71f5b37dc3824a876233461bb982003a8
+
+  notify:
+    name: Post Workflow Status To Slack
+    needs:
+      - release
+    if: ${{ needs.release.outputs.release_created }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{secrets.GITHUB_TOKEN}}
+          slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}

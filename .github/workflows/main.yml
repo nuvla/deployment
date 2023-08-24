@@ -13,9 +13,6 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: rename pom.xml to let SonarCloud GHA Scan to run
-        run: mv pom.xml{,.moved}
-
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -29,15 +26,6 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-            - name: Cache local Maven repository
 
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -62,15 +50,14 @@ jobs:
 
       - name: Deploy Docker swarm testing cluster
         env:
-          TRAVIS_BUILD_DIR: .
           SWARM_SIZE: 1
           WAIT_AVAIL_MIN: 5
           EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
           EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
         run: |
-          $TRAVIS_BUILD_DIR/test/swarm-deploy.sh deploy $SWARM_SIZE
+          ./test/swarm-deploy.sh deploy $SWARM_SIZE
           ip=`cat $HOME/nuvla-test-host`
-          $TRAVIS_BUILD_DIR/test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || { >&2 echo "failed to provision Nuvla."; $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate; exit 1; }
+          ./test/wait-avail.sh https://$ip/api/cloud-entry-point $WAIT_AVAIL_MIN || { >&2 echo "failed to provision Nuvla."; ./test/swarm-deploy.sh terminate; exit 1; }
 
       - name: Run Nuvla functional tests
         run: |
@@ -86,10 +73,9 @@ jobs:
       - name: Terminate Docker swarm testing cluster
         if: ${{ always() }}
         env:
-          TRAVIS_BUILD_DIR: .
           EXOSCALE_API_KEY: ${{ secrets.EXOSCALE_API_KEY }}
           EXOSCALE_API_SECRET: ${{ secrets.EXOSCALE_API_SECRET }}
-        run: $TRAVIS_BUILD_DIR/test/swarm-deploy.sh terminate
+        run: ./test/swarm-deploy.sh terminate
 
   job-notify:
     if: always()
