@@ -36,4 +36,3 @@ jobs:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           slack_webhook_url: ${{secrets.SLACK_WEBHOOK_URL}}
           include_commit_message: true
-          icon_emoji: ':sunflower:'
