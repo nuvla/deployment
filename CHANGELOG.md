@@ -6,6 +6,25 @@
 
 ## Released
 
+## [2.3.6](https://github.com/nuvla/deployment/compare/2.3.5...v2.3.6) (2023-08-24)
+
+
+### Configuration
+
+* **elasticsearch:** Send hostname to sniffer to resolve to current IP ([417df57](https://github.com/nuvla/deployment/commit/417df578d87ab7165c8cf2f9c00455c5bf87af03))
+* **traefik:** Respond with 503 when no api-server or ui ([417df57](https://github.com/nuvla/deployment/commit/417df578d87ab7165c8cf2f9c00455c5bf87af03))
+
+
+### Features
+
+* Drive version and generate changelog from git commits messages ([fe4527f](https://github.com/nuvla/deployment/commit/fe4527f893dd6da3066f870a47d8ed4ddd81551c))
+
+
+### Bug Fixes
+
+* Broken release process replaced by release-please tool ([fe4527f](https://github.com/nuvla/deployment/commit/fe4527f893dd6da3066f870a47d8ed4ddd81551c))
+* Remove references of Travis ([fe4527f](https://github.com/nuvla/deployment/commit/fe4527f893dd6da3066f870a47d8ed4ddd81551c))
+
 ## [2.3.5] - 2023-08-23
 
 This release update Nuvla components to following versions:
@@ -649,5 +668,3 @@ manage data, and deploy and use NuvlaBox resources at the edge.
 ### Changed
 
 - Initial release to test deployment process.
-
- 
