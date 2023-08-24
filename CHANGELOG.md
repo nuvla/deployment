@@ -4,10 +4,6 @@
 
 ### Changed
 
-- Dependencies - traefik:v2.9
-- Traefik - Respond with 503 when no api-server or ui
-- ES - Send hostname to sniffer to resolve to current IP
-
 ## Released
 
 ## [2.3.5] - 2023-08-23
