@@ -2,6 +2,14 @@
 
 ## Released
 
+## [2.3.7](https://github.com/nuvla/deployment/compare/v2.3.6...v2.3.7) (2023-08-24)
+
+
+### Bug Fixes
+
+* **release:** Fix notify if condition ([6813d38](https://github.com/nuvla/deployment/commit/6813d38d12fab0b3b56b072dc9af490383909977))
+* **release:** Remove bootstrap release-please vars ([6813d38](https://github.com/nuvla/deployment/commit/6813d38d12fab0b3b56b072dc9af490383909977))
+
 ## [2.3.6](https://github.com/nuvla/deployment/compare/2.3.5...v2.3.6) (2023-08-24)
 
 
