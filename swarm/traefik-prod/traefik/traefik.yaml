@@ -3,6 +3,9 @@ providers:
     exposedByDefault: false
     swarmMode: true
     network: traefik-public
+    allowEmptyServices: true
+  file:
+    filename: dynamic.yaml
 
 entryPoints:
   web:

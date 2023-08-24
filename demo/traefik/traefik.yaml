@@ -2,6 +2,9 @@ providers:
   docker:
     exposedByDefault: false
     swarmMode: true
+    allowEmptyServices: true
+  file:
+    filename: dynamic.yaml
 
 entryPoints:
   web:

@@ -6,8 +6,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.yaml
+      - source: traefik.yaml-1
         target: /traefik.yaml
+      - source: dynamic.yaml-1
+        target: /dynamic.yaml
     secrets:
       - source: nuvla.crt
         target: /nuvla.crt
@@ -37,8 +39,10 @@ services:
       - traefik-public
 
 configs:
-  traefik.yaml:
+  traefik.yaml-1:
     file: ./traefik/traefik.yaml
+  dynamic.yaml-1:
+    file: ./traefik/dynamic.yaml
 
 secrets:
   nuvla.crt:

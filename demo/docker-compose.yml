@@ -6,8 +6,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.yaml
+      - source: traefik.yaml-1
         target: /traefik.yaml
+      - source: dynamic.yaml-1
+        target: /dynamic.yaml
     ports:
       - target: 80
         published: 80
@@ -32,6 +34,7 @@ services:
     image: nuvla/es:7.11.1.0
     environment:
       - cluster.name=elasticsearch
+      - http.publish_host=es
       - xpack.security.enabled=false
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -137,8 +140,10 @@ services:
       - backend
 
 configs:
-  traefik.yaml:
+  traefik.yaml-1:
     file: ./traefik/traefik.yaml
+  dynamic.yaml-1:
+    file: ./traefik/dynamic.yaml
   log4j.properties:
     file: ./log4j.properties
 
