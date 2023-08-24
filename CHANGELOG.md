@@ -1,9 +1,5 @@
 # Changelog
 
-## Unreleased
-
-### Changed
-
 ## Released
 
 ## [2.3.6](https://github.com/nuvla/deployment/compare/2.3.5...v2.3.6) (2023-08-24)
