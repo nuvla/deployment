@@ -2,6 +2,20 @@
 
 ## Released
 
+## [2.4.0](https://github.com/nuvla/deployment/compare/v2.3.7...v2.4.0) (2023-09-25)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.1.0 ([8b7799b](https://github.com/nuvla/deployment/commit/8b7799b243fd576210c65ae2520de6dd4bb30cff))
+* **job-engine:** nuvla/job:3.7.0 ([8b7799b](https://github.com/nuvla/deployment/commit/8b7799b243fd576210c65ae2520de6dd4bb30cff))
+* **ui:** nuvla/ui:2.33.14 ([8b7799b](https://github.com/nuvla/deployment/commit/8b7799b243fd576210c65ae2520de6dd4bb30cff))
+
+
+### Features
+
+* Deployment group state machine and operational status workflows ([8b7799b](https://github.com/nuvla/deployment/commit/8b7799b243fd576210c65ae2520de6dd4bb30cff))
+
 ## [2.3.7](https://github.com/nuvla/deployment/compare/v2.3.6...v2.3.7) (2023-08-24)
 
 
