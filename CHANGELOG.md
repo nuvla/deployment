@@ -2,6 +2,20 @@
 
 ## Released
 
+## [2.5.0](https://github.com/nuvla/deployment/compare/v2.4.0...v2.5.0) (2023-10-27)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.2.0 ([83bff2c](https://github.com/nuvla/deployment/commit/83bff2c80b15afdbc8dc6a62235d4b5a891d340a))
+* **job-engine:** nuvla/job:3.7.0 ([83bff2c](https://github.com/nuvla/deployment/commit/83bff2c80b15afdbc8dc6a62235d4b5a891d340a))
+* **ui:** nuvla/ui:2.34.0 ([83bff2c](https://github.com/nuvla/deployment/commit/83bff2c80b15afdbc8dc6a62235d4b5a891d340a))
+
+
+### Features
+
+* Nuvlaedge heartbeat capability, heartbeat and telemetry decoupling, Refactor NuvlaEdge job execution (pull only) ([83bff2c](https://github.com/nuvla/deployment/commit/83bff2c80b15afdbc8dc6a62235d4b5a891d340a))
+
 ## [2.4.0](https://github.com/nuvla/deployment/compare/v2.3.7...v2.4.0) (2023-09-25)
 
 
