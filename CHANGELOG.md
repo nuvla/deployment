@@ -2,6 +2,20 @@
 
 ## Released
 
+## [2.6.0](https://github.com/nuvla/deployment/compare/v2.5.0...v2.6.0) (2023-11-10)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.3.0 ([5932726](https://github.com/nuvla/deployment/commit/5932726fa7084af0c490168bbebadf352b80a3d8))
+* **job-engine:** nuvla/job:3.9.0 ([5932726](https://github.com/nuvla/deployment/commit/5932726fa7084af0c490168bbebadf352b80a3d8))
+* **ui:** nuvla/ui:2.35.0 ([5932726](https://github.com/nuvla/deployment/commit/5932726fa7084af0c490168bbebadf352b80a3d8))
+
+
+### Features
+
+* Values query support; get queries support select parm, select param behavior enhanced ([5932726](https://github.com/nuvla/deployment/commit/5932726fa7084af0c490168bbebadf352b80a3d8))
+
 ## [2.5.0](https://github.com/nuvla/deployment/compare/v2.4.0...v2.5.0) (2023-10-27)
 
 
