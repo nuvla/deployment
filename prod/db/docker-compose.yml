@@ -31,7 +31,7 @@ services:
       - discovery.seed_hosts=es
       - cluster.initial_master_nodes=es
       - cluster.name=elasticsearch
-      - bootstrap.memory_lock_true
+      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms6g -Xmx6g"
     deploy:
       placement:
