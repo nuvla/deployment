@@ -25,3 +25,6 @@ entryPoints:
 
 log:
   level: INFO
+
+metrics:
+  prometheus: {}

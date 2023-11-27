@@ -47,3 +47,9 @@ scrape_configs:
           - 'tasks.elasticsearch_exporter'
         type: 'A'
         port: 9114
+  - job_name: 'traefik'
+    dns_sd_configs:
+      - names:
+          - 'tasks.traefik'
+        type: 'A'
+        port: 8080
