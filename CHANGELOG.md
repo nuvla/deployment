@@ -2,6 +2,31 @@
 
 ## Released
 
+## [2.7.0](https://github.com/nuvla/deployment/compare/v2.6.0...v2.7.0) (2023-12-14)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.4.0 ([4205099](https://github.com/nuvla/deployment/commit/4205099bba5210cc7dd615928eb13abe9c25bb8a))
+* **job-engine:** nuvla/job:3.9.2 ([4205099](https://github.com/nuvla/deployment/commit/4205099bba5210cc7dd615928eb13abe9c25bb8a))
+* **ui:** nuvla/ui:2.36.0 ([4205099](https://github.com/nuvla/deployment/commit/4205099bba5210cc7dd615928eb13abe9c25bb8a))
+
+
+### Configuration
+
+* **monitoring:** Config to scrape Traefik metrics ([2a32a27](https://github.com/nuvla/deployment/commit/2a32a275aef6ceba94f9f1ab9fed0e64751e03bf))
+* **traefik:** Export Traefik metrics to Prometheus ([2a32a27](https://github.com/nuvla/deployment/commit/2a32a275aef6ceba94f9f1ab9fed0e64751e03bf))
+
+
+### Features
+
+* Deployment group public release ([4205099](https://github.com/nuvla/deployment/commit/4205099bba5210cc7dd615928eb13abe9c25bb8a))
+
+
+### Bug Fixes
+
+* **prod:** ES avoid swapping by memory lock ([#93](https://github.com/nuvla/deployment/issues/93)) ([af9c2ff](https://github.com/nuvla/deployment/commit/af9c2ff8061dcaa982d38abf3bcb1948e039eb01))
+
 ## [2.6.0](https://github.com/nuvla/deployment/compare/v2.5.0...v2.6.0) (2023-11-10)
 
 
