@@ -2,6 +2,13 @@
 
 ## Released
 
+## [2.8.1](https://github.com/nuvla/deployment/compare/v2.8.0...v2.8.1) (2024-03-22)
+
+
+### Dependencies
+
+* **monitoring:** Deprecated es exporter replaced by prometheuscommunity/elasticsearch-exporter:v1.7.0 ([926fc52](https://github.com/nuvla/deployment/commit/926fc5267ef313795b6ed06aa23650e5b662aea7))
+
 ## [2.8.0](https://github.com/nuvla/deployment/compare/v2.7.1...v2.8.0) (2024-03-22)
 
 
