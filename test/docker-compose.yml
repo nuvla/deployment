@@ -31,7 +31,7 @@ services:
       - test-net
 
   es:
-    image: nuvla/es:7.11.1.0
+    image: nuvla/es:8.11.3.0
     environment:
       - cluster.name=elasticsearch
       - http.publish_host=es
