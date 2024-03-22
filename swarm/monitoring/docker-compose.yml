@@ -148,22 +148,22 @@ services:
           memory: 64M
 
   elasticsearch_exporter:
-    image: justwatch/elasticsearch_exporter:1.1.0
+    image: prometheuscommunity/elasticsearch-exporter:v1.7.0
     command:
       - '--es.uri=http://es:9200'
       - '--es.all'
-      # Check for ES 7.x RBAC https://github.com/justwatchcom/elasticsearch_exporter#elasticsearch-7x-security-privileges
-      - '--es.cluster_settings'
       - '--es.indices'
       - '--es.indices_settings'
       - '--es.shards'
-      - '--es.snapshots'
+      - '--collector.clustersettings'
+      - '--collector.snapshots'
     deploy:
       mode: replicated
       replicas: 1
       placement:
         constraints:
           - node.role == manager
+    restart: always
     networks:
       - net
       # Must correspond to the network in which ES running.
