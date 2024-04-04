@@ -13,15 +13,15 @@ secrets:
     file: ./secrets/session.key
 
 configs:
-  log4j.properties:
-    file: ./log4j.properties
+  logback.xml:
+    file: ./logback.xml
 
 services:
   api:
-    image: nuvla/api:6.5.0
+    image: nuvla/api:6.6.2
     configs:
-      - source: log4j.properties
-        target: /opt/nuvla/server/resources/log4j.properties
+      - source: logback.xml
+        target: /opt/nuvla/server/resources/logback.xml
     environment:
       - ES_ENDPOINTS=es
       - ES_SNIFFER_INIT=yes
