@@ -66,10 +66,10 @@ services:
       - backend
 
   api:
-    image: nuvla/api:6.5.0
+    image: nuvla/api:6.6.2
     configs:
-      - source: log4j.properties
-        target: /opt/nuvla/server/resources/log4j.properties
+      - source: logback.xml
+        target: /opt/nuvla/server/resources/logback.xml
     environment:
       - ES_ENDPOINTS=es
       - ES_SNIFFER_INIT=no
@@ -96,7 +96,7 @@ services:
     healthcheck:
       start_period: 30s
       retries: 5
-      test: curl -sSf http://localhost:8200/api/cloud-entry-point || exit 1
+      test: wget -qO- http://localhost:8200/api/cloud-entry-point || exit 1
 
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
@@ -144,8 +144,8 @@ configs:
     file: ./traefik/traefik.yaml
   dynamic.yaml-1:
     file: ./traefik/dynamic.yaml
-  log4j.properties:
-    file: ./log4j.properties
+  logback.xml:
+    file: ./logback.xml
 
 networks:
   frontend:
