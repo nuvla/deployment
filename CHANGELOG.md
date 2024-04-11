@@ -2,6 +2,19 @@
 
 ## Released
 
+## [2.8.1](https://github.com/nuvla/deployment/compare/v2.8.0...v2.8.1) (2024-04-11)
+
+
+### Dependencies
+
+* **api:** nuvla/api:6.6.0 ([#99](https://github.com/nuvla/deployment/issues/99)) ([6fd3b4c](https://github.com/nuvla/deployment/commit/6fd3b4cd65ecb3a34268a85215fcbaa7c807bd50))
+* **monitoring:** Deprecated es exporter replaced by prometheuscommunity/elasticsearch-exporter:v1.7.0 ([926fc52](https://github.com/nuvla/deployment/commit/926fc5267ef313795b6ed06aa23650e5b662aea7))
+
+
+### Configuration
+
+* **api:** logback logging ([6fd3b4c](https://github.com/nuvla/deployment/commit/6fd3b4cd65ecb3a34268a85215fcbaa7c807bd50))
+
 ## [2.8.0](https://github.com/nuvla/deployment/compare/v2.7.1...v2.8.0) (2024-03-22)
 
 
