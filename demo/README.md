@@ -21,25 +21,22 @@ The `docker stack` commands below should then work.
 This can be started with the command:
 
 ```sh
-docker stack deploy -c docker-compose.yml demo
+docker stack deploy -c docker-compose.yml nuvla
 ```
-
-> **WARNING**: You must use the stack name "demo", unless you modify
-> the `docker-compose.yml` file.
 
 You can view the status of the deployment with:
 
 ```sh
-docker stack services demo
+docker stack services nuvla
 ```
 
-If this is the first time you've run the demo, it make take some time
-to download the images and to then start the services.
+If this is the first time you've run the demo, it may take some time
+to download the images and then start the services.
 
 With the service reference, you can view the logs of any service:
 
 ```sh
-docker service logs -f demo_api
+docker service logs -f nuvla_api
 ```
 
 changing the name of the service as necessary.
@@ -47,7 +44,7 @@ changing the name of the service as necessary.
 The browser interface for Nuvla can be accessed from
 `https://localhost/` and the API from
 `https://localhost/api/cloud-entry-point`.  assuming that you're
-running everything locally.  Change "localhost" to your host name when
+running everything locally.  Change "localhost" to your hostname when
 running remotely.
 
 > **NOTE**: The demonstration deployment uses self-signed
@@ -56,28 +53,28 @@ running remotely.
 
 ## Bootstrapping
 
-If NUVLA_SUPER_PASSWORD env variable is set and super user doesn't
+If NUVLA_SUPER_PASSWORD env variable is set and "super" user doesn't
 already exist, the super user will be created at the server
 startup. The default value is "supeR8-supeR8", but you can use a
-different value if you wish.
+different value.
 
 ## Stopping
 
 To stop the server, simply do the following:
 
 ```sh
-docker stack rm demo
+docker stack rm nuvla
 ```
 
 This should stop the containers and remove the containers and defined
 networks.
 
-The volumes ("demo_esdata", "demo_zkdata", and "demo_zkdatalog") will
+The volumes ("nuvla_esdata", "nuvla_zkdata", and "nuvla_zkdatalog") will
 remain and will be reused if the demonstration is restarted.  To
 remove them,
 
 ```sh
-docker volume rm demo_esdata demo_zkdata demo_zkdatalog
+docker volume rm nuvla_esdata nuvla_zkdata nuvla_zkdatalog
 ```
 
 or to remove all unused volumes:
@@ -91,10 +88,10 @@ volumes from all deployments.
 
 ## Manual Clean Up
 
-When running the command to remove the stack, it should asynchonously
+When running the command to remove the stack, it should asynchronously
 delete all the resources associated with the stack. Unfortunately,
 there are race conditions in the task management that may cause the
-"demo_frontend" network to enter a state where it cannot be deleted.
+"nuvla_frontend" network to enter a state where it cannot be deleted.
 
 The discussion around this issue can be found in a [GitHub
 issue](https://github.com/moby/moby/issues/32620) and a related
@@ -105,7 +102,7 @@ The only clean workaround is to restart the Docker daemon.
 
 ## Deploying demo Nuvla instance with notifications
 
-For demonstration of the notification feature of Nuvla use `docker-compose-notifs.yml`
+For a demonstration of the notification feature of Nuvla use `docker-compose-notifs.yml`
 for the deployment. To configure email notifications, please set the following 
 environment variables before launching the deployment.
 
