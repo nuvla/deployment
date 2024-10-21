@@ -2,6 +2,15 @@
 
 ## Released
 
+## [2.10.0](https://github.com/nuvla/deployment/compare/v2.9.0...v2.10.0) (2024-10-21)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.10.0 ([9a3e23d](https://github.com/nuvla/deployment/commit/9a3e23db089af2d9130f8fbf58954c1cce4c2093))
+* **job-engine:** nuvla/job:4.6.1 ([9a3e23d](https://github.com/nuvla/deployment/commit/9a3e23db089af2d9130f8fbf58954c1cce4c2093))
+* **ui:** nuvla/ui:2.40.0 ([9a3e23d](https://github.com/nuvla/deployment/commit/9a3e23db089af2d9130f8fbf58954c1cce4c2093))
+
 ## [2.9.0](https://github.com/nuvla/deployment/compare/v2.8.1...v2.9.0) (2024-09-25)
 
 
