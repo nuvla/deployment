@@ -1,8 +1,8 @@
 providers:
-  docker:
-    exposedByDefault: false
-    swarmMode: true
+  swarm:
+    endpoint: "unix:///var/run/docker.sock"
     network: traefik-public
+    exposedByDefault: false
     allowEmptyServices: true
   file:
     filename: dynamic.yaml

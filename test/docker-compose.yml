@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   proxy:
-    image: traefik:v2.9
+    image: traefik:v3.3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
@@ -75,7 +75,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=frontend"
+        - "traefik.swarm.network=frontend"
         - "traefik.http.services.api-service.loadbalancer.server.port=8200"
         - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
         - "traefik.http.middlewares.api-remove-authn-info.headers.customrequestheaders.nuvla-authn-info="

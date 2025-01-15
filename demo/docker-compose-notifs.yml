@@ -2,12 +2,14 @@ version: '3.7'
 
 services:
   proxy:
-    image: traefik:v2.9
+    image: traefik:v3.3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     configs:
-      - source: traefik.yaml
+      - source: traefik.yaml-1
         target: /traefik.yaml
+      - source: dynamic.yaml-1
+        target: /dynamic.yaml
     ports:
       - target: 80
         published: 80
@@ -29,9 +31,10 @@ services:
       - frontend
 
   es:
-    image: nuvla/es:7.11.1.0
+    image: nuvla/es:8.11.3.0
     environment:
       - cluster.name=elasticsearch
+      - http.publish_host=es
       - xpack.security.enabled=false
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -63,10 +66,10 @@ services:
       - backend
 
   api:
-    image: nuvla/api:6.0.16
+    image: nuvla/api:6.12.0
     configs:
-      - source: log4j.properties
-        target: /opt/nuvla/server/resources/log4j.properties
+      - source: logback.xml
+        target: /opt/nuvla/server/resources/logback.xml
     environment:
       - ES_ENDPOINTS=es
       - ES_SNIFFER_INIT=no
@@ -77,10 +80,12 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.docker.network=frontend"
+        - "traefik.swarm.network=frontend"
         - "traefik.http.services.api-service.loadbalancer.server.port=8200"
         - "traefik.http.services.api-service.loadbalancer.healthcheck.path=/api/cloud-entry-point"
-        - "traefik.http.middlewares.api-middleware.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.middlewares.api-remove-authn-info.headers.customrequestheaders.nuvla-authn-info="
+        - "traefik.http.middlewares.api-compress.compress=true"
+        - "traefik.http.middlewares.api-middleware.chain.middlewares=api-remove-authn-info,api-compress"
         - "traefik.http.routers.api-router.rule=PathPrefix(`/api`)"
         - "traefik.http.routers.api-router.entrypoints=websecure"
         - "traefik.http.routers.api-router.tls=true"
@@ -94,12 +99,12 @@ services:
     healthcheck:
       start_period: 30s
       retries: 5
-      test: curl -sSf http://localhost:8200/api/cloud-entry-point || exit 1
+      test: wget -qO- http://localhost:8200/api/cloud-entry-point || exit 1
 
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.33.6
+    image: nuvla/ui:2.42.0
     deploy:
       labels:
         - "traefik.enable=true"
@@ -115,7 +120,7 @@ services:
       - frontend
 
   job-executor:
-    image: nuvla/job:3.2.7
+    image: nuvla/job:4.9.0
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 2
@@ -126,7 +131,7 @@ services:
       - backend
 
   job-distributor:
-    image: nuvla/job:3.2.7
+    image: nuvla/job:4.9.0
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
@@ -267,20 +272,22 @@ services:
 
 
 configs:
-  traefik.yaml:
+  traefik.yaml-1:
     file: ./traefik/traefik.yaml
-  log4j.properties:
-    file: ./log4j.properties
+  dynamic.yaml-1:
+    file: ./traefik/dynamic.yaml
+  logback.xml:
+    file: ./logback.xml
   ksql-queries-file:
     file: ../streams/ksqldb/statements.replicas-1.sql
 
 networks:
   frontend:
-    driver: overlay
-    name: frontend
+    driver: "overlay"
+    name: "frontend"
   backend:
-    driver: overlay
-    name: backend
+    driver: "overlay"
+    name: "backend"
 
 volumes:
   esdata:
