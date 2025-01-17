@@ -2,6 +2,13 @@
 
 ## Released
 
+## [2.11.1](https://github.com/nuvla/deployment/compare/v2.11.0...v2.11.1) (2025-01-17)
+
+
+### Dependencies
+
+* **traefik:** Upgrade to Traefik v.3.3 ([#104](https://github.com/nuvla/deployment/issues/104)) ([410680e](https://github.com/nuvla/deployment/commit/410680ec08fe2aacced0ebb0bd6b515344864367))
+
 ## [2.11.0](https://github.com/nuvla/deployment/compare/v2.10.0...v2.11.0) (2024-12-13)
 
 
