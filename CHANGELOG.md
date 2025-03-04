@@ -2,6 +2,21 @@
 
 ## Released
 
+## [2.12.0](https://github.com/nuvla/deployment/compare/v2.11.0...v2.12.0) (2025-03-04)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.15.0 ([7c6fd0c](https://github.com/nuvla/deployment/commit/7c6fd0c21eac6c57a6a8ab1b0ba5783973a0a679))
+* **job-engine:** nuvla/job:4.10.0 ([7c6fd0c](https://github.com/nuvla/deployment/commit/7c6fd0c21eac6c57a6a8ab1b0ba5783973a0a679))
+* **traefik:** Upgrade to Traefik v.3.3 ([#104](https://github.com/nuvla/deployment/issues/104)) ([410680e](https://github.com/nuvla/deployment/commit/410680ec08fe2aacced0ebb0bd6b515344864367))
+* **ui:** nuvla/ui:2.46.0 ([7c6fd0c](https://github.com/nuvla/deployment/commit/7c6fd0c21eac6c57a6a8ab1b0ba5783973a0a679))
+
+
+### Features
+
+* **json logging:** Logging with telemere for api-server container config ([#106](https://github.com/nuvla/deployment/issues/106)) ([7c6fd0c](https://github.com/nuvla/deployment/commit/7c6fd0c21eac6c57a6a8ab1b0ba5783973a0a679))
+
 ## [2.11.0](https://github.com/nuvla/deployment/compare/v2.10.0...v2.11.0) (2024-12-13)
 
 
