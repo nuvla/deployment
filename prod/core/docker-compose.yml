@@ -1,5 +1,3 @@
-version: '3.7'
-
 networks:
   traefik-public:
     external: true
@@ -12,16 +10,9 @@ secrets:
   session.key:
     file: ./secrets/session.key
 
-configs:
-  logback.xml:
-    file: ./logback.xml
-
 services:
   api:
-    image: nuvla/api:6.12.0
-    configs:
-      - source: logback.xml
-        target: /opt/nuvla/server/resources/logback.xml
+    image: nuvla/api:6.15.0
     environment:
       - ES_ENDPOINTS=es
       - ES_SNIFFER_INIT=yes
@@ -31,6 +22,8 @@ services:
       - NUVLA_SUPER_PASSWORD=supeR8-supeR8
       - KAFKA_PRODUCER_INIT=yes
       - KAFKA_ENDPOINTS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
+      - JSON_LOGGING=true
+      - TAOENSSO_TELEMERE_RT_MIN_LEVEL={:default :info}
     secrets:
       - source: session.crt
         target: /etc/nuvla/session/session.crt
@@ -61,7 +54,7 @@ services:
   # User interface takes the paths /, /ui/*, anything else
   # is routed elsewhere.
   ui:
-    image: nuvla/ui:2.42.0
+    image: nuvla/ui:2.46.0
     deploy:
       placement:
         constraints:
@@ -80,7 +73,7 @@ services:
       - traefik-public
 
   job-executor:
-    image: nuvla/job:4.9.0
+    image: nuvla/job:4.10.0
     command: -- /app/job_executor.py --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
       replicas: 5
@@ -94,7 +87,7 @@ services:
       - nuvla-backend
 
   job-distributor:
-    image: nuvla/job:4.9.0
+    image: nuvla/job:4.10.0
     entrypoint: /app/job_distributor.py
     command: --api-url http://api:8200 --api-insecure --api-authn-header group/nuvla-admin --zk-hosts zk:2181
     deploy:
