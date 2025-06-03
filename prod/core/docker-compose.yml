@@ -24,6 +24,7 @@ services:
       - KAFKA_ENDPOINTS=${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}
       - JSON_LOGGING=true
       - TAOENSSO_TELEMERE_RT_MIN_LEVEL={:default :info}
+      - CREDENTIAL_ENCRYPTION_KEY=${CREDENTIAL_ENCRYPTION_KEY}
     secrets:
       - source: session.crt
         target: /etc/nuvla/session/session.crt

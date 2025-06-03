@@ -27,6 +27,10 @@ export SMTP_PASSWORD=password
 # requirements.
 export STREAMS_REPLICATION=false
 
+# Enable credential encryption in nuvla api server
+# Choose a strong key with more than 32 characters
+export CREDENTIAL_ENCRYPTION_KEY=
+
 #
 # Deploy traefik.
 #
