@@ -48,3 +48,6 @@ export DOCKER_HOST=<HOST>:2376
 If you want to backup Elasticsearch to S3, you can make S3 key and
 secret available for the installation. For details see
 [db/README.md](db/README.md).
+
+## Enable credential encryption
+
