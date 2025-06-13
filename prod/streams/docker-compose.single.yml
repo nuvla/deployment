@@ -105,7 +105,7 @@ services:
 
   # Notification service to Slack
   notify-slack:
-    image: nuvla/kafka-notify:0.6.1
+    image: nuvla/kafka-notify:0.10.0
     depends_on:
       - ksqldb-server
     networks:
@@ -113,11 +113,12 @@ services:
     command:
       - slack
     environment:
+      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
       NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
 
   # Notification service to Email
   notify-email:
-    image: nuvla/kafka-notify:0.6.1
+    image: nuvla/kafka-notify:0.10.0
     depends_on:
       - ksqldb-server
     networks:
@@ -125,16 +126,12 @@ services:
     command:
       - email
     environment:
+      KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_BOOTSTRAP_SERVERS:-kafka:9092}"
       NUVLA_ENDPOINT: "${NUVLA_ENDPOINT}"
-      # If not provided, will be taken from configuration/nuvla resource if defined there.
-      SMTP_HOST: "${SMTP_HOST}"
-      SMTP_PORT: "${SMTP_PORT}"
-      SMTP_SSL: "${SMTP_SSL}"
-      SMTP_USER: "${SMTP_USER}"
-      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      # See https://github.com/nuvla/kafka-notify for SMTP configuration via config file.
 
   subs-notifs:
-    image: nuvla/subs-notifs:0.0.7
+    image: nuvla/subs-notifs:0.1.0
     depends_on:
       - ksqldb-server
     networks:
