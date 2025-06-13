@@ -27,6 +27,9 @@ CREATE STREAM NOTIFICATIONS_S (
     subs_name VARCHAR,
     method_ids ARRAY<VARCHAR>,
     subs_description VARCHAR,
+    template VARCHAR,
+    trigger_resource_path VARCHAR,
+    trigger_resource_name VARCHAR,
     resource_uri VARCHAR,
     resource_name VARCHAR,
     resource_description VARCHAR,
@@ -49,6 +52,9 @@ SELECT
     subs_name,
     EXPLODE(method_ids) as method_id,
     subs_description,
+    template,
+    trigger_resource_path,
+    trigger_resource_name,
     resource_uri,
     resource_name,
     resource_description,
@@ -71,6 +77,9 @@ CREATE STREAM NOTIFICATIONS_EMAIL_S (
     subs_id VARCHAR,
     subs_name VARCHAR,
     subs_description VARCHAR,
+    template VARCHAR,
+    trigger_resource_path VARCHAR,
+    trigger_resource_name VARCHAR,
     resource_uri VARCHAR,
     resource_name VARCHAR,
     resource_description VARCHAR,
@@ -87,21 +96,24 @@ CREATE STREAM NOTIFICATIONS_EMAIL_S (
 
 INSERT INTO NOTIFICATIONS_EMAIL_S
 SELECT
-     notif.id as id,
-     notif.method as method,
-     notif.destination as destination,
-     ni.subs_id,
-     ni.subs_name,
-     ni.subs_description,
-     ni.resource_uri,
-     ni.resource_name,
-     ni.resource_description,
-     ni.metric,
-     ni.condition,
-     ni.condition_value,
-     ni."VALUE",
-     ni.timestamp,
-     ni.recovery
+    notif.id as id,
+    notif.method as method,
+    notif.destination as destination,
+    ni.subs_id,
+    ni.subs_name,
+    ni.subs_description,
+    ni.template,
+    ni.trigger_resource_path,
+    ni.trigger_resource_name,
+    ni.resource_uri,
+    ni.resource_name,
+    ni.resource_description,
+    ni.metric,
+    ni.condition,
+    ni.condition_value,
+    ni."VALUE",
+    ni.timestamp,
+    ni.recovery
 FROM NOTIFICATIONS_INDIVIDUAL_S AS ni
 JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = ni.method_id
 WHERE LCASE(notif.method) = 'email'
@@ -117,6 +129,9 @@ CREATE STREAM NOTIFICATIONS_SLACK_S (
     subs_id VARCHAR,
     subs_name VARCHAR,
     subs_description VARCHAR,
+    template VARCHAR,
+    trigger_resource_path VARCHAR,
+    trigger_resource_name VARCHAR,
     resource_uri VARCHAR,
     resource_name VARCHAR,
     resource_description VARCHAR,
@@ -135,24 +150,81 @@ CREATE STREAM NOTIFICATIONS_SLACK_S (
 
 INSERT INTO NOTIFICATIONS_SLACK_S
 SELECT
-     notif.id as id,
-     notif.method as method,
-     notif.destination as destination,
-     ni.subs_id,
-     ni.subs_name,
-     ni.subs_description,
-     ni.resource_uri,
-     ni.resource_name,
-     ni.resource_description,
-     ni.metric,
-     ni.condition,
-     ni.condition_value,
-     ni."VALUE",
-     ni.timestamp,
-     ni.recovery
+    notif.id as id,
+    notif.method as method,
+    notif.destination as destination,
+    ni.subs_id,
+    ni.subs_name,
+    ni.subs_description,
+    ni.template,
+    ni.trigger_resource_path,
+    ni.trigger_resource_name,
+    ni.resource_uri,
+    ni.resource_name,
+    ni.resource_description,
+    ni.metric,
+    ni.condition,
+    ni.condition_value,
+    ni."VALUE",
+    ni.timestamp,
+    ni.recovery
 FROM NOTIFICATIONS_INDIVIDUAL_S AS ni
 JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = ni.method_id
 WHERE LCASE(notif.method) = 'slack'
+EMIT CHANGES;
+
+--
+-- mqtt notifications stream
+-- keyed by subscription ID
+CREATE STREAM NOTIFICATIONS_MQTT_S (
+    id VARCHAR KEY,
+    method VARCHAR,
+    destination VARCHAR,
+    subs_id VARCHAR,
+    subs_name VARCHAR,
+    subs_description VARCHAR,
+    template VARCHAR,
+    trigger_resource_path VARCHAR,
+    trigger_resource_name VARCHAR,
+    resource_uri VARCHAR,
+    resource_name VARCHAR,
+    resource_description VARCHAR,
+    metric VARCHAR,
+    condition VARCHAR,
+    condition_value VARCHAR,
+    "VALUE" VARCHAR,
+    timestamp VARCHAR,
+    recovery BOOLEAN
+) WITH (
+    KAFKA_TOPIC='NOTIFICATIONS_MQTT_S',
+    PARTITIONS=1,
+    REPLICAS=1,
+    VALUE_FORMAT = 'JSON');
+
+
+INSERT INTO NOTIFICATIONS_MQTT_S
+SELECT
+    notif.id as id,
+    notif.method as method,
+    notif.destination as destination,
+    ni.subs_id,
+    ni.subs_name,
+    ni.subs_description,
+    ni.template,
+    ni.trigger_resource_path,
+    ni.trigger_resource_name,
+    ni.resource_uri,
+    ni.resource_name,
+    ni.resource_description,
+    ni.metric,
+    ni.condition,
+    ni.condition_value,
+    ni."VALUE",
+    ni.timestamp,
+    ni.recovery
+FROM NOTIFICATIONS_INDIVIDUAL_S AS ni
+JOIN NOTIFICATION_METHOD_T AS notif ON notif.id = ni.method_id
+WHERE LCASE(notif.method) = 'mqtt'
 EMIT CHANGES;
 
 ---------------------------------
@@ -195,6 +267,7 @@ CREATE STREAM NUVLAEDGE_STATUS_S (
                            disks ARRAY<STRUCT<"used" BIGINT, "capacity" BIGINT, "device" VARCHAR>>>,
    "current-time" VARCHAR,
    updated VARCHAR,
+   "nuvlabox-engine-version" VARCHAR,
    acl STRUCT<"owners" ARRAY<VARCHAR>,
               "view-data" ARRAY<VARCHAR>
    >)
@@ -215,15 +288,10 @@ SELECT
     "online-prev" as online_prev,
     network,
     resources,
-    (resources->cpu->"load" * 100) / resources->cpu->"capacity" as resources_cpu_load_pers,
-    (resources->ram->"used" * 100) / resources->ram->"capacity" as resources_ram_used_pers,
-    (resources->disks[1]->"used" * 100) / resources->disks[1]->"capacity" as resources_disk1_used_pers,
     "resources-prev" as resources_prev,
-    ("resources-prev"->cpu->"load" * 100) / "resources-prev"->cpu->"capacity" as resources_prev_cpu_load_pers,
-    ("resources-prev"->ram->"used" * 100) / "resources-prev"->ram->"capacity" as resources_prev_ram_used_pers,
-    ("resources-prev"->disks[1]->"used" * 100) / "resources-prev"->disks[1]->"capacity" as resources_prev_disk1_used_pers,
     "current-time" as timestamp,
     updated as nuvla_timestamp,
+    "nuvlabox-engine-version" as nuvlabox_engine_version,
     tlm.acl as acl
 FROM NUVLAEDGE_STATUS_S as tlm
 JOIN NUVLAEDGE_T as nb ON tlm.parent = nb.id
