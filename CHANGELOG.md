@@ -2,6 +2,20 @@
 
 ## Released
 
+## [2.13.0](https://github.com/nuvla/deployment/compare/v2.12.0...v2.13.0) (2025-06-13)
+
+
+### Dependencies
+
+* **api-server:** nuvla/api:6.16.0 ([50e33d3](https://github.com/nuvla/deployment/commit/50e33d367cc464dd23cf085121aacbbc263a5e50))
+* **job-engine:** nuvla/job:5.1.0 ([50e33d3](https://github.com/nuvla/deployment/commit/50e33d367cc464dd23cf085121aacbbc263a5e50))
+* **ui:** nuvla/ui:2.47.0 ([50e33d3](https://github.com/nuvla/deployment/commit/50e33d367cc464dd23cf085121aacbbc263a5e50))
+
+
+### Configuration
+
+* **prod:** Add credential encryption key env variable ([#107](https://github.com/nuvla/deployment/issues/107)) ([50e33d3](https://github.com/nuvla/deployment/commit/50e33d367cc464dd23cf085121aacbbc263a5e50))
+
 ## [2.12.0](https://github.com/nuvla/deployment/compare/v2.11.0...v2.12.0) (2025-03-04)
 
 
